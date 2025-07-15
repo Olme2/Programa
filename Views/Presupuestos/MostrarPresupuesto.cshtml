@@ -9,7 +9,6 @@
 <h3>Detalles del Presupuesto @Model.IdPresupuesto</h3>  
 <div class="container mt-4">
     <div class="mb-4">
-        <p>Nombre del Cliente: @Model.Cliente.Nombre</p>
         <p>Fecha de Creación: @Model.FechaCreacion.ToString("dd/MM/yyyy HH:mm")</p>
     </div>
     @if(Model.Detalle.Count>0){
@@ -27,13 +26,9 @@
                     double total = 0;
                     foreach (var detalle in Model.Detalle)
                     {
-                        double subtotal = detalle.Producto.Precio * detalle.Cantidad;
-                        total += subtotal;
                     <tr>
-                        <td>@detalle.Producto.Descripcion</td>
                         <td>@String.Format("{0:N2}", detalle.Producto.Precio)</td>
                         <td>@detalle.Cantidad</td>
-                        <td>$@String.Format("{0:N2}", subtotal)</td>
                     </tr>
                     }
                 }

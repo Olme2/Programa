@@ -1,20 +1,26 @@
-@model Productos
+@model ListarProductosViewModel
 
-@if(ViewBag.ErrorMessage != null){
-    <div class="error-message">
-        <p>@ViewBag.ErrorMessage</p>
-    </div>
+@using System.Globalization
+
+@{
+    var nf = new NumberFormatInfo {
+        NumberDecimalSeparator = ",",
+        NumberGroupSeparator = "."
+    };
 }
 
-<div class="container mt-4">
-    <div class="mb-4">
-        <h2 class="text-center">Producto n° @Model.IdProducto</h2>
-        <p class="text-center">Descripcion: @Model.Descripcion</p>
-        <p class="text-center">Precio: $@Model.Precio</p>
-    </div>
-    <h3 class="text-center">¿Está seguro de eliminar este producto?</h3>
-    <div class="text-center">
-        <a asp-controller="Productos" asp-action="EliminarProductoPorId" asp-route-id="@Model.IdProducto" class="btn btn-danger">Eliminar</a>
-        <a asp-controller="Productos" asp-action="Index" class="btn btn-secondary">Cancelar</a>
-    </div>
-</div>
+<h3>Eliminar producto</h3>
+<p>¿Estás seguro que deseas eliminar el producto "<strong>@Model.Producto</strong>"?</p>
+<ul>
+    <li><strong>Proveedor:</strong> @Model.Proveedor</li>
+    <li><strong>Stock:</strong> @Model.Stock.ToString("N2", nf)</li>
+    <li><strong>Costo:</strong> $@Model.Costo.ToString("N2", nf)</li>
+    <li><strong>Precio:</strong> $@Model.Precio.ToString("N2",nf)</li>
+    <li><strong>Ganancia:</strong> $@Model.Ganancia.ToString("N2",nf)</li>
+    <li><strong>% Ganancia:</strong> @Model.PorcentajeGanancia.ToString("N2",nf)%</li>
+</ul>
+<form asp-controller="Productos" asp-action="EliminarProducto" method="post">
+    <input type="hidden" asp-for="IdProducto" />
+    <button type="submit" class="btn btn-danger">Eliminar</button>
+    <a asp-action="Index" class="btn btn-secondary">Cancelar</a>
+</form>

@@ -1,15 +1,31 @@
-using System.ComponentModel.DataAnnotations; 
-public class AltaProductoViewModel{
-    private string descripcion;
-    private int precio;
-
-    public AltaProductoViewModel(){
+using System.ComponentModel.DataAnnotations;
+public class AltaProductoViewModel
+{
+    private string producto;
+    private int idProveedor;
+    private decimal stock;
+    private decimal costo;
+    private decimal precio;
+    private List<ListarProveedoresViewModel> proveedores;
+    public AltaProductoViewModel()
+    {
+        producto = string.Empty;
+        proveedores = new List<ListarProveedoresViewModel>();
     }
-
-    [StringLength(250, ErrorMessage = "La descripcion no puede ser mas larga que 250 caracteres")]
-    public string Descripcion { get => descripcion; set => descripcion = value;}
-
-    [Required(ErrorMessage = "Precio obligatorio")]
-    [Range(1, int.MaxValue, ErrorMessage = "Precio positivo")]
-    public int Precio { get => precio; set => precio = value;}
+    public AltaProductoViewModel(List<ListarProveedoresViewModel> Proveedores)
+    {
+        producto = string.Empty;
+        proveedores = Proveedores;
+    }
+    [Required(ErrorMessage = "Nombre Obligatorio")]
+    public string Producto { get => producto; set => producto = value; }
+    [Required(ErrorMessage = "Id proveedor obligatorio")]
+    public int IdProveedor { get => idProveedor; set => idProveedor = value; }
+    [Required(ErrorMessage = "Stock Obligatorio")]
+    public decimal Stock { get => stock; set => stock = value; }
+    [Required(ErrorMessage = "Costo Obligatorio")]
+    public decimal Costo { get => costo; set => costo = value; }
+    [Required(ErrorMessage = "Precio Obligatorio")]
+    public decimal Precio { get => precio; set => precio = value; }
+    public List<ListarProveedoresViewModel> Proveedores { get => proveedores;  set => proveedores = value; }
 }

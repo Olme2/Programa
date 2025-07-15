@@ -1,0 +1,36 @@
+@model ListarProveedoresViewModel
+
+@{
+    ViewData["Title"] = "Eliminar Proveedor";
+}
+
+<h1>Eliminar Proveedor</h1>
+
+<div class="alert alert-danger">
+    <h4>¿Está seguro que desea eliminar este proveedor?</h4>
+</div>
+
+<div class="row">
+    <div class="col-md-6">
+        <dl class="row">
+            <dt class="col-sm-4">Proveedor:</dt>
+            <dd class="col-sm-8">@Model.Proveedor</dd>
+            
+            <dt class="col-sm-4">Contacto:</dt>
+            <dd class="col-sm-8">@Model.Contacto</dd>
+        </dl>
+        
+        <form asp-action="EliminarProveedor" method="post">
+            <input type="hidden" asp-for="IdProveedor" />
+            <input type="submit" value="Eliminar" class="btn btn-danger" />
+            <a asp-action="Index" class="btn btn-secondary">Cancelar</a>
+        </form>
+    </div>
+</div>
+
+@if (ViewBag.ErrorMessage != null)
+{
+    <div class="alert alert-danger mt-3">
+        @ViewBag.ErrorMessage
+    </div>
+}

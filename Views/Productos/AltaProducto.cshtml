@@ -7,11 +7,32 @@
 }
 
 <h3>Creacion de nuevo producto</h3>
-<form asp-controller="Productos" asp-action="CrearProducto" method="post" class="form">
+<form asp-controller="Productos" asp-action="AltaProducto" method="post" class="form">
     <div class="form-group">
-    <label asp-for="Descripcion">Descripción</label>
-    <input asp-for="Descripcion" class="form-control" required>
-    <span asp-validation-for="Descripcion" class="text-danger"></span>
+        <label asp-for="Producto">Nombre</label>
+        <input asp-for="Producto" class="form-control" required>
+        <span asp-validation-for="Producto" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="IdProveedor">Proveedor</label>
+        <select asp-for="IdProveedor" class="form-control" required>
+            <option value="">Seleccione un proveedor</option>
+            @foreach (var proveedor in Model.Proveedores)
+            {
+                <option value="@proveedor.IdProveedor">@proveedor.Proveedor</option>
+            }
+        </select>
+        <span asp-validation-for="IdProveedor" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="Stock">Stock (kg)</label>
+        <input asp-for="Stock" class="form-control" required>
+        <span asp-validation-for="Stock" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+    <label asp-for="Costo">Costo</label>
+    <input asp-for="Costo" placeholder="Costo" class="form-control" required>
+    <span asp-validation-for="Costo" class="text-danger"></span>
     </div>
     <div class="form-group">
     <label asp-for="Precio">Precio</label>

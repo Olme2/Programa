@@ -1,4 +1,6 @@
 @model ModificarProductoViewModel
+@using Microsoft.AspNetCore.Mvc.Rendering
+
 
 @if(ViewBag.ErrorMessage != null){
     <div class="error-message">
@@ -6,24 +8,43 @@
     </div>
 }
 
-<h2 class="text-center">Modificar Producto n° @Model.IdProducto</h2>
-<form asp-controller="Productos" asp-action="ModificarProductoPorId" method="post" class="form">
-    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+<h3>Modificar producto</h3>
+<form asp-controller="Productos" asp-action="ModificarProducto" method="post" class="form">
+    <input type="hidden" asp-for="IdProducto" />
     <div class="form-group">
-        <label asp-for="Descripcion">Descripcion</label>
-        <input asp-for="Descripcion" value="@Model.Descripcion" class="form-control" required>
-        <span asp-validation-for="Descripcion" class="text-danger"></span>
+        <label asp-for="Producto">Nombre</label>
+        <input asp-for="Producto" class="form-control" required>
+        <span asp-validation-for="Producto" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="IdProveedor">Proveedor</label>
+        <select asp-for="IdProveedor" class="form-control" required>
+            <option value="">Seleccione un proveedor</option>
+            @foreach (var proveedor in Model.Proveedores)
+            {
+                <option value="@proveedor.IdProveedor">@proveedor.Proveedor</option>
+            }
+        </select>
+        <span asp-validation-for="IdProveedor" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="Stock">Stock</label>
+        <input asp-for="Stock" class="form-control" required>
+        <span asp-validation-for="Stock" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="Costo">Costo</label>
+        <input asp-for="Costo" class="form-control" required>
+        <span asp-validation-for="Costo" class="text-danger"></span>
     </div>
     <div class="form-group">
         <label asp-for="Precio">Precio</label>
-        <input asp-for="Precio" value="@Model.Precio" class="form-control" required>
+        <input asp-for="Precio" class="form-control" required>
         <span asp-validation-for="Precio" class="text-danger"></span>
     </div>
-    <input type="hidden" asp-for="IdProducto" value="@Model.IdProducto">
-    <div class=" mt-3">
-        <button type="submit" class="btn btn-primary">Modificar</button>
+    <div class="mt-3">
+        <button type="submit" class="btn btn-primary">Guardar</button>
         <a asp-action="Index" class="btn btn-danger">Cancelar</a>
     </div>
 </form>
-
 @section Scripts{<partial name="_ValidationScriptsPartial"/>}

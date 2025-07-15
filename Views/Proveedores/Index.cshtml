@@ -1,0 +1,43 @@
+@model List<ListarProveedoresViewModel>
+@using Microsoft.AspNetCore.Mvc.Rendering
+@{
+    ViewData["Title"] = "Proveedores";
+}
+
+<h1>Lista de Proveedores</h1>
+
+@if (ViewBag.ErrorMessage != null)
+{
+    <div class="alert alert-danger">
+        @ViewBag.ErrorMessage
+    </div>
+}
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Proveedor</th>
+            <th>Contacto</th>
+            <th>Acciones</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var proveedor in Model)
+        {
+            <tr>
+                <td>@proveedor.Proveedor</td>
+                @if(proveedor.Contacto == null){
+                    <td>Sin datos de contacto</td>
+                }else{
+                    <td>@proveedor.Contacto</td>
+                }
+                <td>
+                    <a asp-action="ModificarProveedor" asp-route-id="@proveedor.IdProveedor" class="btn btn-warning btn-sm">Modificar</a>
+                    <a asp-action="EliminarProveedor" asp-route-id="@proveedor.IdProveedor" class="btn btn-danger btn-sm">Eliminar</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<a asp-action="AltaProveedor" class="btn btn-primary">Crear Nuevo Proveedor</a>

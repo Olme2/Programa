@@ -1,6 +1,6 @@
 using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
-using tl2_tp6_2024_Olme2.Models;
+using entornoPolleria.Models;
 public class HomeController : Controller
 {
     private readonly ILogger<HomeController> _logger;
@@ -12,13 +12,11 @@ public class HomeController : Controller
 
     public IActionResult Index()
     {
-        if (string.IsNullOrEmpty(HttpContext.Session.GetString("usuario"))) return RedirectToAction ("Index", "Login");
         return View();
     }
 
     public IActionResult Privacy()
     {
-        if (string.IsNullOrEmpty(HttpContext.Session.GetString("User"))) return RedirectToAction ("Index", "Login");
         return View();
     }
 

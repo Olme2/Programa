@@ -7,111 +7,111 @@ build_property.InvariantGlobalization =
 build_property.PlatformNeutralAssembly = 
 build_property.EnforceExtendedAnalyzerRules = 
 build_property._SupportedPlatformList = Linux,macOS,Windows
-build_property.RootNamespace = tl2_tp6_2024_Olme2
-build_property.RootNamespace = tl2_tp6_2024_Olme2
-build_property.ProjectDir = C:\tl2-tp6-2024-Olme2\
+build_property.RootNamespace = entornoPolleria
+build_property.RootNamespace = entornoPolleria
+build_property.ProjectDir = C:\Users\Valentino\OneDrive\Desktop\Polleria\Programa\
 build_property.EnableComHosting = 
 build_property.EnableGeneratedComInterfaceComImportInterop = 
 build_property.RazorLangVersion = 8.0
 build_property.SupportLocalizedComponentNames = 
 build_property.GenerateRazorMetadataSourceChecksumAttributes = 
-build_property.MSBuildProjectDirectory = C:\tl2-tp6-2024-Olme2
+build_property.MSBuildProjectDirectory = C:\Users\Valentino\OneDrive\Desktop\Polleria\Programa
 build_property._RazorSourceGeneratorDebug = 
 build_property.EffectiveAnalysisLevelStyle = 9.0
 build_property.EnableCodeStyleSeverity = 
 
-[C:/tl2-tp6-2024-Olme2/Views/Clientes/AltaCliente.cshtml]
+[C:/Users/Valentino/OneDrive/Desktop/Polleria/Programa/Views/Clientes/AltaCliente.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQ2xpZW50ZXNcQWx0YUNsaWVudGUuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/tl2-tp6-2024-Olme2/Views/Clientes/EliminarCliente.cshtml]
+[C:/Users/Valentino/OneDrive/Desktop/Polleria/Programa/Views/Clientes/EliminarCliente.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQ2xpZW50ZXNcRWxpbWluYXJDbGllbnRlLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/tl2-tp6-2024-Olme2/Views/Clientes/Index.cshtml]
+[C:/Users/Valentino/OneDrive/Desktop/Polleria/Programa/Views/Clientes/Index.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQ2xpZW50ZXNcSW5kZXguY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/tl2-tp6-2024-Olme2/Views/Clientes/ModificarCliente.cshtml]
+[C:/Users/Valentino/OneDrive/Desktop/Polleria/Programa/Views/Clientes/ModificarCliente.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQ2xpZW50ZXNcTW9kaWZpY2FyQ2xpZW50ZS5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/tl2-tp6-2024-Olme2/Views/Home/Index.cshtml]
+[C:/Users/Valentino/OneDrive/Desktop/Polleria/Programa/Views/Home/Index.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcSG9tZVxJbmRleC5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/tl2-tp6-2024-Olme2/Views/Home/Privacy.cshtml]
+[C:/Users/Valentino/OneDrive/Desktop/Polleria/Programa/Views/Home/Privacy.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcSG9tZVxQcml2YWN5LmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/tl2-tp6-2024-Olme2/Views/Login/CrearUsuario.cshtml]
+[C:/Users/Valentino/OneDrive/Desktop/Polleria/Programa/Views/Login/CrearUsuario.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTG9naW5cQ3JlYXJVc3VhcmlvLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/tl2-tp6-2024-Olme2/Views/Login/Index.cshtml]
+[C:/Users/Valentino/OneDrive/Desktop/Polleria/Programa/Views/Login/Index.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTG9naW5cSW5kZXguY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/tl2-tp6-2024-Olme2/Views/Presupuestos/AgregarProductosAPresupuesto.cshtml]
+[C:/Users/Valentino/OneDrive/Desktop/Polleria/Programa/Views/Presupuestos/AgregarProductosAPresupuesto.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcUHJlc3VwdWVzdG9zXEFncmVnYXJQcm9kdWN0b3NBUHJlc3VwdWVzdG8uY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/tl2-tp6-2024-Olme2/Views/Presupuestos/AltaPresupuesto.cshtml]
+[C:/Users/Valentino/OneDrive/Desktop/Polleria/Programa/Views/Presupuestos/AltaPresupuesto.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcUHJlc3VwdWVzdG9zXEFsdGFQcmVzdXB1ZXN0by5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/tl2-tp6-2024-Olme2/Views/Presupuestos/EliminarPresupuesto.cshtml]
+[C:/Users/Valentino/OneDrive/Desktop/Polleria/Programa/Views/Presupuestos/EliminarPresupuesto.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcUHJlc3VwdWVzdG9zXEVsaW1pbmFyUHJlc3VwdWVzdG8uY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/tl2-tp6-2024-Olme2/Views/Presupuestos/EliminarProductosDePresupuesto.cshtml]
+[C:/Users/Valentino/OneDrive/Desktop/Polleria/Programa/Views/Presupuestos/EliminarProductosDePresupuesto.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcUHJlc3VwdWVzdG9zXEVsaW1pbmFyUHJvZHVjdG9zRGVQcmVzdXB1ZXN0by5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/tl2-tp6-2024-Olme2/Views/Presupuestos/Index.cshtml]
+[C:/Users/Valentino/OneDrive/Desktop/Polleria/Programa/Views/Presupuestos/Index.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcUHJlc3VwdWVzdG9zXEluZGV4LmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/tl2-tp6-2024-Olme2/Views/Presupuestos/ModificarPresupuesto.cshtml]
+[C:/Users/Valentino/OneDrive/Desktop/Polleria/Programa/Views/Presupuestos/ModificarPresupuesto.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcUHJlc3VwdWVzdG9zXE1vZGlmaWNhclByZXN1cHVlc3RvLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/tl2-tp6-2024-Olme2/Views/Presupuestos/MostrarPresupuesto.cshtml]
+[C:/Users/Valentino/OneDrive/Desktop/Polleria/Programa/Views/Presupuestos/MostrarPresupuesto.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcUHJlc3VwdWVzdG9zXE1vc3RyYXJQcmVzdXB1ZXN0by5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/tl2-tp6-2024-Olme2/Views/Productos/AltaProducto.cshtml]
+[C:/Users/Valentino/OneDrive/Desktop/Polleria/Programa/Views/Productos/AltaProducto.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcUHJvZHVjdG9zXEFsdGFQcm9kdWN0by5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/tl2-tp6-2024-Olme2/Views/Productos/EliminarProducto.cshtml]
+[C:/Users/Valentino/OneDrive/Desktop/Polleria/Programa/Views/Productos/EliminarProducto.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcUHJvZHVjdG9zXEVsaW1pbmFyUHJvZHVjdG8uY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/tl2-tp6-2024-Olme2/Views/Productos/index.cshtml]
+[C:/Users/Valentino/OneDrive/Desktop/Polleria/Programa/Views/Productos/index.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcUHJvZHVjdG9zXGluZGV4LmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/tl2-tp6-2024-Olme2/Views/Productos/ModificarProducto.cshtml]
+[C:/Users/Valentino/OneDrive/Desktop/Polleria/Programa/Views/Productos/ModificarProducto.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcUHJvZHVjdG9zXE1vZGlmaWNhclByb2R1Y3RvLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/tl2-tp6-2024-Olme2/Views/Shared/Error.cshtml]
+[C:/Users/Valentino/OneDrive/Desktop/Polleria/Programa/Views/Shared/Error.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXEVycm9yLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/tl2-tp6-2024-Olme2/Views/Shared/_ValidationScriptsPartial.cshtml]
+[C:/Users/Valentino/OneDrive/Desktop/Polleria/Programa/Views/Shared/_ValidationScriptsPartial.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXF9WYWxpZGF0aW9uU2NyaXB0c1BhcnRpYWwuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/tl2-tp6-2024-Olme2/Views/_ViewImports.cshtml]
+[C:/Users/Valentino/OneDrive/Desktop/Polleria/Programa/Views/_ViewImports.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcX1ZpZXdJbXBvcnRzLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/tl2-tp6-2024-Olme2/Views/_ViewStart.cshtml]
+[C:/Users/Valentino/OneDrive/Desktop/Polleria/Programa/Views/_ViewStart.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcX1ZpZXdTdGFydC5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/tl2-tp6-2024-Olme2/Views/Shared/_Layout.cshtml]
+[C:/Users/Valentino/OneDrive/Desktop/Polleria/Programa/Views/Shared/_Layout.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXF9MYXlvdXQuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = b-xwm5wsakz1

@@ -8,7 +8,6 @@ public class ModificarPresupuestoViewModel{
     
     public ModificarPresupuestoViewModel(Presupuestos presupuesto){
         idPresupuesto = presupuesto.IdPresupuesto;
-        idCliente = presupuesto.Cliente.ClienteId;
         fechaCreacion = presupuesto.FechaCreacion;
     }
 

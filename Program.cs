@@ -1,11 +1,10 @@
+using Microsoft.EntityFrameworkCore;
+using entornoPolleria;
+using System.Globalization;
 var builder = WebApplication.CreateBuilder(args);
-builder.Services.AddSingleton<IClientesRepository,ClientesRepository>();
-builder.Services.AddSingleton<IPresupuestosRepository, PresupuestosRepository>();
-builder.Services.AddSingleton<IProductosRepository, ProductosRepository>();
-builder.Services.AddScoped<IUsuariosRepository, UsuariosRepository>();
-
-var CadenaDeConexion = builder.Configuration.GetConnectionString("SqliteConexion")!.ToString();
-builder.Services.AddSingleton(CadenaDeConexion);
+builder.Services.AddScoped<IPresupuestosRepository, PresupuestosRepository>();
+builder.Services.AddScoped<IProductosRepository, ProductosRepository>();
+builder.Services.AddScoped<IProveedoresRepository, ProveedoresRepository>();
 // Add services to the container.
 builder.Services.AddSession(options =>
 {
@@ -14,6 +13,9 @@ builder.Services.AddSession(options =>
     options.Cookie.IsEssential = true; 
 });
 builder.Services.AddControllersWithViews();
+AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
+builder.Services.AddDbContext<AppDbContext>(options => 
+    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 var app = builder.Build();
 app.UseSession();
 // Configure the HTTP request pipeline.
@@ -23,7 +25,9 @@ if (!app.Environment.IsDevelopment())
     // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
 }
-
+var cultureInfo = new CultureInfo("en-US");
+CultureInfo.DefaultThreadCurrentCulture = cultureInfo;
+CultureInfo.DefaultThreadCurrentUICulture = cultureInfo;
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 
@@ -33,6 +37,6 @@ app.UseAuthorization();
 
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=Login}/{action=Index}/{id?}");
+    pattern: "{controller=Home}/{action=Index}/{id?}");
 
 app.Run();

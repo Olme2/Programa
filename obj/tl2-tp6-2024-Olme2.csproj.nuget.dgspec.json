@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\tl2-tp6-2024-Olme2\\tl2-tp6-2024-Olme2.csproj": {}
+    "C:\\Users\\Valentino\\OneDrive\\Desktop\\Polleria\\Programa\\tl2-tp6-2024-Olme2.csproj": {}
   },
   "projects": {
-    "C:\\tl2-tp6-2024-Olme2\\tl2-tp6-2024-Olme2.csproj": {
+    "C:\\Users\\Valentino\\OneDrive\\Desktop\\Polleria\\Programa\\tl2-tp6-2024-Olme2.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\tl2-tp6-2024-Olme2\\tl2-tp6-2024-Olme2.csproj",
+        "projectUniqueName": "C:\\Users\\Valentino\\OneDrive\\Desktop\\Polleria\\Programa\\tl2-tp6-2024-Olme2.csproj",
         "projectName": "tl2-tp6-2024-Olme2",
-        "projectPath": "C:\\tl2-tp6-2024-Olme2\\tl2-tp6-2024-Olme2.csproj",
+        "projectPath": "C:\\Users\\Valentino\\OneDrive\\Desktop\\Polleria\\Programa\\tl2-tp6-2024-Olme2.csproj",
         "packagesPath": "C:\\Users\\Valentino\\.nuget\\packages\\",
-        "outputPath": "C:\\tl2-tp6-2024-Olme2\\obj\\",
+        "outputPath": "C:\\Users\\Valentino\\OneDrive\\Desktop\\Polleria\\Programa\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"

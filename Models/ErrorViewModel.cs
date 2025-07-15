@@ -1,4 +1,4 @@
-namespace tl2_tp6_2024_Olme2.Models;
+namespace entornoPolleria.Models;
 
 public class ErrorViewModel
 {

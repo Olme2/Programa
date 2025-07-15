@@ -5,15 +5,22 @@ namespace Controllers;
 public class ProductosController : Controller{
     private readonly ILogger<ProductosController> _logger;
     private IProductosRepository repositorioProductos;
-    public ProductosController(ILogger<ProductosController> logger, IProductosRepository RepositorioProductos){
-        _logger=logger;
+    private IProveedoresRepository repositorioProveedores;
+    public ProductosController(ILogger<ProductosController> logger, IProductosRepository RepositorioProductos, IProveedoresRepository RepositorioProveedores)
+    {
+        _logger = logger;
         repositorioProductos = RepositorioProductos;
+        repositorioProveedores = RepositorioProveedores;
     }
     public IActionResult Index(){
         try{
-            if(string.IsNullOrEmpty(HttpContext.Session.GetString("usuario"))) return RedirectToAction("Index", "Login");
-            ViewData["EsAdmin"] = HttpContext.Session.GetString("Rol") == "Admin";
-            return View(repositorioProductos.ListarProductosRegistrados());
+            var productosVM = new List<ListarProductosViewModel>();
+            var productos = repositorioProductos.ListarProductosRegistrados();
+                productosVM = productos.Select(p =>{
+                var nombreProveedor = repositorioProveedores.ObtenerDetallesDeProveedorPorId(p.IdProveedor).Proveedor;
+                return new ListarProductosViewModel(p, nombreProveedor);
+            }).ToList();
+            return View(productosVM);
         }catch(Exception e){
             _logger.LogError(e.ToString());
             ViewBag.ErrorMessage = "No se pudo cargó la lista de productos correctamente";
@@ -23,13 +30,10 @@ public class ProductosController : Controller{
     [HttpGet]
     public IActionResult AltaProducto(){
         try{
-            if(string.IsNullOrEmpty(HttpContext.Session.GetString("usuario"))) return RedirectToAction("Index", "Login");
-            if (HttpContext.Session.GetString("Rol") != "Admin")
-            {
-                TempData["ErrorMessage"] = "Sin permisos para realizar esta acción";
-                return RedirectToAction("Index");
-            }
-            return View();
+            var proveedores = repositorioProveedores.ListarProveedores();
+            var proveedoresVM = proveedores.Select(p => new ListarProveedoresViewModel(p)).ToList();
+            var model = new AltaProductoViewModel(proveedoresVM);
+            return View(model);
         }catch(Exception e){
             _logger.LogError(e.ToString());
             ViewBag.ErrorMessage = "No se pudo cargó el formulario de creación de producto correctamente";
@@ -37,90 +41,80 @@ public class ProductosController : Controller{
         }
     }
     [HttpPost]
-    public IActionResult CrearProducto(AltaProductoViewModel productoVM){
+    public IActionResult AltaProducto(AltaProductoViewModel productoVM){
         try{
-            if(string.IsNullOrEmpty(HttpContext.Session.GetString("usuario"))) return RedirectToAction("Index", "Login");
-            if (HttpContext.Session.GetString("Rol") != "Admin")
-            {
-                TempData["ErrorMessage"] = "Sin permisos para realizar esta acción";
+            if(ModelState.IsValid){
+                Productos producto = new Productos(productoVM);
+                repositorioProductos.CrearNuevoProducto(producto);
                 return RedirectToAction("Index");
             }
-            if(!ModelState.IsValid) return RedirectToAction("Index");
-            var producto = new Productos(productoVM);
-            repositorioProductos.CrearNuevoProducto(producto);
-            return RedirectToAction("Index");
+            return View(productoVM);
         }catch(Exception e){
             _logger.LogError(e.ToString());
-            ViewBag.ErrorMessage = "Creación del producto sin éxito";
-            return RedirectToAction("Index");
+            ViewBag.ErrorMessage = "No se pudo crear el producto: " + e.Message;
+            if (e.InnerException != null)
+                ViewBag.ErrorMessage += " | Detalle: " + e.InnerException.Message;
+            var proveedores = repositorioProveedores.ListarProveedores();
+            var proveedoresVM = proveedores.Select(p => new ListarProveedoresViewModel(p)).ToList();
+            productoVM.Proveedores = proveedoresVM;
+            return View(productoVM);
         }
     }
     [HttpGet]
     public IActionResult ModificarProducto(int id){
         try{
-            if(string.IsNullOrEmpty(HttpContext.Session.GetString("usuario"))) return RedirectToAction("Index", "Login");
-            if (HttpContext.Session.GetString("Rol") != "Admin")
-            {
-                TempData["ErrorMessage"] = "Sin permisos para realizar esta acción";
-                return RedirectToAction("Index");
-            }
-            var producto = repositorioProductos.ObtenerDetallesDeProductoPorId(id);
-            var productoVM = new ModificarProductoViewModel(producto);
+            Productos producto = repositorioProductos.ObtenerDetallesDeProductoPorId(id);
+            var proveedores = repositorioProveedores.ListarProveedores();
+            var provedoresVM = proveedores.Select(p => new ListarProveedoresViewModel(p)).ToList();
+            ModificarProductoViewModel productoVM = new ModificarProductoViewModel(producto, provedoresVM);
             return View(productoVM);
         }catch(Exception e){
             _logger.LogError(e.ToString());
-            ViewBag.ErrorMessage = "No se cargó el formulario de modificación del producto correctamente";
+            ViewBag.ErrorMessage = "No se pudo cargar el producto";
             return RedirectToAction("Index");
         }
     }
     [HttpPost]
-    public IActionResult ModificarProductoPorId(Productos producto){
+    public IActionResult ModificarProducto(ModificarProductoViewModel productoVM){
         try{
-            if(string.IsNullOrEmpty(HttpContext.Session.GetString("usuario"))) return RedirectToAction("Index", "Login");
-            if (HttpContext.Session.GetString("Rol") != "Admin")
-            {
-                TempData["ErrorMessage"] = "Sin permisos para realizar esta acción";
+            if(ModelState.IsValid){
+                Productos producto = new Productos(productoVM);
+                repositorioProductos.ModificarProducto(producto);
                 return RedirectToAction("Index");
             }
-            repositorioProductos.ModificarProducto(producto);
             return RedirectToAction("Index");
         }catch(Exception e){
             _logger.LogError(e.ToString());
-            ViewBag.ErrorMessage = "Modificación del producto sin éxito";
-            return RedirectToAction("Index");
+            ViewBag.ErrorMessage = "No se pudo modificar el producto: " + e.Message;
+            if (e.InnerException != null)
+                ViewBag.ErrorMessage += " | Detalle: " + e.InnerException.Message;
+            var proveedores = repositorioProveedores.ListarProveedores();
+            var provedoresVM = proveedores.Select(p => new ListarProveedoresViewModel(p)).ToList();
+            productoVM.Proveedores = provedoresVM;
+            return View(productoVM);
         }
     }
     [HttpGet]
     public IActionResult EliminarProducto(int id){
         try{
-            if(string.IsNullOrEmpty(HttpContext.Session.GetString("usuario"))) return RedirectToAction("Index", "Login");
-            if (HttpContext.Session.GetString("Rol") != "Admin")
-            {
-                TempData["ErrorMessage"] = "Sin permisos para realizar esta acción";
-                return RedirectToAction("Index");
-            }
             var producto = repositorioProductos.ObtenerDetallesDeProductoPorId(id);
-            return View(producto);
+            var nombreProveedor = repositorioProveedores.ObtenerDetallesDeProveedorPorId(producto.IdProveedor).Proveedor;
+            var productoVM = new ListarProductosViewModel(producto, nombreProveedor);
+            return View(productoVM);
         }catch(Exception e){
             _logger.LogError(e.ToString());
-            ViewBag.ErrorMessage = "No se cargó el producto a eliminar correctamente";
+            ViewBag.ErrorMessage = "No se pudo cargar el producto";
             return RedirectToAction("Index");
         }
     }
-    [HttpGet]
-    public IActionResult EliminarProductoPorId(int id){
+    [HttpPost]
+    public IActionResult EliminarProducto(ListarProductosViewModel productoVM){
         try{
-            if(string.IsNullOrEmpty(HttpContext.Session.GetString("usuario"))) return RedirectToAction("Index", "Login");
-            if (HttpContext.Session.GetString("Rol") != "Admin")
-            {
-                TempData["ErrorMessage"] = "Sin permisos para realizar esta acción";
-                return RedirectToAction("Index");
-            }
-            repositorioProductos.EliminarProductoPorId(id);
+            repositorioProductos.EliminarProductoPorId(productoVM.IdProducto);
             return RedirectToAction("Index");
         }catch(Exception e){
             _logger.LogError(e.ToString());
-            ViewBag.ErrorMessage = "Eliminación del producto sin éxito";
+            ViewBag.ErrorMessage = "No se pudo eliminar el producto";
             return RedirectToAction("Index");
         }
     }

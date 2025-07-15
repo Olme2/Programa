@@ -1,24 +1,40 @@
-using System.ComponentModel.DataAnnotations; 
-public class ModificarProductoViewModel{
+using System.ComponentModel.DataAnnotations;
+public class ModificarProductoViewModel
+{
     private int idProducto;
-    private string descripcion;
-    private int precio;
-    
-    public ModificarProductoViewModel(){
+    private string producto;
+    private int idProveedor;
+    private decimal stock;
+    private decimal costo;
+    private decimal precio;
+    private List<ListarProveedoresViewModel> proveedores;
+
+    public ModificarProductoViewModel()
+    {
+        producto = string.Empty;
+        proveedores = new List<ListarProveedoresViewModel>();
+    }
+    public ModificarProductoViewModel(Productos Producto, List<ListarProveedoresViewModel> Proveedores)
+    {
+        idProducto = Producto.IdProducto;
+        producto = Producto.Producto;
+        idProveedor = Producto.IdProveedor;
+        stock = Producto.Stock;
+        costo = Producto.Costo;
+        precio = Producto.Precio;
+        proveedores = Proveedores;
     }
 
-    public ModificarProductoViewModel(Productos producto){
-        idProducto = producto.IdProducto;
-        descripcion = producto.Descripcion;
-        precio = producto.Precio;
-    }
-
-    public int IdProducto { get => idProducto; set => idProducto = value;}
-
-    [StringLength(250, ErrorMessage = "La descripción no puede superar los 250 caracteres")]
-    public string Descripcion { get => descripcion; set => descripcion = value;}
-
+    public int IdProducto { get => idProducto; set => idProducto = value; }
+    [Required(ErrorMessage = "Nombre obligatorio")]
+    public string Producto { get => producto; set => producto = value; }
+    [Required(ErrorMessage = "Proveedor obligatorio")]
+    public int IdProveedor { get => idProveedor; set => idProveedor = value; }
+    [Required(ErrorMessage = "Stock obligatorio")]
+    public decimal Stock { get => stock; set => stock = value; }
+    [Required(ErrorMessage = "Costo obligatorio")]
+    public decimal Costo { get => costo; set => costo = value; }
     [Required(ErrorMessage = "Precio obligatorio")]
-    [Range(1, int.MaxValue, ErrorMessage = "Precio positivo")]
-    public int Precio { get => precio; set => precio = value;}
+    public decimal Precio { get => precio; set => precio = value; }
+    public List<ListarProveedoresViewModel> Proveedores { get => proveedores; set => proveedores = value; }
 }

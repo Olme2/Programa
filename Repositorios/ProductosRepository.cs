@@ -1,87 +1,40 @@
-using Microsoft.Data.Sqlite;
+using entornoPolleria;
+using Microsoft.EntityFrameworkCore;
 
 class ProductosRepository : IProductosRepository{
-    private readonly string connectionString;
-    public ProductosRepository(string CadenaDeConexion){
-        connectionString = CadenaDeConexion;
+    private readonly AppDbContext _context;
+    public ProductosRepository(AppDbContext context){
+        _context = context;
     }
     public void CrearNuevoProducto(Productos producto){
-        string queryString=@"INSERT INTO Productos (Descripcion, Precio) VALUES (@Descripcion, @Precio)";
-        using(SqliteConnection connection=new SqliteConnection(connectionString)){
-            connection.Open();
-            SqliteCommand command=new SqliteCommand(queryString, connection);
-            command.Parameters.AddWithValue("@Descripcion", producto.Descripcion);
-            command.Parameters.AddWithValue("@Precio", producto.Precio);
-            command.ExecuteNonQuery();
-            connection.Close();
-        }
+        _context.Set<Productos>().Add(producto);
+        _context.SaveChanges();
     }
     public void ModificarProducto(Productos producto){
-        string queryString=@"UPDATE Productos SET Descripcion=@Descripcion, Precio=@Precio WHERE idProducto=@Id";
-        using(SqliteConnection connection=new SqliteConnection(connectionString)){
-            connection.Open();
-            SqliteCommand command=new SqliteCommand(queryString, connection);
-            command.Parameters.AddWithValue("@Descripcion", producto.Descripcion);
-            command.Parameters.AddWithValue("@Precio", producto.Precio);
-            command.Parameters.AddWithValue("@Id", producto.IdProducto);
-            command.ExecuteNonQuery();
-            connection.Close();
-        }
+        _context.Set<Productos>().Update(producto);
+        _context.SaveChanges();
     }
     public List<Productos> ListarProductosRegistrados(){
-        List<Productos> productos=new List<Productos>();
-        string queryString=@"SELECT * FROM Productos";
-        using(SqliteConnection connection=new SqliteConnection(connectionString)){
-            connection.Open();
-            SqliteCommand command=new SqliteCommand(queryString, connection);
-            using(SqliteDataReader reader=command.ExecuteReader()){
-                while(reader.Read()){
-                    Productos nuevoProducto=new Productos();
-                    nuevoProducto.IdProducto=Convert.ToInt32(reader["idProducto"]);
-                    nuevoProducto.Descripcion=reader["Descripcion"].ToString();
-                    nuevoProducto.Precio=Convert.ToInt32(reader["Precio"]);
-                    productos.Add(nuevoProducto);
-                }
-            }
-            connection.Close();
-        }
-        return productos;
+        return _context.Set<Productos>().ToList();
     }
     public Productos ObtenerDetallesDeProductoPorId(int id){
-        Productos? producto = null;
-        string queryString=@"SELECT * FROM Productos WHERE idProducto=@id";
-        using(SqliteConnection connection=new SqliteConnection(connectionString)){
-            connection.Open();
-            SqliteCommand command=new SqliteCommand(queryString, connection);
-            command.Parameters.AddWithValue("@id", id);
-            using(SqliteDataReader reader=command.ExecuteReader()){
-                if(reader.Read()){
-                    producto=new Productos();
-                    producto.IdProducto=Convert.ToInt32(reader["idProducto"]);
-                    producto.Descripcion=reader["Descripcion"].ToString();
-                    producto.Precio=Convert.ToInt32(reader["Precio"]);
-                }
-            }
-            connection.Close();
-        }
-        if (producto == null)
-        {
+        var producto = _context.Set<Productos>().FirstOrDefault(p => p.IdProducto == id);
+        if(producto == null){
             throw new Exception("Producto inexistente");
         }
         return producto;
     }
     public void EliminarProductoPorId(int id){
-        string queryString=@"DELETE FROM Productos WHERE idProducto=@id";
-        string queryString2=@"DELETE FROM PresupuestosDetalle WHERE idProducto=@id";
-        using(SqliteConnection connection= new SqliteConnection(connectionString)){
-            connection.Open();
-            SqliteCommand command= new SqliteCommand(queryString, connection);
-            SqliteCommand command2= new SqliteCommand(queryString2, connection);
-            command.Parameters.AddWithValue("@id", id);
-            command2.Parameters.AddWithValue("@id", id);
-            command2.ExecuteNonQuery();
-            command.ExecuteNonQuery();
-            connection.Close();
+        var producto = _context.Set<Productos>().FirstOrDefault(p => p.IdProducto == id);
+        if(producto != null){
+            _context.Set<Productos>().Remove(producto);
+            _context.SaveChanges();
+        }
+        // Eliminar detalles relacionados en PresupuestosDetalle si corresponde
+        var detalles = _context.Set<PresupuestosDetalle>().Where(d => d.Producto.IdProducto == id).ToList();
+        if(detalles.Any()){
+            _context.Set<PresupuestosDetalle>().RemoveRange(detalles);
+            _context.SaveChanges();
         }
     }
 }

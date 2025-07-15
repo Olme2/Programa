@@ -28,7 +28,6 @@
             @foreach(var presupuesto in Model){
                 <tr>
                     <td>@presupuesto.IdPresupuesto</td>
-                    <td>@presupuesto.Cliente.Nombre</td>
                     <td>@presupuesto.FechaCreacion.ToString("dd/MM/yyyy HH:mm")</td>
                     <td><a asp-controller="Presupuestos" asp-action="MostrarPresupuesto" asp-route-id="@presupuesto.IdPresupuesto" class="btn btn-info">Ver Detalles</a>
                     @if ((bool)ViewData["EsAdmin"])
