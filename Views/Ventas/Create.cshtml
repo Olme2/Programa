@@ -1,0 +1,91 @@
+@model AltaVentaViewModel
+@{
+    ViewBag.Title = "Nueva Venta";
+    var productos = ViewBag.Productos as List<Productos>;
+}
+<h2 style="font-size:1.2rem;">Nueva Venta</h2>
+@if (ViewBag.ErrorMessage != null)
+{
+    <div class="alert alert-danger" style="font-size:0.95rem;">@ViewBag.ErrorMessage</div>
+}
+<form asp-action="Create" method="post" autocomplete="off">
+    <div class="mb-2">
+        <label asp-for="IdMetodo" class="form-label" style="font-size:0.95rem;">Método de Pago</label>
+        <select asp-for="IdMetodo" asp-items="@(new SelectList(Model.MetodosDePago, "IdMetodo", "Metodo"))" class="form-select form-select-sm" style="width:220px; display:inline-block;">
+            <option value="">Seleccione...</option>
+        </select>
+        <span asp-validation-for="IdMetodo" class="text-danger" style="font-size:0.9rem;"></span>
+    </div>
+    <div class="mb-2">
+        <label class="form-label" style="font-size:0.95rem;">Productos</label>
+        <table class="table table-sm table-bordered" style="font-size:0.95rem; min-width:600px;">
+            <thead class="table-light">
+                <tr>
+                    <th style="width:180px;">Producto</th>
+                    <th style="width:80px;">Stock</th>
+                    <th style="width:80px;">Cantidad</th>
+                    <th style="width:80px;">Promoción</th>
+                    <th style="width:100px;">Precio Promo</th>
+                    <th style="width:100px;">Costo Promo</th>
+                    <th style="width:60px;"></th>
+                </tr>
+            </thead>
+            <tbody id="detallesBody">
+                @for (int i = 0; i < Model.Detalles.Count; i++)
+                {
+                    <tr>
+                        <td>
+                            <select name="Detalles[@i].IdProducto" class="form-select form-select-sm" style="width:160px;">
+                                <option value="">Seleccione...</option>
+                                @foreach (var p in productos)
+                                {
+                                    <option value="@p.IdProducto">@p.Producto</option>
+                                }
+                            </select>
+                        </td>
+                        <td>@(productos.FirstOrDefault(p => p.IdProducto == Model.Detalles[i].IdProducto)?.Stock.ToString("N2") ?? "-")</td>
+                        <td><input type="number" name="Detalles[@i].Cantidad" value="@Model.Detalles[i].Cantidad" min="0.001" step="0.001" class="form-control form-control-sm" style="width:70px;" /></td>
+                        <td><input type="checkbox" name="Detalles[@i].Promocion" @(Model.Detalles[i].Promocion ? "checked" : "") /></td>
+                        <td><input type="number" name="Detalles[@i].PrecioPromo" value="@Model.Detalles[i].PrecioPromo" min="0" step="0.01" class="form-control form-control-sm" style="width:90px;" /></td>
+                        <td><input type="number" name="Detalles[@i].CostoPromo" value="@Model.Detalles[i].CostoPromo" min="0" step="0.01" class="form-control form-control-sm" style="width:90px;" /></td>
+                        <td><button type="button" class="btn btn-sm btn-danger" onclick="quitarFila(@i)">-</button></td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+        <button type="button" class="btn btn-sm btn-secondary" onclick="agregarFila()">Agregar Producto</button>
+        <span asp-validation-for="Detalles" class="text-danger" style="font-size:0.9rem;"></span>
+    </div>
+    <div class="mb-2">
+        <label asp-for="Detalle" class="form-label" style="font-size:0.95rem;">Detalle (opcional)</label>
+        <input asp-for="Detalle" class="form-control form-control-sm" style="width:350px; display:inline-block;" />
+    </div>
+    <button type="submit" class="btn btn-sm btn-success">Guardar Venta</button>
+    <a asp-action="Index" class="btn btn-sm btn-secondary">Cancelar</a>
+</form>
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        function agregarFila() {
+            var idx = document.querySelectorAll('#detallesBody tr').length;
+            var productos = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(productos));
+            var row = `<tr>
+                <td><select name="Detalles[${idx}].IdProducto" class="form-select form-select-sm" style="width:160px;">
+                    <option value="">Seleccione...</option>
+                    ${productos.map(p => `<option value=\"${p.IdProducto}\">${p.Producto}</option>`).join('')}
+                </select></td>
+                <td>-</td>
+                <td><input type="number" name="Detalles[${idx}].Cantidad" min="0.001" step="0.001" class="form-control form-control-sm" style="width:70px;" /></td>
+                <td><input type="checkbox" name="Detalles[${idx}].Promocion" /></td>
+                <td><input type="number" name="Detalles[${idx}].PrecioPromo" min="0" step="0.01" class="form-control form-control-sm" style="width:90px;" /></td>
+                <td><input type="number" name="Detalles[${idx}].CostoPromo" min="0" step="0.01" class="form-control form-control-sm" style="width:90px;" /></td>
+                <td><button type="button" class="btn btn-sm btn-danger" onclick="quitarFila(${idx})">-</button></td>
+            </tr>`;
+            document.getElementById('detallesBody').insertAdjacentHTML('beforeend', row);
+        }
+        function quitarFila(idx) {
+            var filas = document.querySelectorAll('#detallesBody tr');
+            if (filas[idx]) filas[idx].remove();
+        }
+    </script>
+} 

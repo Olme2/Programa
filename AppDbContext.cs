@@ -9,6 +9,9 @@ namespace entornoPolleria
 
         public DbSet<Productos> Productos { get; set; }
         public DbSet<Proveedores> Proveedores { get; set; }
+        public DbSet<Ventas> Ventas { get; set; }
+        public DbSet<DetallesVentas> DetallesVentas { get; set; }
+        public DbSet<MetodosDePago> MetodosDePago { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {

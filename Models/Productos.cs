@@ -50,4 +50,5 @@ public class Productos
     public decimal Precio { get => precio; set => precio = value; }
     public decimal Ganancia { get => ganancia; set => ganancia = value; }
     public decimal PorcentajeGanancia { get => porcentajeGanancia; set => porcentajeGanancia = value; }
+    public List<DetallesVentas>? DetallesVentas { get; set; }
 }

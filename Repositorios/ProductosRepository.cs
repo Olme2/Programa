@@ -31,10 +31,6 @@ class ProductosRepository : IProductosRepository{
             _context.SaveChanges();
         }
         // Eliminar detalles relacionados en PresupuestosDetalle si corresponde
-        var detalles = _context.Set<PresupuestosDetalle>().Where(d => d.Producto.IdProducto == id).ToList();
-        if(detalles.Any()){
-            _context.Set<PresupuestosDetalle>().RemoveRange(detalles);
-            _context.SaveChanges();
-        }
+        
     }
 }

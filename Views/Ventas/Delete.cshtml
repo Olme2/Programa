@@ -1,0 +1,16 @@
+@model VentaConDetallesViewModel
+@{
+    ViewBag.Title = "Eliminar Venta";
+}
+<h2 style="font-size:1.2rem;">Eliminar Venta</h2>
+<div class="alert alert-warning" style="font-size:0.98rem;">¿Está seguro que desea eliminar esta venta? Esta acción no se puede deshacer.</div>
+<div class="mb-2" style="font-size:0.98rem;">
+    <b>Fecha:</b> @Model.Fecha.ToString("dd/MM/yyyy") &nbsp; <b>Hora:</b> @Model.Hora.ToString("HH:mm")<br />
+    <b>Método de Pago:</b> @Model.MetodoDePago<br />
+    <b>Total:</b> $@Model.Total.ToString("N2")
+</div>
+<form asp-action="Delete" method="post">
+    <input type="hidden" name="id" value="@Model.IdVenta" />
+    <button type="submit" class="btn btn-sm btn-danger">Eliminar</button>
+    <a asp-action="Index" class="btn btn-sm btn-secondary">Cancelar</a>
+</form> 
