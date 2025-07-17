@@ -28,7 +28,12 @@ public class ProductosRepository : IProductosRepository
 
     public Productos ObtenerDetallesDeProductoPorId(int id)
     {
-        return _context.Productos.Find(id);
+        var producto = _context.Set<Productos>().FirstOrDefault(p => p.IdProducto == id);
+        if (producto == null)
+        {
+            throw new Exception("Producto inexistente");
+        }
+        return producto;
     }
 
     public void EliminarProductoPorId(int id)
