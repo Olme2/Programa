@@ -8,23 +8,12 @@ public class Productos
     private decimal stock;
     private decimal costo;
     private decimal precio;
-    private decimal ganancia;
-    private decimal porcentajeGanancia;
+
     public Productos()
     {
         producto = string.Empty;
     }
-    public Productos(int IdProducto, int IdProveedor, string Producto, decimal Stock, decimal Costo, decimal Precio, decimal Ganancia, decimal PorcentajeGanancia)
-    {
-        idProducto = IdProducto;
-        idProveedor = IdProveedor;
-        producto = Producto;
-        stock = Stock;
-        costo = Costo;
-        precio = Precio;
-        ganancia = Ganancia;
-        porcentajeGanancia = PorcentajeGanancia;
-    }
+
     public Productos(AltaProductoVM productoVM)
     {
         idProveedor = productoVM.IdProveedor;
@@ -32,7 +21,6 @@ public class Productos
         stock = productoVM.Stock;
         costo = productoVM.Costo;
         precio = productoVM.Precio;
-        // No setear Ganancia ni PorcentajeGanancia
     }
 
     public Productos(ModificarProductoVM productoVM)
@@ -44,12 +32,11 @@ public class Productos
         costo = productoVM.Costo;
         precio = productoVM.Precio;
     }
+
     public int IdProducto { get => idProducto; set => idProducto = value; }
     public int IdProveedor { get => idProveedor; set => idProveedor = value; }
     public string Producto { get => producto; set => producto = value; }
     public decimal Stock { get => stock; set => stock = value; }
     public decimal Costo { get => costo; set => costo = value; }
     public decimal Precio { get => precio; set => precio = value; }
-    public decimal Ganancia { get => ganancia; set => ganancia = value; }
-    public decimal PorcentajeGanancia { get => porcentajeGanancia; set => porcentajeGanancia = value; }
 }

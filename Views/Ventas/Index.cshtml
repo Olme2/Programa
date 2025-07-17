@@ -1,6 +1,6 @@
 @model List<VentasVM.ListarVentasVM>
 @{
-    ViewData["Title"] = "Ventas";
+    ViewData["Title"] = "Lista de Ventas";
 }
 <h2>Ventas</h2>
 <form asp-action="Index" method="get" class="row g-3 mb-3">
@@ -37,8 +37,7 @@
                 <td>@v.IdVenta</td>
                 <td>@v.Total.ToString("C")</td>
                 <td>@v.Fecha.ToShortDateString()</td>
-                <td>@v.Hora</td>
-                <td>@v.MetodoPagoNombre</td>
+                <td>@v.Hora</td> //solucionar
                 <td>@v.Costo.ToString("C")</td>
                 <td>@v.Ganancia.ToString("C")</td>
                 <td>@v.PorcentajeGanancia.ToString("F2")%</td>

@@ -4,12 +4,12 @@ using ProveedoresVM;
 public class ProveedoresController : Controller
 {
     private readonly ILogger<ProveedoresController> _logger;
-    private IProveedoresRepository repositorioProveedores;
+    private IProveedoresRepository _proveedoresRepo;
 
-    public ProveedoresController(ILogger<ProveedoresController> logger, IProveedoresRepository RepositorioProveedores)
+    public ProveedoresController(ILogger<ProveedoresController> logger, IProveedoresRepository proveedoresRepo)
     {
         _logger = logger;
-        repositorioProveedores = RepositorioProveedores;
+        _proveedoresRepo = proveedoresRepo;
     }
 
     public IActionResult Index()
@@ -17,7 +17,7 @@ public class ProveedoresController : Controller
         try
         {
             var proveedoresVM = new List<ListarProveedoresVM>();
-            var proveedores = repositorioProveedores.ListarProveedores();
+            var proveedores = _proveedoresRepo.ListarProveedores();
             proveedoresVM = proveedores.Select(p => new ListarProveedoresVM(p)).ToList();
             return View(proveedoresVM);
         }
@@ -54,7 +54,7 @@ public class ProveedoresController : Controller
             if (ModelState.IsValid)
             {
                 Proveedores proveedor = new Proveedores(proveedorVM);
-                repositorioProveedores.CrearNuevoProveedor(proveedor);
+                _proveedoresRepo.CrearNuevoProveedor(proveedor);
                 return RedirectToAction("Index");
             }
             return View(proveedorVM);
@@ -72,7 +72,7 @@ public class ProveedoresController : Controller
     {
         try
         {
-            Proveedores proveedor = repositorioProveedores.ObtenerDetallesDeProveedorPorId(id);
+            Proveedores proveedor = _proveedoresRepo.ObtenerDetallesDeProveedorPorId(id);
             ModificarProveedorVM proveedorVM = new ModificarProveedorVM(proveedor);
             return View(proveedorVM);
         }
@@ -92,7 +92,7 @@ public class ProveedoresController : Controller
             if (ModelState.IsValid)
             {
                 Proveedores proveedor = new Proveedores(proveedorVM);
-                repositorioProveedores.ModificarProveedor(proveedor);
+                _proveedoresRepo.ModificarProveedor(proveedor);
                 return RedirectToAction("Index");
             }
             return View(proveedorVM);
@@ -110,7 +110,7 @@ public class ProveedoresController : Controller
     {
         try
         {
-            var proveedor = repositorioProveedores.ObtenerDetallesDeProveedorPorId(id);
+            var proveedor = _proveedoresRepo.ObtenerDetallesDeProveedorPorId(id);
             var proveedorVM = new ListarProveedoresVM(proveedor);
             return View(proveedorVM);
         }
@@ -127,7 +127,7 @@ public class ProveedoresController : Controller
     {
         try
         {
-            repositorioProveedores.EliminarProveedorPorId(proveedorVM.IdProveedor);
+            _proveedoresRepo.EliminarProveedorPorId(proveedorVM.IdProveedor);
             return RedirectToAction("Index");
         }
         catch (Exception e)

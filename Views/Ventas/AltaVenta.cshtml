@@ -7,9 +7,7 @@
     <div class="col-md-4">
         <label asp-for="IdMetodoPago" class="form-label">Método de Pago</label>
         <select asp-for="IdMetodoPago" class="form-select">
-            @foreach(var metodo in Model.MetodosPago){
-                <option value="@metodo.IdMetodo">@metodo.Metodo</option>
-            }
+            //agregar
         </select>
     </div>
     <div class="col-md-4">

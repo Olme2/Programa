@@ -5,39 +5,28 @@ public class DetallesCompras
     private int idCompra;
     private int idProducto;
     private decimal cantidad;
-    private decimal precio;
+    private decimal costoUnitario;
 
-    public DetallesCompras() { }
-    public DetallesCompras(int IdCompra, int IdProducto, decimal Cantidad, decimal Precio)
-    {
-        idCompra = IdCompra;
-        idProducto = IdProducto;
-        cantidad = Cantidad;
-        precio = Precio;
-    }
+    public DetallesCompras(){}
+
     public DetallesCompras(AltaDetalleCompraVM detalleCompraVM)
     {
         idCompra = detalleCompraVM.IdCompra;
         idProducto = detalleCompraVM.IdProducto;
         cantidad = detalleCompraVM.Cantidad;
-        precio = detalleCompraVM.Precio;
+        costoUnitario = detalleCompraVM.CostoUnitario;
     }
+
     public DetallesCompras(ModificarDetalleCompraVM detalleCompraVM)
     {
         idCompra = detalleCompraVM.IdCompra;
         idProducto = detalleCompraVM.IdProducto;
         cantidad = detalleCompraVM.Cantidad;
-        precio = detalleCompraVM.Precio;
+        costoUnitario = detalleCompraVM.CostoUnitario;
     }
-    public DetallesCompras(ListarDetallesCompraVM detalleCompraVM)
-    {
-        idCompra = detalleCompraVM.IdCompra;
-        idProducto = detalleCompraVM.IdProducto;
-        cantidad = detalleCompraVM.Cantidad;
-        precio = detalleCompraVM.Precio;
-    }
+
     public int IdCompra { get => idCompra; set => idCompra = value; }
     public int IdProducto { get => idProducto; set => idProducto = value; }
     public decimal Cantidad { get => cantidad; set => cantidad = value; }
-    public decimal Precio { get => precio; set => precio = value; }
+    public decimal CostoUnitario { get => costoUnitario; set => costoUnitario = value; }
 }

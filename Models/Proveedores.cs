@@ -11,13 +11,6 @@ public class Proveedores
         proveedor = string.Empty;
     }
 
-    public Proveedores(int IdProveedor, string Proveedor, string Contacto)
-    {
-        idProveedor = IdProveedor;
-        proveedor = Proveedor;
-        contacto = Contacto;
-    }
-
     public Proveedores(AltaProveedorVM proveedorVM)
     {
         proveedor = proveedorVM.Proveedor;
@@ -30,7 +23,7 @@ public class Proveedores
         proveedor = proveedorVM.Proveedor;
         contacto = proveedorVM.Contacto;
     }
-
+    
     public int IdProveedor { get => idProveedor; set => idProveedor = value; }
     public string Proveedor { get => proveedor; set => proveedor = value; }
     public string? Contacto { get => contacto; set => contacto = value; }

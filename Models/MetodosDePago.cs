@@ -9,16 +9,13 @@ public class MetodosDePago
     {
         metodo = string.Empty;
     }
+
     public MetodosDePago(AltaMetodoDePagoVM MetodoVM)
     {
         metodo = MetodoVM.Metodo;
     }
+    
     public MetodosDePago(ModificarMetodoDePagoVM MetodoVM)
-    {
-        idMetodo = MetodoVM.IdMetodo;
-        metodo = MetodoVM.Metodo;
-    }
-    public MetodosDePago(ListarMetodosDePagoVM MetodoVM)
     {
         idMetodo = MetodoVM.IdMetodo;
         metodo = MetodoVM.Metodo;

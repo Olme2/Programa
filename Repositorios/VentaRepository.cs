@@ -1,4 +1,5 @@
 using entornoPolleria;
+using Microsoft.EntityFrameworkCore;
 
 public class VentaRepository : IVentaRepository
 {
@@ -11,7 +12,8 @@ public class VentaRepository : IVentaRepository
 
     public List<Ventas> ListarVentasRegistradas()
     {
-        return _context.Set<Ventas>().ToList();
+        List<Ventas> ventas = _context.Set<Ventas>().Include(v => v.DetallesVenta).ToList();
+        return ventas;
     }
 
     public Ventas ObtenerDetallesDeVentaPorId(long id)
@@ -45,8 +47,59 @@ public class VentaRepository : IVentaRepository
 
     public List<Ventas> ListarVentasEntreDosFechas(DateOnly fechaInicio, DateOnly fechaFin)
     {
-        return _context.Set<Ventas>()
-            .Where(v => v.Fecha >= fechaInicio && v.Fecha <= fechaFin)
-            .ToList();
+        return _context.Set<Ventas>().Include(v => v.DetallesVenta).Where(v => v.Fecha >= fechaInicio && v.Fecha <= fechaFin).ToList();
     }
 }
+
+/*using entornoPolleria;
+
+public interface IDetalleVentaRepository
+{
+    List<DetallesVentas> GetByVentaId(long idVenta);
+    DetallesVentas GetById(long idVenta, int idProducto);
+    void Add(DetallesVentas detalle);
+    void Update(DetallesVentas detalle);
+    void Delete(long idVenta, int idProducto);
+}
+
+public class DetalleVentaRepository : IDetalleVentaRepository
+{
+    private readonly AppDbContext _context;
+
+    public DetalleVentaRepository(AppDbContext context)
+    {
+        _context = context;
+    }
+
+    public List<DetallesVentas> GetByVentaId(long idVenta)
+    {
+        return _context.Set<DetallesVentas>().Where(d => d.IdVenta == idVenta).ToList();
+    }
+
+    public DetallesVentas GetById(long idVenta, int idProducto)
+    {
+        return _context.Set<DetallesVentas>().Find(idVenta, idProducto);
+    }
+
+    public void Add(DetallesVentas detalle)
+    {
+        _context.Set<DetallesVentas>().Add(detalle);
+        _context.SaveChanges();
+    }
+
+    public void Update(DetallesVentas detalle)
+    {
+        _context.Set<DetallesVentas>().Update(detalle);
+        _context.SaveChanges();
+    }
+
+    public void Delete(long idVenta, int idProducto)
+    {
+        var detalle = _context.Set<DetallesVentas>().Find(idVenta, idProducto);
+        if (detalle != null)
+        {
+            _context.Set<DetallesVentas>().Remove(detalle);
+            _context.SaveChanges();
+        }
+    }
+}*/

@@ -5,6 +5,7 @@ namespace ComprasVM;
 
 public class AltaCompraVM
 {
+    private int idProveedor;
     private decimal total;
     private DateOnly fecha;
     private string? detalle;
@@ -17,6 +18,7 @@ public class AltaCompraVM
         detalles = new List<ListarDetallesCompraVM>();
     }
     
+    public int IdProveedor { get => idProveedor;  set => idProveedor = value; }
     public decimal Total { get => total; set => total = value; }
     public DateOnly Fecha { get => fecha; set => fecha = value; }
     public string? Detalle { get => detalle; set => detalle = value; }

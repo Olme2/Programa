@@ -7,25 +7,15 @@ public class DetallesPromociones
     private decimal cantidad;
 
     public DetallesPromociones(){}
-    public DetallesPromociones(int IdPromocion, int IdProducto, decimal Cantidad)
-    {
-        idPromocion = IdPromocion;
-        idProducto = IdProducto;
-        cantidad = Cantidad;
-    }
+
     public DetallesPromociones(AltaDetallePromocionVM detallePromocionVM)
     {
         idPromocion = detallePromocionVM.IdPromocion;
         idProducto = detallePromocionVM.IdProducto;
         cantidad = detallePromocionVM.Cantidad;
     }
+    
     public DetallesPromociones(ModificarDetallePromocionVM detallePromocionVM)
-    {
-        idPromocion = detallePromocionVM.IdPromocion;
-        idProducto = detallePromocionVM.IdProducto;
-        cantidad = detallePromocionVM.Cantidad;
-    }
-    public DetallesPromociones(ListarDetallesPromocionVM detallePromocionVM)
     {
         idPromocion = detallePromocionVM.IdPromocion;
         idProducto = detallePromocionVM.IdProducto;

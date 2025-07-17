@@ -3,51 +3,53 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using VentasVM;
 public class VentasController : Controller
 {
+    private readonly ILogger _logger;
     private readonly IVentaRepository _ventaRepo;
     private readonly IMetodosPagoRepository _metodosPagoRepo;
-    private readonly IDetalleVentaRepository _detalleVentaRepo;
+    private readonly IProductosRepository _productosRepo;
 
-    public VentasController(IVentaRepository ventaRepo, IMetodosPagoRepository metodosPagoRepo, IDetalleVentaRepository detalleVentaRepo)
+    public VentasController(ILogger logger, IVentaRepository ventaRepo, IMetodosPagoRepository metodosPagoRepo, IProductosRepository productosRepo)
     {
+        _logger = logger;
         _ventaRepo = ventaRepo;
         _metodosPagoRepo = metodosPagoRepo;
-        _detalleVentaRepo = detalleVentaRepo;
+        _productosRepo = productosRepo;
     }
 
-    public IActionResult Index(FiltrarVentasVM filters)
+    [HttpGet]
+    public IActionResult Index(FiltrarVentasVM filtros)
     {
-        DateOnly fechaInicio = filters?.FechaInicio ?? DateOnly.FromDateTime(DateTime.Today);
-        DateOnly fechaFin = filters?.FechaFin ?? DateOnly.FromDateTime(DateTime.Today);
-        var ventas = _ventaRepo.ListarVentasEntreDosFechas(fechaInicio, fechaFin);
-        var viewModel = ventas.Select(v => new ListarVentasVM
+        try
         {
-            IdVenta = v.IdVenta,
-            Total = v.Total,
-            Fecha = v.Fecha,
-            Hora = v.Hora,
-            MetodoPagoNombre = "",
-            Costo = v.Costo,
-            Ganancia = v.Ganancia,
-            PorcentajeGanancia = v.PorcentajeGanancia
-        }).ToList();
-        return View(viewModel);
+            DateOnly fechaInicio = filtros?.FechaInicio ?? DateOnly.FromDateTime(DateTime.Today);
+            DateOnly fechaFin = filtros?.FechaFin ?? DateOnly.FromDateTime(DateTime.Today);
+            var ventas = _ventaRepo.ListarVentasEntreDosFechas(fechaInicio, fechaFin);
+            var viewModel = ventas.Select(v =>
+            {
+                var productosVendidos = v.DetallesVenta.Select(d => _productosRepo.ObtenerDetallesDeProductoPorId(d.IdProducto).Producto).ToList(); //Obtiene lista de productos string
+                var metodoDePago = _metodosPagoRepo.ObtenerDetallesDeMetodoDePagoPorId(v.IdMetodo).Metodo; //Obtiene metodo de pago string
+                return new ListarVentasVM(v, metodoDePago, productosVendidos);
+            }).ToList();
+            return View(viewModel);
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e.ToString());
+            ViewBag.ErrorMessage = "No se cargo la lista de ventas correctamente";
+            return RedirectToAction("AltaVenta", "Ventas");
+        }
     }
 
-    // GET: /Ventas/AltaVenta
+    [HttpGet]
     public IActionResult AltaVenta()
     {
         var metodos = _metodosPagoRepo.ListarMetodosDePagoRegistrados();
-        var vm = new AltaVentaVM
-        {
-            Fecha = DateOnly.FromDateTime(DateTime.Today),
-            Hora = TimeOnly.FromDateTime(DateTime.Now),
-            MetodosPago = metodos
-        };
+        var vm = new AltaVentaVM(metodos);
         return View(vm);
     }
 
     // POST: /Ventas/AltaVenta
-    [HttpPost]
+    /*[HttpPost]
     public IActionResult AltaVenta(AltaVentaVM model)
     {
         if (!ModelState.IsValid)
@@ -69,7 +71,7 @@ public class VentasController : Controller
         };
         _ventaRepo.CrearNuevaVenta(venta);
         return RedirectToAction("Index");
-    }
+    }*/
 
     // GET: /Ventas/ModificarVenta/{id}
     public IActionResult ModificarVenta(long id)
@@ -110,7 +112,7 @@ public class VentasController : Controller
     }
 
     // GET: /Ventas/EliminarVenta/{id}
-    public IActionResult EliminarVenta(long id)
+    /*public IActionResult EliminarVenta(long id)
     {
         var venta = _ventaRepo.ObtenerDetallesDeVentaPorId(id);
         if (venta == null) return NotFound();
@@ -137,7 +139,7 @@ public class VentasController : Controller
             }).ToList()
         };
         return View(vm);
-    }
+    }*/
 
     // POST: /Ventas/EliminarVentaConfirmado/{id}
     [HttpPost, ActionName("EliminarVentaConfirmado")]
@@ -148,7 +150,7 @@ public class VentasController : Controller
     }
 
     // GET: /Ventas/VerDetalles/{id}
-    public IActionResult VerDetalles(long id)
+    /*public IActionResult VerDetalles(long id)
     {
         var venta = _ventaRepo.ObtenerDetallesDeVentaPorId(id);
         if (venta == null) return NotFound();
@@ -175,5 +177,122 @@ public class VentasController : Controller
             }).ToList()
         };
         return View(vm);
-    }
+    }*/
 } 
+
+/*using Microsoft.AspNetCore.Mvc;
+public class DetallesVentasController : Controller
+{
+    private readonly IDetalleVentaRepository _detalleVentaRepo;
+    private readonly IProductosRepository _productosRepo;
+
+    public DetallesVentasController(IDetalleVentaRepository detalleVentaRepo, IProductosRepository productosRepo)
+    {
+        _detalleVentaRepo = detalleVentaRepo;
+        _productosRepo = productosRepo;
+    }
+
+    public IActionResult AgregarDetalle(long idVenta)
+    {
+        var productos = _productosRepo.ListarProductosRegistrados();
+        var vm = new AltaDetallesVentaVM
+        {
+            IdVenta = idVenta,
+            Productos = productos.Select(p => new Microsoft.AspNetCore.Mvc.Rendering.SelectListItem { Value = p.IdProducto.ToString(), Text = p.Producto }).ToList()
+        };
+        return View(vm);
+    }
+
+    // POST: /DetallesVentas/AgregarDetalle
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public IActionResult AgregarDetalle(AltaDetallesVentaVM model)
+    {
+        if (!ModelState.IsValid)
+        {
+            var productos = _productosRepo.ListarProductosRegistrados();
+            model.Productos = productos.Select(p => new Microsoft.AspNetCore.Mvc.Rendering.SelectListItem { Value = p.IdProducto.ToString(), Text = p.Producto }).ToList();
+            return View(model);
+        }
+        var detalle = new DetallesVentas
+        {
+            IdVenta = model.IdVenta,
+            IdProducto = model.IdProducto,
+            Cantidad = model.Cantidad,
+            Promocion = model.Promocion,
+            PrecioPromo = model.PrecioPromo,
+            CostoPromo = model.CostoPromo
+        };
+        _detalleVentaRepo.Add(detalle);
+        return RedirectToAction("VerDetalles", "Ventas", new { id = model.IdVenta });
+    }
+
+    // GET: /DetallesVentas/ModificarDetalle/{idVenta}/{idProducto}
+    public IActionResult ModificarDetalle(long idVenta, int idProducto)
+    {
+        var detalle = _detalleVentaRepo.GetById(idVenta, idProducto);
+        if (detalle == null) return NotFound();
+        var productos = _productosRepo.ListarProductosRegistrados();
+        var vm = new AltaDetallesVentaVM
+        {
+            IdVenta = detalle.IdVenta,
+            IdProducto = detalle.IdProducto,
+            Cantidad = detalle.Cantidad,
+            Promocion = detalle.Promocion,
+            PrecioPromo = detalle.PrecioPromo,
+            CostoPromo = detalle.CostoPromo,
+            Productos = productos.Select(p => new Microsoft.AspNetCore.Mvc.Rendering.SelectListItem { Value = p.IdProducto.ToString(), Text = p.Producto }).ToList()
+        };
+        return View(vm);
+    }
+
+    // POST: /DetallesVentas/ModificarDetalle
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public IActionResult ModificarDetalle(AltaDetallesVentaVM model)
+    {
+        if (!ModelState.IsValid)
+        {
+            var productos = _productosRepo.ListarProductosRegistrados();
+            model.Productos = productos.Select(p => new Microsoft.AspNetCore.Mvc.Rendering.SelectListItem { Value = p.IdProducto.ToString(), Text = p.Producto }).ToList();
+            return View(model);
+        }
+        var detalle = _detalleVentaRepo.GetById(model.IdVenta, model.IdProducto);
+        if (detalle == null) return NotFound();
+        detalle.Cantidad = model.Cantidad;
+        detalle.Promocion = model.Promocion;
+        detalle.PrecioPromo = model.PrecioPromo;
+        detalle.CostoPromo = model.CostoPromo;
+        _detalleVentaRepo.Update(detalle);
+        return RedirectToAction("VerDetalles", "Ventas", new { id = model.IdVenta });
+    }
+
+    // GET: /DetallesVentas/EliminarDetalle/{idVenta}/{idProducto}
+    public IActionResult EliminarDetalle(long idVenta, int idProducto)
+    {
+        var detalle = _detalleVentaRepo.GetById(idVenta, idProducto);
+        if (detalle == null) return NotFound();
+        var vm = new DetallesVentaVM
+        {
+            IdVenta = detalle.IdVenta,
+            IdProducto = detalle.IdProducto,
+            ProductoNombre = "", // Mapear nombre real si es necesario
+            Cantidad = detalle.Cantidad,
+            Promocion = detalle.Promocion,
+            PrecioPromo = detalle.PrecioPromo,
+            CostoPromo = detalle.CostoPromo
+        };
+        ViewBag.IdVenta = detalle.IdVenta;
+        ViewBag.IdProducto = detalle.IdProducto;
+        return View(vm);
+    }
+
+    // POST: /DetallesVentas/EliminarDetalle
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public IActionResult EliminarDetalle(DetallesVentaVM model)
+    {
+        _detalleVentaRepo.Delete(model.IdVenta, model.IdProducto);
+        return RedirectToAction("VerDetalles", "Ventas", new { id = model.IdVenta });
+    }
+} */
