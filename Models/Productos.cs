@@ -1,3 +1,5 @@
+using ProductosVM;
+
 public class Productos
 {
     private int idProducto;
@@ -23,7 +25,7 @@ public class Productos
         ganancia = Ganancia;
         porcentajeGanancia = PorcentajeGanancia;
     }
-    public Productos(AltaProductoViewModel productoVM)
+    public Productos(AltaProductoVM productoVM)
     {
         idProveedor = productoVM.IdProveedor;
         producto = productoVM.Producto;
@@ -33,7 +35,7 @@ public class Productos
         // No setear Ganancia ni PorcentajeGanancia
     }
 
-    public Productos(ModificarProductoViewModel productoVM)
+    public Productos(ModificarProductoVM productoVM)
     {
         idProducto = productoVM.IdProducto;
         idProveedor = productoVM.IdProveedor;

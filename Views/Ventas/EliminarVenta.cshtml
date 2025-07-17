@@ -1,0 +1,27 @@
+@model VentasVM.VerVentaVM
+@{
+    ViewData["Title"] = "Eliminar Venta";
+}
+<h2>Eliminar Venta</h2>
+<div class="alert alert-danger">
+    <strong>¿Estás seguro que deseas eliminar esta venta?</strong>
+</div>
+<dl class="row">
+    <dt class="col-sm-3">ID</dt>
+    <dd class="col-sm-9">@Model.IdVenta</dd>
+    <dt class="col-sm-3">Total</dt>
+    <dd class="col-sm-9">@Model.Total.ToString("C")</dd>
+    <dt class="col-sm-3">Fecha</dt>
+    <dd class="col-sm-9">@Model.Fecha.ToShortDateString()</dd>
+    <dt class="col-sm-3">Hora</dt>
+    <dd class="col-sm-9">@Model.Hora</dd>
+    <dt class="col-sm-3">Método de Pago</dt>
+    <dd class="col-sm-9">@Model.MetodoPagoNombre</dd>
+    <dt class="col-sm-3">Detalle</dt>
+    <dd class="col-sm-9">@Model.Detalle</dd>
+</dl>
+<form asp-action="EliminarVentaConfirmado" method="post">
+    <input type="hidden" asp-for="IdVenta" />
+    <button type="submit" class="btn btn-danger">Confirmar Eliminación</button>
+    <a asp-action="Index" class="btn btn-secondary">Cancelar</a>
+</form> 

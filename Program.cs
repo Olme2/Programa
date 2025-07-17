@@ -1,10 +1,15 @@
 using Microsoft.EntityFrameworkCore;
 using entornoPolleria;
 using System.Globalization;
+
 var builder = WebApplication.CreateBuilder(args);
-builder.Services.AddScoped<IPresupuestosRepository, PresupuestosRepository>();
+
 builder.Services.AddScoped<IProductosRepository, ProductosRepository>();
 builder.Services.AddScoped<IProveedoresRepository, ProveedoresRepository>();
+builder.Services.AddScoped<IVentaRepository, VentaRepository>();
+builder.Services.AddScoped<IDetalleVentaRepository, DetalleVentaRepository>();
+builder.Services.AddScoped<IMetodosPagoRepository, MetodosPagoRepository>();
+
 // Add services to the container.
 builder.Services.AddSession(options =>
 {

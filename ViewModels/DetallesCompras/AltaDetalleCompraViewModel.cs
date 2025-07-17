@@ -1,0 +1,17 @@
+using ProductosVM;
+
+namespace DetallesComprasVM;
+
+public class AltaDetalleCompraVM
+{
+    private int idCompra;
+    private int idProducto;
+    private decimal cantidad;
+    private decimal precio;
+    private List<ListarProductosVM> productos;
+    public int IdCompra { get => idCompra; set => idCompra = value; }
+    public int IdProducto { get => idProducto;  set => idProducto = value; }
+    public decimal Cantidad { get => cantidad; set => cantidad = value;}
+    public List<ListarProductosVM> Productos { get => productos; set => productos = value; }
+    public decimal Precio { get => precio; set => precio = value; }
+}

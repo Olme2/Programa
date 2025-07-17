@@ -1,0 +1,25 @@
+@model List<MetodosVM.ListarMetodosDePagoVM>
+
+<h2>Listado de Métodos de Pago</h2>
+<table class="table">
+    <thead>
+        <tr>
+            <th>Método de Pago</th>
+            <th>Acciones</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var metodo in Model)
+        {
+            <tr>
+                <td>@metodo.Metodo</td>
+                <td>
+                    <a asp-action="ModificarMetodoDePago" asp-route-id="@metodo.IdMetodo" class="btn btn-warning btn-sm">Modificar</a>
+                    <a asp-action="EliminarMetodoDePago" asp-route-id="@metodo.IdMetodo" class="btn btn-danger btn-sm">Eliminar</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<a asp-action="AltaMetodoDePago" class="btn btn-primary">Agregar Método de Pago</a> 

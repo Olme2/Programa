@@ -1,0 +1,35 @@
+@model DetallesVentasVM.AltaDetalleVentaVM
+@{
+    ViewData["Title"] = "Modificar Detalle de Venta";
+}
+<h2>Modificar Detalle de Venta</h2>
+<form asp-action="ModificarDetalle" method="post" class="row g-3">
+    <input type="hidden" asp-for="IdVenta" />
+    <input type="hidden" asp-for="IdProducto" />
+    <div class="col-md-6">
+        <label asp-for="IdProducto" class="form-label">Producto</label> //solucionar
+    </div>
+    <div class="col-md-3">
+        <label asp-for="Cantidad" class="form-label">Cantidad</label>
+        <input asp-for="Cantidad" class="form-control" />
+    </div>
+    <div class="col-md-3">
+        <label asp-for="Promocion" class="form-label">¿Promoción?</label>
+        <select asp-for="Promocion" class="form-select">
+            <option value="false">No</option>
+            <option value="true">Sí</option>
+        </select>
+    </div>
+    <div class="col-md-3">
+        <label asp-for="PrecioPromo" class="form-label">Precio Promocional</label>
+        <input asp-for="PrecioPromo" class="form-control" />
+    </div>
+    <div class="col-md-3">
+        <label asp-for="CostoPromo" class="form-label">Costo Promocional</label>
+        <input asp-for="CostoPromo" class="form-control" />
+    </div>
+    <div class="col-12">
+        <button type="submit" class="btn btn-primary">Guardar Cambios</button>
+        <a asp-action="VerDetalles" asp-route-id="@Model.IdVenta" class="btn btn-secondary">Cancelar</a>
+    </div>
+</form> 

@@ -1,0 +1,44 @@
+@model VentasVM.VerVentaVM
+@{
+    ViewData["Title"] = "Detalles de Venta";
+}
+<h2>Detalles de Venta</h2>
+<div class="mb-3">
+    <strong>ID Venta:</strong> @Model.IdVenta<br />
+    <strong>Total:</strong> @Model.Total.ToString("C")<br />
+    <strong>Fecha:</strong> @Model.Fecha.ToString("yyyy-MM-dd")<br />
+    <strong>Hora:</strong> @Model.Hora.ToString("HH:mm")<br />
+    <strong>Método de Pago:</strong> @Model.MetodoPagoNombre<br />
+    <strong>Detalle:</strong> @Model.Detalle
+</div>
+<a asp-action="AgregarDetalle" asp-route-idVenta="@Model.IdVenta" class="btn btn-success mb-3">Añadir Producto a la Venta</a>
+<table class="table table-bordered table-sm">
+    <thead>
+        <tr>
+            <th>Producto</th>
+            <th>Cantidad</th>
+            <th>Promoción</th>
+            <th>Precio Promo</th>
+            <th>Costo Promo</th>
+            <th>Acciones</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var d in Model.Detalles)
+        {
+            <tr>
+                <td>@d.Cantidad</td> //solucionar
+                <td>@(d.Promocion ? "Sí" : "No")</td>
+                <td>@d.PrecioPromo.ToString("C")</td>
+                <td>@d.CostoPromo.ToString("C")</td>
+                <td>
+                    <a asp-action="ModificarDetalle" asp-route-idVenta="@d.IdVenta" asp-route-idProducto="@d.IdProducto" class="btn btn-warning btn-sm">Modificar</a>
+                    <form asp-action="EliminarDetalle" asp-route-idVenta="@d.IdVenta" asp-route-idProducto="@d.IdProducto" method="post" style="display:inline">
+                        <button type="submit" class="btn btn-danger btn-sm">Eliminar</button>
+                    </form>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+<a asp-action="Index" class="btn btn-secondary mt-3">Volver al Listado</a> 

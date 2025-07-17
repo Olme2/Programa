@@ -1,0 +1,28 @@
+@model VentasVM.ModificarVentaVM
+@{
+    ViewData["Title"] = "Modificar Venta";
+}
+<h2>Modificar Venta</h2>
+<form asp-action="ModificarVenta" method="post" class="row g-3">
+    <input type="hidden" asp-for="IdVenta" />
+    <div class="col-md-4">
+        <label asp-for="IdMetodoPago" class="form-label">Método de Pago</label>
+        <select asp-for="IdMetodoPago" class="form-select" asp-items="Model.MetodosPago"></select>
+    </div>
+    <div class="col-md-4">
+        <label asp-for="Detalle" class="form-label">Detalle</label>
+        <input asp-for="Detalle" class="form-control" />
+    </div>
+    <div class="col-md-2">
+        <label asp-for="Fecha" class="form-label">Fecha</label>
+        <input asp-for="Fecha" type="date" class="form-control" value="@(Model.Fecha.ToString("yyyy-MM-dd"))" />
+    </div>
+    <div class="col-md-2">
+        <label asp-for="Hora" class="form-label">Hora</label>
+        <input asp-for="Hora" type="time" class="form-control" value="@(Model.Hora.ToString("HH:mm"))" />
+    </div>
+    <div class="col-12">
+        <button type="submit" class="btn btn-primary">Guardar Cambios</button>
+        <a asp-action="Index" class="btn btn-secondary">Cancelar</a>
+    </div>
+</form> 

@@ -1,3 +1,5 @@
+using ProveedoresVM;
+
 public class Proveedores
 {
     private int idProveedor;
@@ -16,13 +18,13 @@ public class Proveedores
         contacto = Contacto;
     }
 
-    public Proveedores(AltaProveedorViewModel proveedorVM)
+    public Proveedores(AltaProveedorVM proveedorVM)
     {
         proveedor = proveedorVM.Proveedor;
         contacto = proveedorVM.Contacto;
     }
 
-    public Proveedores(ModificarProveedorViewModel proveedorVM)
+    public Proveedores(ModificarProveedorVM proveedorVM)
     {
         idProveedor = proveedorVM.IdProveedor;
         proveedor = proveedorVM.Proveedor;

@@ -1,6 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
-
-namespace Controllers;
+using ProveedoresVM;
 
 public class ProveedoresController : Controller
 {
@@ -17,9 +16,9 @@ public class ProveedoresController : Controller
     {
         try
         {
-            var proveedoresVM = new List<ListarProveedoresViewModel>();
+            var proveedoresVM = new List<ListarProveedoresVM>();
             var proveedores = repositorioProveedores.ListarProveedores();
-            proveedoresVM = proveedores.Select(p => new ListarProveedoresViewModel(p)).ToList();
+            proveedoresVM = proveedores.Select(p => new ListarProveedoresVM(p)).ToList();
             return View(proveedoresVM);
         }
         catch (Exception e)
@@ -48,7 +47,7 @@ public class ProveedoresController : Controller
     }
 
     [HttpPost]
-    public IActionResult AltaProveedor(AltaProveedorViewModel proveedorVM)
+    public IActionResult AltaProveedor(AltaProveedorVM proveedorVM)
     {
         try
         {
@@ -74,7 +73,7 @@ public class ProveedoresController : Controller
         try
         {
             Proveedores proveedor = repositorioProveedores.ObtenerDetallesDeProveedorPorId(id);
-            ModificarProveedorViewModel proveedorVM = new ModificarProveedorViewModel(proveedor);
+            ModificarProveedorVM proveedorVM = new ModificarProveedorVM(proveedor);
             return View(proveedorVM);
         }
         catch (Exception e)
@@ -86,7 +85,7 @@ public class ProveedoresController : Controller
     }
 
     [HttpPost]
-    public IActionResult ModificarProveedor(ModificarProveedorViewModel proveedorVM)
+    public IActionResult ModificarProveedor(ModificarProveedorVM proveedorVM)
     {
         try
         {
@@ -112,7 +111,7 @@ public class ProveedoresController : Controller
         try
         {
             var proveedor = repositorioProveedores.ObtenerDetallesDeProveedorPorId(id);
-            var proveedorVM = new ListarProveedoresViewModel(proveedor);
+            var proveedorVM = new ListarProveedoresVM(proveedor);
             return View(proveedorVM);
         }
         catch (Exception e)
@@ -124,7 +123,7 @@ public class ProveedoresController : Controller
     }
 
     [HttpPost]
-    public IActionResult EliminarProveedor(ListarProveedoresViewModel proveedorVM)
+    public IActionResult EliminarProveedor(ListarProveedoresVM proveedorVM)
     {
         try
         {

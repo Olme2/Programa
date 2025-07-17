@@ -1,5 +1,4 @@
 using entornoPolleria;
-using Microsoft.EntityFrameworkCore;
 
 class ProveedoresRepository : IProveedoresRepository
 {

@@ -1,0 +1,54 @@
+@model List<VentasVM.ListarVentasVM>
+@{
+    ViewData["Title"] = "Ventas";
+}
+<h2>Ventas</h2>
+<form asp-action="Index" method="get" class="row g-3 mb-3">
+    <div class="col-auto">
+        <label for="FechaInicio" class="form-label">Desde</label>
+        <input type="date" class="form-control" id="FechaInicio" name="FechaInicio" value="@Context.Request.Query["FechaInicio"]" />
+    </div>
+    <div class="col-auto">
+        <label for="FechaFin" class="form-label">Hasta</label>
+        <input type="date" class="form-control" id="FechaFin" name="FechaFin" value="@Context.Request.Query["FechaFin"]" />
+    </div>
+    <div class="col-auto align-self-end">
+        <button type="submit" class="btn btn-primary">Filtrar</button>
+    </div>
+</form>
+<table class="table table-striped table-bordered table-sm">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Total</th>
+            <th>Fecha</th>
+            <th>Hora</th>
+            <th>Método de Pago</th>
+            <th>Costo</th>
+            <th>Ganancia</th>
+            <th>% Ganancia</th>
+            <th>Acciones</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var v in Model)
+        {
+            <tr>
+                <td>@v.IdVenta</td>
+                <td>@v.Total.ToString("C")</td>
+                <td>@v.Fecha.ToShortDateString()</td>
+                <td>@v.Hora</td>
+                <td>@v.MetodoPagoNombre</td>
+                <td>@v.Costo.ToString("C")</td>
+                <td>@v.Ganancia.ToString("C")</td>
+                <td>@v.PorcentajeGanancia.ToString("F2")%</td>
+                <td>
+                    <a asp-action="VerDetalles" asp-route-id="@v.IdVenta" class="btn btn-info btn-sm">Ver Detalles</a>
+                    <a asp-action="ModificarVenta" asp-route-id="@v.IdVenta" class="btn btn-warning btn-sm">Modificar</a>
+                    <a asp-action="EliminarVenta" asp-route-id="@v.IdVenta" class="btn btn-danger btn-sm">Eliminar</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+<a asp-action="AltaVenta" class="btn btn-success mt-3">Registrar Nueva Venta</a> 

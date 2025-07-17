@@ -1,0 +1,16 @@
+@model MetodosVM.ModificarMetodoDePagoVM
+
+<h2>Modificar Método de Pago</h2>
+
+<form asp-action="ModificarMetodoDePago" method="post">
+    <input type="hidden" asp-for="IdMetodo" />
+    <div class="form-group">
+        <label asp-for="Metodo"></label>
+        <input asp-for="Metodo" class="form-control" />
+        <span asp-validation-for="Metodo" class="text-danger"></span>
+    </div>
+    <div class="mt-3">
+        <button type="submit" class="btn btn-primary">Guardar Cambios</button>
+        <a asp-action="Index" class="btn btn-secondary">Cancelar</a>
+    </div>
+</form> 
