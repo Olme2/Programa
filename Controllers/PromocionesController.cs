@@ -48,7 +48,8 @@ public class PromocionesController : Controller
         try
         {
             var promocion = _promocionesRepo.ObtenerDetallesDePromocionPorId(id);
-            var vm = new PromocionesVM.ModificarPromocionVM(promocion); // Asegúrate de tener este VM
+            var costo =
+            var vm = new ModificarPromocionVM(promocion);
             return View(vm);
         }
         catch (Exception e)

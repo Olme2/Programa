@@ -16,13 +16,35 @@ public class Promociones
         detallesPromocion = new List<DetallesPromociones>();
     }
 
-    public Promociones(AltaPromocionVM promocionVM)
+    public Promociones(string Promocion, decimal Precio, DateOnly Inicio, DateOnly? Fin, List<DetallesPromociones> Detalles)
     {
+        promocion = Promocion;
+        precio = Precio;
+        inicio = Inicio;
+        fin = Fin;
+        detallesPromocion = Detalles;
+    }
+    public static Promociones CrearDesdeViewModel(AltaPromocionVM promocionVM)
+    {
+        var detalles = promocionVM.DetallesPromocion.Select(detalleVM => new DetallesPromociones(detalleVM)).ToList();
+        return new Promociones(promocionVM.Promocion,promocionVM.Precio,promocionVM.Inicio,promocionVM.Fin,detalles);
+    }
+
+    public Promociones(ModificarPromocionVM promocionVM)
+    {
+        idPromocion = promocionVM.IdPromocion;
         promocion = promocionVM.Promocion;
         precio = promocionVM.Precio;
         inicio = promocionVM.Inicio;
-        detallesPromocion = promocionVM.DetallesPromocion;
+        fin = promocionVM.Fin;
+        detallesPromocion = promocionVM.DetallesPromocion.Select(d => new DetallesPromociones(d)).ToList();
     }
+
+    public decimal CalcularCostoTotal()
+    {
+        return detallesPromocion.Sum(detalle => detalle.CalcularCosto());
+    }
+
     public int IdPromocion { get => idPromocion; set => idPromocion = value; }
     public string Promocion { get => promocion; set => promocion = value; }
     public decimal Precio { get => precio; set => precio = value; }

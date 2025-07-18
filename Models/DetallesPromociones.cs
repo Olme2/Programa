@@ -2,27 +2,30 @@ using DetallesPromocionesVM;
 
 public class DetallesPromociones
 {
-    private int idPromocion;
-    private int idProducto;
-    private decimal cantidad;
-
-    public DetallesPromociones(){}
-
-    public DetallesPromociones(AltaDetallePromocionVM detallePromocionVM)
+    public int IdProducto { get; set; }
+    public int IdPromocion { get; set; }
+    public decimal Cantidad { get; set; }
+    public virtual Productos? Producto { get; set; }
+    public DetallesPromociones() {}
+    public DetallesPromociones(int idProducto, decimal cantidad)
     {
-        idPromocion = detallePromocionVM.IdPromocion;
-        idProducto = detallePromocionVM.IdProducto;
-        cantidad = detallePromocionVM.Cantidad;
+        if (cantidad <= 0)
+        {
+            throw new ArgumentException("La cantidad debe ser mayor que cero.", nameof(cantidad));
+        }   
+        IdProducto = idProducto;
+        Cantidad = cantidad;
     }
-    
-    public DetallesPromociones(ModificarDetallePromocionVM detallePromocionVM)
+    public static DetallesPromociones CrearDesdeViewModel(AltaDetallePromocionVM detalleVM)
     {
-        idPromocion = detallePromocionVM.IdPromocion;
-        idProducto = detallePromocionVM.IdProducto;
-        cantidad = detallePromocionVM.Cantidad;
+        return new DetallesPromociones(detalleVM.IdProducto, detalleVM.Cantidad);
     }
-
-    public int IdPromocion { get => idPromocion; set => idPromocion = value; }
-    public int IdProducto { get => idProducto; set => idProducto = value; }
-    public decimal Cantidad { get => cantidad; set => cantidad = value; }
+    public decimal CalcularCosto()
+    {
+        if (Producto == null)
+        {
+            throw new InvalidOperationException("El producto no fue cargado para calcular el costo.");
+        }
+        return Producto.Precio * Cantidad;
+    }
 }

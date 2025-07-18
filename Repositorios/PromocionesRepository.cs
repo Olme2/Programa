@@ -25,12 +25,12 @@ public class PromocionesRepository : IPromocionesRepository
     }
 
     public List<Promociones> ListarPromocionesRegistradas()
-    {
-        return _context.Promociones
-                       .Include(p => p.DetallesPromocion)
-                       .OrderByDescending(p => p.Fin == null) 
-                       .ToList();
-    }
+{
+    return _context.Set<Promociones>()
+        .Include(p => p.DetallesPromocion)         
+            .ThenInclude(d => d.Producto)
+        .ToList();
+}
 
     public Promociones ObtenerDetallesDePromocionPorId(int id)
     {
