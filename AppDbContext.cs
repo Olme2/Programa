@@ -18,19 +18,9 @@ namespace entornoPolleria
         public DbSet<DetallesPromociones> DetallesPromociones { get; set; }
         public DbSet<VentasPromociones> VentasPromociones { get; set; }
 
-        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        {
-            if (!optionsBuilder.IsConfigured)
-            {
-                var config = new ConfigurationBuilder()
-                    .AddIniFile("postgresql.conf")
-                    .Build();
-                optionsBuilder.UseNpgsql($"Host={config["Host"]};Port={config["Port"]};Database={config["Database"]};Username={config["Username"]};Password={config["Password"]}");
-            }
-        }
-
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            base.OnModelCreating(modelBuilder);
             // Configuración del modelo Productos
             modelBuilder.Entity<Productos>(entity =>
             {
@@ -53,6 +43,7 @@ namespace entornoPolleria
                 entity.Property(e => e.IdProveedor).HasColumnName("id_proveedor").UseIdentityColumn();
                 entity.Property(e => e.Proveedor).HasColumnName("proveedor").HasMaxLength(50).IsRequired();
                 entity.Property(e => e.Contacto).HasColumnName("contacto").HasMaxLength(50);
+                entity.Property(e => e.Debo).HasColumnName("debo").HasColumnType("numeric(9,2)").IsRequired();
             });
 
             // Compras
@@ -98,6 +89,11 @@ namespace entornoPolleria
                 entity.Property(e => e.IdProducto).HasColumnName("id_producto").IsRequired();
                 entity.Property(e => e.IdPromocion).HasColumnName("id_promocion").IsRequired();
                 entity.Property(e => e.Cantidad).HasColumnName("cantidad").HasColumnType("numeric(6,3)").IsRequired();
+                entity.HasOne<Promociones>()
+                      .WithMany(p => p.DetallesPromocion) 
+                      .HasForeignKey(d => d.IdPromocion) 
+                      .IsRequired()
+                      .OnDelete(DeleteBehavior.Cascade); 
             });
 
             // Ventas

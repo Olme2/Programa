@@ -1,6 +1,6 @@
 using entornoPolleria;
 
-class ProveedoresRepository : IProveedoresRepository
+public class ProveedoresRepository : IProveedoresRepository
 {
     private readonly AppDbContext _context;
     
@@ -9,39 +9,34 @@ class ProveedoresRepository : IProveedoresRepository
         _context = context;
     }
     
-    public List<Proveedores> ListarProveedores()
+    public IEnumerable<Proveedores> ObtenerTodos()
     {
-        return _context.Set<Proveedores>().ToList();
+        return _context.Proveedores.ToList();
     }
 
-    public void CrearNuevoProveedor(Proveedores proveedor)
+    public Proveedores? ObtenerPorId(int id)
     {
-        _context.Set<Proveedores>().Add(proveedor);
+        return _context.Proveedores.FirstOrDefault(p => p.IdProveedor == id);
+    }
+
+    public void Crear(Proveedores proveedor)
+    {
+        _context.Proveedores.Add(proveedor);
         _context.SaveChanges();
     }
 
-    public void ModificarProveedor(Proveedores proveedor)
+    public void Actualizar(Proveedores proveedor)
     {
-        _context.Set<Proveedores>().Update(proveedor);
+        _context.Proveedores.Update(proveedor);
         _context.SaveChanges();
     }
 
-    public Proveedores ObtenerDetallesDeProveedorPorId(int id)
+    public void Eliminar(int id)
     {
-        var proveedor = _context.Set<Proveedores>().FirstOrDefault(p => p.IdProveedor == id);
-        if (proveedor == null)
-        {
-            throw new Exception("Proveedor inexistente");
-        }
-        return proveedor;
-    }
-
-    public void EliminarProveedorPorId(int id)
-    {
-        var proveedor = _context.Set<Proveedores>().FirstOrDefault(p => p.IdProveedor == id);
+        var proveedor = _context.Proveedores.Find(id);
         if (proveedor != null)
         {
-            _context.Set<Proveedores>().Remove(proveedor);
+            _context.Proveedores.Remove(proveedor);
             _context.SaveChanges();
         }
     }

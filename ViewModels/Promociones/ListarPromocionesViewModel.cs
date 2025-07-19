@@ -1,43 +1,28 @@
+using System.ComponentModel.DataAnnotations;
 namespace PromocionesVM;
 
 public class ListarPromocionesVM
 {
-    private int idPromocion;
-    private string promocion;
-    private decimal costo;
-    private decimal precio;
-    private decimal ganancia;
-    private decimal porcentajeGanancia;
-    private DateOnly inicio;
-    private DateOnly? fin;
-    private List<string> productos;
-
-    public ListarPromocionesVM()
-    {
-        promocion = string.Empty;
-        productos = new List<string>();
-    }
-
-    public ListarPromocionesVM(Promociones Promocion, List<string> Productos)
-    {
-        idPromocion = Promocion.IdPromocion;
-        promocion = Promocion.Promocion;
-        costo = Promocion.CalcularCostoTotal();
-        precio = Promocion.Precio;
-        ganancia = precio - Costo;
-        porcentajeGanancia = (ganancia-Costo/Costo)*100;
-        inicio = Promocion.Inicio;
-        fin = Promocion.Fin;
-        productos = Productos;
-    }
-
-    public int IdPromocion { get => idPromocion; set => idPromocion = value; }
-    public string Promocion { get => promocion; set => promocion = value; }
-    public decimal Costo { get => costo; set => costo = value; }
-    public decimal Precio { get => precio; set => precio = value; }
-    public decimal Ganancia { get => ganancia; set => ganancia = value;}
-    public decimal PorcentajeGanancia { get => porcentajeGanancia; set => porcentajeGanancia = value; }
-    public DateOnly Inicio { get => inicio; set => inicio = value; }
-    public DateOnly? Fin { get => fin; set => fin = value; }
-    public List<string> Productos { get => productos; set => productos = value; }
+    public int IdPromocion { get; set; }
+    public string Promocion { get; set; } = string.Empty;
+    [Display(Name = "Productos")]
+    public string ProductosConcatenados { get; set; } = string.Empty;
+    [DataType(DataType.Currency)]
+    public decimal Costo { get; set; }
+    [DataType(DataType.Currency)]
+    public decimal Precio { get; set; }
+    [DataType(DataType.Currency)]
+    public decimal Ganancia { get; set; }
+    [Display(Name = "% Ganancia")]
+    [DisplayFormat(DataFormatString = "{0:P2}")]
+    public decimal PorcentajeGanancia { get; set; }
+    [Display(Name = "Fecha de Inicio")]
+    [DisplayFormat(DataFormatString = "{0:dd/MM}")]
+    public DateOnly Inicio { get; set; }
+    [Display(Name = "Fecha de Fin")]
+    [DisplayFormat(DataFormatString = "{0:dd/MM}", NullDisplayText = "-")]
+    public DateOnly? Fin { get; set; }
+    public bool Activa { get; set; }
+    public bool EsEliminable { get; set; }
+    public ListarPromocionesVM() { }
 }

@@ -1,29 +1,25 @@
 using System.ComponentModel.DataAnnotations;
-
+namespace ProveedoresVM;
 public class ModificarProveedorVM
 {
-    private int idProveedor;
-    private string proveedor;
-    private string? contacto;
+    [Required]
+    public int IdProveedor { get; set; }
 
-    public ModificarProveedorVM()
+    [Required(ErrorMessage = "El nombre del proveedor es obligatorio.")]
+    [StringLength(50, ErrorMessage = "El nombre no puede exceder los 50 caracteres.")]
+    public string Proveedor { get; set; } = string.Empty;
+
+    [StringLength(100, ErrorMessage = "El contacto no puede exceder los 100 caracteres.")]
+    public string? Contacto { get; set; }
+    [Range(0, 9999999.99, ErrorMessage = "El saldo no puede ser negativo.")]
+    public decimal Debo { get; set; }
+    public ModificarProveedorVM() { }
+
+    public ModificarProveedorVM(Proveedores proveedor)
     {
-        proveedor = string.Empty;
-        contacto = string.Empty;
+        IdProveedor = proveedor.IdProveedor;
+        Proveedor = proveedor.Proveedor;
+        Contacto = proveedor.Contacto;
+        Debo = proveedor.Debo;
     }
-
-    public ModificarProveedorVM(Proveedores Proveedor)
-    {
-        idProveedor = Proveedor.IdProveedor;
-        proveedor = Proveedor.Proveedor;
-        contacto = Proveedor.Contacto;
-    }
-
-    public int IdProveedor { get => idProveedor; set => idProveedor = value; }
-
-    [Required(ErrorMessage = "Nombre del proveedor obligatorio")]
-    [StringLength(50, ErrorMessage = "El nombre no puede ser más largo que 50 caracteres")]
-    public string Proveedor { get => proveedor; set => proveedor = value; }
-    [StringLength(100, ErrorMessage = "El contacto no puede ser más largo que 100 caracteres")]
-    public string? Contacto { get => contacto; set => contacto = value; }
-} 
+}

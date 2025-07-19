@@ -2,29 +2,32 @@ using ProveedoresVM;
 
 public class Proveedores
 {
-    private int idProveedor;
-    private string proveedor;
-    private string? contacto;
+    public int IdProveedor { get; private set; }
+    public string Proveedor { get; private set; }
+    public string? Contacto { get; private set; }
+    public decimal Debo { get; private set; }
 
-    public Proveedores()
+    private Proveedores()
     {
-        proveedor = string.Empty;
+        Proveedor = string.Empty;
     }
 
-    public Proveedores(AltaProveedorVM proveedorVM)
+    private Proveedores(string proveedor, string? contacto, decimal deboInicial)
     {
-        proveedor = proveedorVM.Proveedor;
-        contacto = proveedorVM.Contacto;
+        Proveedor = proveedor;
+        Contacto = contacto;
+        Debo = deboInicial;
     }
 
-    public Proveedores(ModificarProveedorVM proveedorVM)
+    public static Proveedores CrearDesdeViewModel(AltaProveedorVM vm)
     {
-        idProveedor = proveedorVM.IdProveedor;
-        proveedor = proveedorVM.Proveedor;
-        contacto = proveedorVM.Contacto;
+        return new Proveedores(vm.Proveedor, vm.Contacto, vm.Debo);
     }
-    
-    public int IdProveedor { get => idProveedor; set => idProveedor = value; }
-    public string Proveedor { get => proveedor; set => proveedor = value; }
-    public string? Contacto { get => contacto; set => contacto = value; }
-} 
+
+    public void ActualizarDesdeViewModel(ModificarProveedorVM vm)
+    {
+        Proveedor = vm.Proveedor;
+        Contacto = vm.Contacto;
+        Debo = vm.Debo;
+    }
+}

@@ -1,14 +1,17 @@
 public class DetallesVentas
 {
-    private long idVenta;
-    private int idProducto;
-    private decimal cantidad;
-    private decimal costoUnitario;
-    private decimal precioUnitario;
-    
-    public long IdVenta { get => idVenta; set => idVenta = value; }
-    public int IdProducto { get => idProducto; set => idProducto = value; }
-    public decimal Cantidad { get => cantidad; set => cantidad = value; }
-    public decimal CostoUnitario { get => costoUnitario; set => costoUnitario = value; }
-    public decimal PrecioUnitario { get => precioUnitario; set => precioUnitario = value; }
+    // --- Propiedades de la Entidad ---
+    public long IdVenta { get; set; }
+    public int IdProducto { get; set; }
+    public decimal Cantidad { get; set; }
+    public decimal CostoUnitario { get; set; }
+    public decimal PrecioUnitario { get; set; }
+    public virtual Ventas Venta { get; set; }
+    public virtual Productos Producto { get; set; }
+    private DetallesVentas()
+    {
+        Venta = null!;
+        Producto = null!;
+    }
+
 }

@@ -1,11 +1,13 @@
-namespace DetallesPromocionesVM;
+using System.ComponentModel.DataAnnotations;
 
+namespace DetallesPromocionesVM;
 public class ModificarDetallePromocionVM
 {
-    private int idPromocion;
-    private int idProducto;
-    private decimal cantidad;
-    public int IdPromocion { get => idPromocion; set => IdPromocion = value; }
-    public int IdProducto { get => idProducto; set => IdProducto = value; }
-    public decimal Cantidad { get => cantidad; set => cantidad = value;}
+    [Required]
+    [Range(1, int.MaxValue, ErrorMessage = "Debe seleccionar un producto válido.")]
+    public int IdProducto { get; set; }
+    [Required]
+    [Range(0.001, 999.999, ErrorMessage = "La cantidad debe ser al menos 0,001 y como maximo 999,999.")]
+    public decimal Cantidad { get; set; }
+    public string NombreProducto { get; set; } = string.Empty;
 }

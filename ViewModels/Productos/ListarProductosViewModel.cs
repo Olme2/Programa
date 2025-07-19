@@ -1,37 +1,43 @@
+using System.ComponentModel.DataAnnotations;
 namespace ProductosVM;
 
 public class ListarProductosVM
-{
-    private int idProducto;
-    private string producto;
-    private string proveedor;
-    private decimal stock;
-    private decimal costo;
-    private decimal precio;
-    private decimal ganancia;
-    private decimal porcentajeGanancia;
-    public ListarProductosVM()
     {
-        producto = string.Empty;
-        proveedor = string.Empty;
+        public int IdProducto { get; set; }
+        public string Producto { get; set; } = string.Empty;
+        public string Proveedor { get; set; } = string.Empty;
+        public decimal Stock { get; set; }
+
+        [DataType(DataType.Currency)]
+        public decimal Costo { get; set; }
+        
+        [DataType(DataType.Currency)]
+        public decimal Precio { get; set; }
+
+        public bool Activo { get; set; }
+        [DataType(DataType.Currency)]
+        public decimal Ganancia { get; set; }
+
+        [Display(Name = "% Ganancia")]
+        [DisplayFormat(DataFormatString = "{0:P2}")]
+        public decimal PorcentajeGanancia { get; set; }
+        [Display(Name = "Vendidos (Semana)")]
+        public int VendidosSemana { get; set; }
+    
+        public bool EsEliminable { get; set; }
+
+        public ListarProductosVM() { }
+
+        public ListarProductosVM(Productos producto)
+        {
+            IdProducto = producto.IdProducto;
+            Producto = producto.Producto;
+            Proveedor = producto.Proveedor?.Proveedor ?? "N/A"; 
+            Stock = producto.Stock;
+            Costo = producto.Costo;
+            Precio = producto.Precio;
+            Activo = producto.Activo;
+            Ganancia = producto.CalcularGanancia();
+            PorcentajeGanancia = producto.CalcularPorcentajeGanancia();
+        }
     }
-    public ListarProductosVM(Productos Producto, string Proveedor)
-    {
-        idProducto = Producto.IdProducto;
-        producto = Producto.Producto;
-        proveedor = Proveedor;
-        stock = Producto.Stock;
-        costo = Producto.Costo;
-        precio = Producto.Precio;
-        ganancia = Producto.Ganancia;
-        porcentajeGanancia = Producto.PorcentajeGanancia;
-    }
-    public int IdProducto { get => idProducto; set => idProducto = value; }
-    public string Producto { get => producto; set => producto = value; }
-    public string Proveedor { get => proveedor; set => proveedor = value; }
-    public decimal Stock { get => stock; set => stock = value; }
-    public decimal Costo { get => costo; set => costo = value; }
-    public decimal Precio { get => precio; set => precio = value; }
-    public decimal Ganancia { get => ganancia; set => ganancia = value; }
-    public decimal PorcentajeGanancia { get => porcentajeGanancia; set => porcentajeGanancia = value; }
-}

@@ -1,8 +1,10 @@
+using PromocionesVM;
 public interface IPromocionesRepository
 {
-    void CrearNuevaPromocion(Promociones promocion);
-    void ModificarPromocion(Promociones promocion);
-    List<Promociones> ListarPromocionesRegistradas();
-    Promociones ObtenerDetallesDePromocionPorId(int id);
-    void EliminarPromocionPorId(int id);
-} 
+    IEnumerable<ListarPromocionesVM> ObtenerListadoPromociones();
+    Promociones? ObtenerPorId(int id);
+    void Crear(Promociones promocion);
+    void Actualizar(Promociones promocion);
+    void Eliminar(int id);
+    bool PuedeSerEliminada(int id);
+}

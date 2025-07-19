@@ -2,53 +2,60 @@ using PromocionesVM;
 
 public class Promociones
 {
-    private int idPromocion;
-    private string promocion;
-    private decimal precio;
-    private DateOnly inicio;
-    private DateOnly? fin;
-    private List<DetallesPromociones> detallesPromocion;
+    public int IdPromocion { get; private set; }
+    public string Promocion { get; private set; }
+    public decimal Precio { get; private set; }
+    public DateOnly Inicio { get; private set; }
+    public DateOnly? Fin { get; private set; }
+    private List<DetallesPromociones> _detallesPromocion = new List<DetallesPromociones>();    
+    public IReadOnlyCollection<DetallesPromociones> DetallesPromocion => _detallesPromocion.AsReadOnly();
 
-    public Promociones()
+    private Promociones()
     {
-        promocion = string.Empty;
-        inicio = DateOnly.FromDateTime(DateTime.Now);
-        detallesPromocion = new List<DetallesPromociones>();
+        Promocion = string.Empty;
     }
 
-    public Promociones(string Promocion, decimal Precio, DateOnly Inicio, DateOnly? Fin, List<DetallesPromociones> Detalles)
+    private Promociones(string nombrePromocion, decimal precio, DateOnly inicio, DateOnly? fin, List<DetallesPromociones> detalles)
     {
-        promocion = Promocion;
-        precio = Precio;
-        inicio = Inicio;
-        fin = Fin;
-        detallesPromocion = Detalles;
+        Promocion = nombrePromocion;
+        Precio = precio;
+        Inicio = inicio;
+        Fin = fin;
+        _detallesPromocion = detalles;
     }
+    
     public static Promociones CrearDesdeViewModel(AltaPromocionVM promocionVM)
     {
-        var detalles = promocionVM.DetallesPromocion.Select(detalleVM => new DetallesPromociones(detalleVM)).ToList();
-        return new Promociones(promocionVM.Promocion,promocionVM.Precio,promocionVM.Inicio,promocionVM.Fin,detalles);
+        var detalles = promocionVM.DetallesPromocion.Select(DetallesPromociones.CrearDesdeViewModel).ToList();
+        return new Promociones(promocionVM.Promocion, promocionVM.Precio, promocionVM.Inicio, promocionVM.Fin, detalles);
     }
 
-    public Promociones(ModificarPromocionVM promocionVM)
+    public void ActualizarDesdeViewModel(ModificarPromocionVM promocionVM)
     {
-        idPromocion = promocionVM.IdPromocion;
-        promocion = promocionVM.Promocion;
-        precio = promocionVM.Precio;
-        inicio = promocionVM.Inicio;
-        fin = promocionVM.Fin;
-        detallesPromocion = promocionVM.DetallesPromocion.Select(d => new DetallesPromociones(d)).ToList();
+        Promocion = promocionVM.Promocion;
+        Precio = promocionVM.Precio;
+        Inicio = promocionVM.Inicio;
+        Fin = promocionVM.Fin;
+        var detallesActualizados = promocionVM.DetallesPromocion.Select(DetallesPromociones.CrearDesdeViewModel).ToList();
+        LimpiarDetalles();
+        foreach (var detalle in detallesActualizados)
+        {
+            AgregarDetalle(detalle);
+        }
+    }
+    
+    public void LimpiarDetalles()
+    {
+        _detallesPromocion.Clear();
+    }
+
+    public void AgregarDetalle(DetallesPromociones detalle)
+    {
+        _detallesPromocion.Add(detalle);
     }
 
     public decimal CalcularCostoTotal()
     {
-        return detallesPromocion.Sum(detalle => detalle.CalcularCosto());
+        return _detallesPromocion.Sum(detalle => detalle.CalcularCosto());
     }
-
-    public int IdPromocion { get => idPromocion; set => idPromocion = value; }
-    public string Promocion { get => promocion; set => promocion = value; }
-    public decimal Precio { get => precio; set => precio = value; }
-    public DateOnly Inicio { get => inicio; set => inicio = value; }
-    public DateOnly? Fin { get => fin; set => fin = value; }
-    public List<DetallesPromociones> DetallesPromocion { get => detallesPromocion; set => detallesPromocion = value; }
 }

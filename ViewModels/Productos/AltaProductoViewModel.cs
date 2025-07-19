@@ -3,33 +3,36 @@ namespace ProductosVM;
 using ProveedoresVM;
 
 public class AltaProductoVM
-{
-    private string producto;
-    private int idProveedor;
-    private decimal stock;
-    private decimal costo;
-    private decimal precio;
-    private List<ListarProveedoresVM> proveedores;
-    public AltaProductoVM()
     {
-        producto = string.Empty;
-        proveedores = new List<ListarProveedoresVM>();
+        [Required(ErrorMessage = "El nombre del producto es obligatorio.")]
+        [StringLength(50, ErrorMessage = "El nombre no puede exceder los 50 caracteres.")]
+        public string Producto { get; set; }
+
+        [Required(ErrorMessage = "Debe seleccionar un proveedor.")]
+        [Display(Name = "Proveedor")]
+        public int IdProveedor { get; set; }
+
+        [Required(ErrorMessage = "El stock inicial es obligatorio.")]
+        [Range(0.001, 99999.999, ErrorMessage = "El stock no puede ser negativo ni mayor a 99.999,999.")]
+        public decimal Stock { get; set; }
+
+        [Required(ErrorMessage = "El costo es obligatorio.")]
+        [Range(0.01, 99999.99, ErrorMessage = "El costo debe ser un valor positivo y no mayor a $99.999,99.")]
+        public decimal Costo { get; set; }
+
+        [Required(ErrorMessage = "El precio es obligatorio.")]
+        [Range(0.01, 99999.99, ErrorMessage = "El precio debe ser un valor positivo y no mayor a $99.999,99.")]
+        public decimal Precio { get; set; }
+        public List<ListarProveedoresVM> Proveedores { get; set; }
+
+        public AltaProductoVM()
+        {
+            Producto = string.Empty;
+            Proveedores = new List<ListarProveedoresVM>();
+        }
+
+        public AltaProductoVM(List<ListarProveedoresVM> proveedores) : this()
+        {
+            Proveedores = proveedores;
+        }
     }
-    public AltaProductoVM(List<ListarProveedoresVM> Proveedores)
-    {
-        producto = string.Empty;
-        proveedores = Proveedores;
-    }
-    [Required(ErrorMessage = "Nombre de producto Obligatorio")]
-    [StringLength(50, ErrorMessage = "El nombre no puede ser más largo que 50 caracteres")]
-    public string Producto { get => producto; set => producto = value; }
-    [Required(ErrorMessage = "Id proveedor obligatorio")]
-    public int IdProveedor { get => idProveedor; set => idProveedor = value; }
-    [Required(ErrorMessage = "Stock Obligatorio")]
-    public decimal Stock { get => stock; set => stock = value; }
-    [Required(ErrorMessage = "Costo Obligatorio")]
-    public decimal Costo { get => costo; set => costo = value; }
-    [Required(ErrorMessage = "Precio Obligatorio")]
-    public decimal Precio { get => precio; set => precio = value; }
-    public List<ListarProveedoresVM> Proveedores { get => proveedores;  set => proveedores = value; }
-}

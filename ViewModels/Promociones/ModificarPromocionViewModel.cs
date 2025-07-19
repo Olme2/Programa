@@ -1,50 +1,44 @@
-using DetallesPromocionesVM;
+using System.ComponentModel.DataAnnotations;
+using DetallesPromocionesVM; 
 using ProductosVM;
 
 namespace PromocionesVM;
-
 public class ModificarPromocionVM
 {
-    private int idPromocion;
-    private string promocion;
-    private decimal costo;
-    private decimal precio;
-    private decimal ganancia;
-    private decimal porcentajeGanancia;
-    private DateOnly inicio;
-    private DateOnly? fin;
-    private List<ModificarDetallePromocionVM> detallesPromocion;
-    private List<ListarProductosVM> productos;
-
+    [Required]
+    public int IdPromocion { get; set; }
+    [Required(ErrorMessage = "El nombre de la promoción es obligatorio.")]
+    [StringLength(50, ErrorMessage = "El nombre no puede exceder los 50 caracteres.")]
+    public string Promocion { get; set; }
+    [Required(ErrorMessage = "El precio de la promoción es obligatorio.")]
+    [Range(0.01, 99999.99, ErrorMessage = "El precio debe estar entre 0,01 y 99.999,99.")]
+    public decimal Precio { get; set; }
+    [Required(ErrorMessage = "La fecha de inicio es obligatoria.")]
+    public DateOnly Inicio { get; set; }
+    public DateOnly? Fin { get; set; }
+    [MinLength(1, ErrorMessage = "La promoción debe tener al menos un producto.")]
+    public List<ModificarDetallePromocionVM> DetallesPromocion { get; set; }
+    public List<ListarProductosVM> Productos { get; set; }
+    
     public ModificarPromocionVM()
     {
-        promocion = string.Empty;
-        detallesPromocion = new List<ModificarDetallePromocionVM>();
-        productos = new List<ListarProductosVM>();
+        Promocion = string.Empty;
+        DetallesPromocion = new List<ModificarDetallePromocionVM>();
+        Productos = new List<ListarProductosVM>();
     }
 
-    public ModificarPromocionVM(Promociones Promocion, decimal Costo, List<ModificarDetallePromocionVM> DetallesPromocion, List<ListarProductosVM> Productos)
+    public ModificarPromocionVM(Promociones promocion, List<ListarProductosVM> productos)
     {
-        idPromocion = Promocion.IdPromocion;
-        promocion = Promocion.Promocion;
-        costo = Costo;
-        precio = Promocion.Precio;
-        ganancia = precio - Costo;
-        porcentajeGanancia = (ganancia - Costo / Costo) * 100;
-        inicio = Promocion.Inicio;
-        fin = Promocion.Fin;
-        detallesPromocion = DetallesPromocion;
-        productos = Productos;
+        IdPromocion = promocion.IdPromocion;
+        Promocion = promocion.Promocion;
+        Precio = promocion.Precio;
+        Inicio = promocion.Inicio;
+        Fin = promocion.Fin;
+        DetallesPromocion = promocion.DetallesPromocion.Select(d => new ModificarDetallePromocionVM
+                                                            {
+                                                                IdProducto = d.IdProducto,
+                                                                Cantidad = d.Cantidad
+                                                            }).ToList();
+        Productos = productos;
     }
-    
-    public int IdPromocion { get => idPromocion; set => idPromocion = value; }
-    public string Promocion { get => promocion; set => promocion = value; }
-    public decimal Costo { get => costo; set => costo = value; }
-    public decimal Precio { get => precio; set => precio = value; }
-    public decimal Ganancia { get => ganancia; set => ganancia = value; }
-    public decimal PorcentajeGanancia { get => porcentajeGanancia; set => porcentajeGanancia = value; }
-    public DateOnly Inicio { get => inicio; set => inicio = value; }
-    public DateOnly? Fin { get => fin; set => fin = value; }
-    public List<ModificarDetallePromocionVM> DetallesPromocion { get => detallesPromocion; set => detallesPromocion = value; }
-    public List<ListarProductosVM> Productos { get => productos; set => productos = value; }
 }

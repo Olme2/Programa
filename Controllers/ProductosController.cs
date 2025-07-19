@@ -5,149 +5,224 @@ using ProveedoresVM;
 public class ProductosController : Controller
 {
     private readonly ILogger<ProductosController> _logger;
-    private IProductosRepository repositorioProductos;
-    private IProveedoresRepository repositorioProveedores;
-    public ProductosController(ILogger<ProductosController> logger, IProductosRepository RepositorioProductos, IProveedoresRepository RepositorioProveedores)
+    private readonly IProductosRepository _productosRepo;
+    private readonly IProveedoresRepository _proveedoresRepo;
+
+    public ProductosController(ILogger<ProductosController> logger, IProductosRepository productosRepo, IProveedoresRepository proveedoresRepo)
     {
         _logger = logger;
-        repositorioProductos = RepositorioProductos;
-        repositorioProveedores = RepositorioProveedores;
+        _productosRepo = productosRepo;
+        _proveedoresRepo = proveedoresRepo;
     }
-    public IActionResult Index()
-    {
-        try
-        {
-            var productosVM = new List<ListarProductosVM>();
-            var productos = repositorioProductos.ListarProductosRegistrados();
-            productosVM = productos.Select(p =>
-            {
-                var nombreProveedor = repositorioProveedores.ObtenerDetallesDeProveedorPorId(p.IdProveedor).Proveedor;
-                return new ListarProductosVM(p, nombreProveedor);
-            }).ToList();
-            return View(productosVM);
-        }
-        catch (Exception e)
-        {
-            _logger.LogError(e.ToString());
-            ViewBag.ErrorMessage = "No se pudo cargó la lista de productos correctamente";
-            return RedirectToAction("Index");
-        }
-    }
+
     [HttpGet]
-    public IActionResult AltaProducto()
+    public IActionResult Index(string busqueda, string ordenarPor = "alfabetico")
     {
         try
         {
-            var proveedores = repositorioProveedores.ListarProveedores();
-            var proveedoresVM = proveedores.Select(p => new ListarProveedoresVM(p)).ToList();
-            var model = new AltaProductoVM(proveedoresVM);
-            return View(model);
-        }
-        catch (Exception e)
-        {
-            _logger.LogError(e.ToString());
-            ViewBag.ErrorMessage = "No se pudo cargó el formulario de creación de producto correctamente";
-            return RedirectToAction("Index");
-        }
-    }
-    [HttpPost]
-    public IActionResult AltaProducto(AltaProductoVM productoVM)
-    {
-        try
-        {
-            if (ModelState.IsValid)
+            // 1. Llamamos al nuevo método del repositorio. ¡Obtenemos los VMs directamente!
+            IEnumerable<ListarProductosVM> productosVM = _productosRepo.ObtenerListadoProductos();
+
+            // 2. Aplicamos el filtro de búsqueda (ahora sobre el ViewModel).
+            if (!string.IsNullOrEmpty(busqueda))
             {
-                Productos producto = new Productos(productoVM);
-                repositorioProductos.CrearNuevoProducto(producto);
-                return RedirectToAction("Index");
+                productosVM = productosVM.Where(p => 
+                    p.Producto.Contains(busqueda, StringComparison.CurrentCultureIgnoreCase) || 
+                    p.Proveedor.Contains(busqueda, StringComparison.CurrentCultureIgnoreCase)
+                );
             }
-            return View(productoVM);
-        }
-        catch (Exception e)
-        {
-            _logger.LogError(e.ToString());
-            ViewBag.ErrorMessage = "No se pudo crear el producto: " + e.Message;
-            if (e.InnerException != null)
-                ViewBag.ErrorMessage += " | Detalle: " + e.InnerException.Message;
-            var proveedores = repositorioProveedores.ListarProveedores();
-            var proveedoresVM = proveedores.Select(p => new ListarProveedoresVM(p)).ToList();
-            productoVM.Proveedores = proveedoresVM;
-            return View(productoVM);
-        }
-    }
-    [HttpGet]
-    public IActionResult ModificarProducto(int id)
-    {
-        try
-        {
-            Productos producto = repositorioProductos.ObtenerDetallesDeProductoPorId(id);
-            var proveedores = repositorioProveedores.ListarProveedores();
-            var provedoresVM = proveedores.Select(p => new ListarProveedoresVM(p)).ToList();
-            ModificarProductoVM productoVM = new ModificarProductoVM(producto, provedoresVM);
-            return View(productoVM);
-        }
-        catch (Exception e)
-        {
-            _logger.LogError(e.ToString());
-            ViewBag.ErrorMessage = "No se pudo cargar el producto";
-            return RedirectToAction("Index");
-        }
-    }
-    [HttpPost]
-    public IActionResult ModificarProducto(ModificarProductoVM productoVM)
-    {
-        try
-        {
-            if (ModelState.IsValid)
+
+            // 3. Aplicamos el ordenamiento según el parámetro.
+            switch (ordenarPor)
             {
-                Productos producto = new Productos(productoVM);
-                repositorioProductos.ModificarProducto(producto);
-                return RedirectToAction("Index");
+                case "stock":
+                    productosVM = productosVM.OrderBy(p => p.Stock);
+                    break;
+                case "vendidos":
+                    productosVM = productosVM.OrderByDescending(p => p.VendidosSemana);
+                    break;
+                default: // "alfabetico" y cualquier otro valor
+                    productosVM = productosVM.OrderBy(p => p.Producto);
+                    break;
             }
-            return RedirectToAction("Index");
+
+            // 4. Pasamos los filtros y ordenamiento a la vista.
+            ViewData["BusquedaActual"] = busqueda;
+            ViewData["OrdenActual"] = ordenarPor;
+            return View(productosVM.ToList());
         }
         catch (Exception e)
         {
-            _logger.LogError(e.ToString());
-            ViewBag.ErrorMessage = "No se pudo modificar el producto: " + e.Message;
-            if (e.InnerException != null)
-                ViewBag.ErrorMessage += " | Detalle: " + e.InnerException.Message;
-            var proveedores = repositorioProveedores.ListarProveedores();
-            var provedoresVM = proveedores.Select(p => new ListarProveedoresVM(p)).ToList();
-            productoVM.Proveedores = provedoresVM;
-            return View(productoVM);
+            _logger.LogError(e, "Error al obtener el listado de productos.");
+            ViewBag.ErrorMessage = "Ocurrió un error al cargar los productos.";
+            return View(new List<ListarProductosVM>());
         }
     }
+
     [HttpGet]
-    public IActionResult EliminarProducto(int id)
+    public IActionResult Alta()
     {
         try
         {
-            var producto = repositorioProductos.ObtenerDetallesDeProductoPorId(id);
-            var nombreProveedor = repositorioProveedores.ObtenerDetallesDeProveedorPorId(producto.IdProveedor).Proveedor;
-            var productoVM = new ListarProductosVM(producto, nombreProveedor);
+            var proveedores = _proveedoresRepo.ObtenerTodos();
+            var proveedoresVM = proveedores.Select(p => new ListarProveedoresVM(p)).ToList();
+            var viewModel = new AltaProductoVM(proveedoresVM);
+            return View(viewModel);
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, "Error al preparar el formulario de alta de producto.");
+            // Usamos TempData para que el mensaje sobreviva la redirección al Index
+            TempData["ErrorMessage"] = "Ocurrió un error al cargar el formulario.";
+            return RedirectToAction(nameof(Index));
+        }
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public IActionResult Alta(AltaProductoVM productoVM)
+    {
+        try
+        {
+            if (!ModelState.IsValid)
+            {
+                // Si el modelo no es válido, debemos recargar los datos para la vista.
+                var proveedores = _proveedoresRepo.ObtenerTodos();
+                productoVM.Proveedores = proveedores.Select(p => new ListarProveedoresVM(p)).ToList();
+                return View(productoVM);
+            }
+
+            var nuevoProducto = Productos.CrearDesdeViewModel(productoVM);
+            _productosRepo.Crear(nuevoProducto);
+
+            // Añadimos el mensaje de éxito para una experiencia de usuario consistente.
+            TempData["SuccessMessage"] = "Producto creado correctamente.";
+
+            return RedirectToAction(nameof(Index));
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, "Error al crear el nuevo producto.");
+            ViewBag.ErrorMessage = "Ocurrió un error al guardar el producto.";
+
+            // Si hay un error, también debemos recargar los datos para la vista.
+            var proveedores = _proveedoresRepo.ObtenerTodos();
+            productoVM.Proveedores = proveedores.Select(p => new ListarProveedoresVM(p)).ToList();
+            return View(productoVM);
+        }
+    }
+
+    // --- ACCIONES DE MODIFICACIÓN ---
+    [HttpGet]
+    public IActionResult Modificar(int id)
+    {
+        try
+        {
+            var producto = _productosRepo.ObtenerPorId(id);
+            if (producto == null)
+            {
+                _logger.LogWarning("Se intentó modificar un producto inexistente con ID {ProductoId}", id);
+                return NotFound(); // Devuelve una página de error 404.
+            }
+
+            var proveedores = _proveedoresRepo.ObtenerTodos();
+            var proveedoresVM = proveedores.Select(p => new ListarProveedoresVM(p)).ToList();
+            
+            // Usamos el constructor que mapea desde el modelo.
+            var productoVM = new ModificarProductoVM(producto, proveedoresVM);
+            
             return View(productoVM);
         }
         catch (Exception e)
         {
-            _logger.LogError(e.ToString());
-            ViewBag.ErrorMessage = "No se pudo cargar el producto";
-            return RedirectToAction("Index");
+            _logger.LogError(e, "Error al cargar el producto con ID {ProductoId} para modificar.", id);
+            ViewBag.ErrorMessage = "Ocurrió un error al cargar el producto.";
+            return RedirectToAction(nameof(Index));
         }
     }
+
     [HttpPost]
-    public IActionResult EliminarProducto(ListarProductosVM productoVM)
+    [ValidateAntiForgeryToken]
+    public IActionResult Modificar(ModificarProductoVM productoVM)
     {
         try
         {
-            repositorioProductos.EliminarProductoPorId(productoVM.IdProducto);
-            return RedirectToAction("Index");
+            if (!ModelState.IsValid)
+            {
+                var proveedores = _proveedoresRepo.ObtenerTodos();
+                productoVM.Proveedores = proveedores.Select(p => new ListarProveedoresVM(p)).ToList();
+                return View(productoVM);
+            }
+
+            var productoExistente = _productosRepo.ObtenerPorId(productoVM.IdProducto);
+            if (productoExistente == null)
+            {
+                return NotFound();
+            }
+
+            productoExistente.ActualizarDesdeViewModel(productoVM);
+            _productosRepo.Actualizar(productoExistente);
+
+            TempData["SuccessMessage"] = "Producto modificado correctamente.";
+
+            return RedirectToAction(nameof(Index));
         }
         catch (Exception e)
         {
-            _logger.LogError(e.ToString());
-            ViewBag.ErrorMessage = "No se pudo eliminar el producto";
-            return RedirectToAction("Index");
+            _logger.LogError(e, "Error al modificar el producto con ID {ProductoId}", productoVM.IdProducto);
+            ViewBag.ErrorMessage = "Ocurrió un error al guardar los cambios.";
+            var proveedores = _proveedoresRepo.ObtenerTodos();
+            productoVM.Proveedores = proveedores.Select(p => new ListarProveedoresVM(p)).ToList();
+            return View(productoVM);
+        }
+    }
+
+    // --- ACCIONES DE ELIMINACIÓN ---
+    [HttpGet]
+    public IActionResult Eliminar(int id)
+    {
+        try
+        {
+            var producto = _productosRepo.ObtenerPorId(id);
+            if (producto == null)
+            {
+                return NotFound();
+            }
+            // Reutilizamos el ListarProductosVM para mostrar los datos de confirmación.
+            var productoVM = new ListarProductosVM(producto);
+            return View(productoVM);
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, "Error al cargar el producto con ID {ProductoId} para eliminar.", id);
+            return RedirectToAction(nameof(Index));
+        }
+    }
+
+    [HttpPost, ActionName("Eliminar")]
+    [ValidateAntiForgeryToken]
+    public IActionResult EliminarConfirmado(int id) // Parámetro simplificado a 'id'
+    {
+        try
+        {
+            if (!_productosRepo.PuedeSerEliminado(id))
+            {
+                _logger.LogWarning("Intento de eliminación de producto en uso con ID {ProductoId}", id);
+                TempData["ErrorMessage"] = "No se puede eliminar el producto porque está siendo utilizado en ventas, compras o promociones.";
+                return RedirectToAction(nameof(Index));
+            }
+
+            _productosRepo.Eliminar(id);
+
+            TempData["SuccessMessage"] = "Producto eliminado correctamente.";
+
+            return RedirectToAction(nameof(Index));
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, "Error al eliminar el producto con ID {ProductoId}", id);
+            TempData["ErrorMessage"] = "Ocurrió un error al eliminar el producto.";
+            return RedirectToAction(nameof(Index));
         }
     }
 }

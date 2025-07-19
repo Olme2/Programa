@@ -4,7 +4,7 @@ using ProveedoresVM;
 public class ProveedoresController : Controller
 {
     private readonly ILogger<ProveedoresController> _logger;
-    private IProveedoresRepository _proveedoresRepo;
+    private readonly IProveedoresRepository _proveedoresRepo;
 
     public ProveedoresController(ILogger<ProveedoresController> logger, IProveedoresRepository proveedoresRepo)
     {
@@ -12,131 +12,197 @@ public class ProveedoresController : Controller
         _proveedoresRepo = proveedoresRepo;
     }
 
-    public IActionResult Index()
+    [HttpGet]
+    public IActionResult Index(string busqueda, string filtroDeuda = "todos")
     {
         try
         {
-            var proveedoresVM = new List<ListarProveedoresVM>();
-            var proveedores = _proveedoresRepo.ListarProveedores();
-            proveedoresVM = proveedores.Select(p => new ListarProveedoresVM(p)).ToList();
+            // 1. Obtenemos la lista completa de proveedores.
+            IEnumerable<Proveedores> proveedores = _proveedoresRepo.ObtenerTodos();
+
+            // 2. Aplicamos el filtro de búsqueda por nombre.
+            if (!string.IsNullOrEmpty(busqueda))
+            {
+                proveedores = proveedores.Where(p => p.Proveedor.Contains(busqueda, StringComparison.CurrentCultureIgnoreCase));
+            }
+
+            // 3. Aplicamos el filtro de deuda.
+            switch (filtroDeuda)
+            {
+                case "conDeuda":
+                    proveedores = proveedores.Where(p => p.Debo > 0);
+                    break;
+                case "sinDeuda":
+                    proveedores = proveedores.Where(p => p.Debo == 0);
+                    break;
+                // Si es "todos" o cualquier otro valor, no hacemos nada y mostramos todos.
+                default:
+                    break;
+            }
+
+            // 4. Aplicamos el ordenamiento.
+            IOrderedEnumerable<Proveedores> proveedoresOrdenados;
+            if (filtroDeuda == "todos")
+            {
+                // Si mostramos todos, primero los que tienen deuda, luego los que no.
+                proveedoresOrdenados = proveedores.OrderByDescending(p => p.Debo > 0).ThenBy(p => p.Proveedor);
+            }
+            else
+            {
+                // Para los otros filtros, solo ordenamos alfabéticamente.
+                proveedoresOrdenados = proveedores.OrderBy(p => p.Proveedor);
+            }
+
+            // 5. Mapeamos a ViewModels.
+            var proveedoresVM = proveedoresOrdenados.Select(p => new ListarProveedoresVM(p)).ToList();
+
+            // 6. Pasamos los filtros actuales a la vista para que los controles mantengan su estado.
+            ViewData["BusquedaActual"] = busqueda;
+            ViewData["FiltroDeudaActual"] = filtroDeuda;
             return View(proveedoresVM);
         }
         catch (Exception e)
         {
-            _logger.LogError(e.ToString());
-            ViewBag.ErrorMessage = "No se cargó la lista de proveedores: " + e.Message;
-            if (e.InnerException != null)
-                ViewBag.ErrorMessage += " | Detalle: " + e.InnerException.Message;
-            return RedirectToAction("Index", "Home");
+            _logger.LogError(e, "Error al obtener el listado de proveedores.");
+            ViewBag.ErrorMessage = "Ocurrió un error al cargar los proveedores.";
+            return View(new List<ListarProveedoresVM>());
         }
     }
 
     [HttpGet]
-    public IActionResult AltaProveedor()
+    public IActionResult Alta()
+    {
+        return View(new AltaProveedorVM());
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public IActionResult Alta(AltaProveedorVM proveedorVM)
     {
         try
         {
-            return View();
+            // 1. Validamos que los datos del formulario cumplan las reglas.
+            if (!ModelState.IsValid)
+            {
+                // Si no son válidos, volvemos a mostrar el formulario con los errores.
+                return View(proveedorVM);
+            }
+
+            // 2. Usamos el Factory Method de nuestro modelo de dominio.
+            //    Aquí ocurre la transformación de ViewModel a Modelo.
+            var nuevoProveedor = Proveedores.CrearDesdeViewModel(proveedorVM);
+
+            // 3. Usamos el método estandarizado del repositorio para guardar.
+            _proveedoresRepo.Crear(nuevoProveedor);
+
+            // 4. Redirigimos al Index (Patrón Post-Redirect-Get).
+            TempData["SuccessMessage"] = "Proveedor creado correctamente.";
+            return RedirectToAction(nameof(Index));
         }
         catch (Exception e)
         {
-            _logger.LogError(e.ToString());
-            ViewBag.ErrorMessage = "No se pudo cargar el formulario de creación de proveedor correctamente";
-            return RedirectToAction("Index");
+            _logger.LogError(e, "Error al crear el nuevo proveedor.");
+            ViewBag.ErrorMessage = "Ocurrió un error al guardar el proveedor.";
+            return View(proveedorVM);
+        }
+    }
+
+    // --- ACCIONES DE MODIFICACIÓN ---
+    [HttpGet]
+    public IActionResult Modificar(int id)
+    {
+        try
+        {
+            var proveedor = _proveedoresRepo.ObtenerPorId(id);
+            if (proveedor == null)
+            {
+                _logger.LogWarning("Se intentó modificar un proveedor inexistente con ID {ProveedorId}", id);
+                return NotFound();
+            }
+            var proveedorVM = new ModificarProveedorVM(proveedor);
+            return View(proveedorVM);
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, "Error al cargar el proveedor con ID {ProveedorId} para modificar.", id);
+            TempData["ErrorMessage"] = "Error al cargar el proveedor. Intente de nuevo."; // Usar TempData para errores en redirección
+            return RedirectToAction(nameof(Index));
         }
     }
 
     [HttpPost]
-    public IActionResult AltaProveedor(AltaProveedorVM proveedorVM)
+    [ValidateAntiForgeryToken]
+    public IActionResult Modificar(ModificarProveedorVM proveedorVM)
     {
         try
         {
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
-                Proveedores proveedor = new Proveedores(proveedorVM);
-                _proveedoresRepo.CrearNuevoProveedor(proveedor);
-                return RedirectToAction("Index");
+                return View(proveedorVM);
             }
-            return View(proveedorVM);
-        }
-        catch (Exception e)
-        {
-            _logger.LogError(e.ToString());
-            ViewBag.ErrorMessage = "No se pudo crear el proveedor";
-            return View(proveedorVM);
-        }
-    }
-
-    [HttpGet]
-    public IActionResult ModificarProveedor(int id)
-    {
-        try
-        {
-            Proveedores proveedor = _proveedoresRepo.ObtenerDetallesDeProveedorPorId(id);
-            ModificarProveedorVM proveedorVM = new ModificarProveedorVM(proveedor);
-            return View(proveedorVM);
-        }
-        catch (Exception e)
-        {
-            _logger.LogError(e.ToString());
-            ViewBag.ErrorMessage = "No se pudo cargar el proveedor";
-            return RedirectToAction("Index");
-        }
-    }
-
-    [HttpPost]
-    public IActionResult ModificarProveedor(ModificarProveedorVM proveedorVM)
-    {
-        try
-        {
-            if (ModelState.IsValid)
+            var proveedorExistente = _proveedoresRepo.ObtenerPorId(proveedorVM.IdProveedor);
+            if (proveedorExistente == null)
             {
-                Proveedores proveedor = new Proveedores(proveedorVM);
-                _proveedoresRepo.ModificarProveedor(proveedor);
-                return RedirectToAction("Index");
+                return NotFound();
             }
-            return View(proveedorVM);
+            proveedorExistente.ActualizarDesdeViewModel(proveedorVM);
+            _proveedoresRepo.Actualizar(proveedorExistente);
+
+            // --- Mensaje de éxito ---
+            TempData["SuccessMessage"] = "Proveedor modificado correctamente.";
+
+            return RedirectToAction(nameof(Index));
         }
         catch (Exception e)
         {
-            _logger.LogError(e.ToString());
-            ViewBag.ErrorMessage = "No se pudo modificar el proveedor";
+            _logger.LogError(e, "Error al modificar el proveedor con ID {ProveedorId}", proveedorVM.IdProveedor);
+            ViewBag.ErrorMessage = "Ocurrió un error al guardar los cambios.";
             return View(proveedorVM);
         }
     }
 
+    // --- ACCIONES DE ELIMINACIÓN ---
     [HttpGet]
-    public IActionResult EliminarProveedor(int id)
+    public IActionResult Eliminar(int id)
     {
         try
         {
-            var proveedor = _proveedoresRepo.ObtenerDetallesDeProveedorPorId(id);
+            var proveedor = _proveedoresRepo.ObtenerPorId(id);
+            if (proveedor == null)
+            {
+                return NotFound();
+            }
             var proveedorVM = new ListarProveedoresVM(proveedor);
             return View(proveedorVM);
         }
         catch (Exception e)
         {
-            _logger.LogError(e.ToString());
-            ViewBag.ErrorMessage = "No se pudo cargar el proveedor";
-            return RedirectToAction("Index");
+            _logger.LogError(e, "Error al cargar el proveedor con ID {ProveedorId} para eliminar.", id);
+            TempData["ErrorMessage"] = "Error al cargar el proveedor para eliminar.";
+            return RedirectToAction(nameof(Index));
         }
     }
 
-    [HttpPost]
-    public IActionResult EliminarProveedor(ListarProveedoresVM proveedorVM)
+    [HttpPost, ActionName("Eliminar")]
+    [ValidateAntiForgeryToken]
+    // Cambiamos el nombre del parámetro a 'id' para que coincida con la convención de routing
+    public IActionResult EliminarConfirmado(int id)
     {
         try
         {
-            _proveedoresRepo.EliminarProveedorPorId(proveedorVM.IdProveedor);
-            return RedirectToAction("Index");
+            _proveedoresRepo.Eliminar(id);
+
+            // --- Mensaje de éxito ---
+            TempData["SuccessMessage"] = "Proveedor eliminado correctamente.";
+
+            return RedirectToAction(nameof(Index));
         }
         catch (Exception e)
         {
-            _logger.LogError(e.ToString());
-            ViewBag.ErrorMessage = "No se pudo eliminar el proveedor: " + e.Message;
-            if (e.InnerException != null)
-                ViewBag.ErrorMessage += " | Detalle: " + e.InnerException.Message;
-            return View(proveedorVM);
+            _logger.LogError(e, "Error al eliminar el proveedor con ID {ProveedorId}", id);
+            // Usamos TempData porque estamos redirigiendo. ViewBag se perdería.
+            TempData["ErrorMessage"] = "Ocurrió un error al eliminar el proveedor. Es posible que esté asociado a productos existentes.";
+            return RedirectToAction(nameof(Index));
         }
     }
-} 
+}

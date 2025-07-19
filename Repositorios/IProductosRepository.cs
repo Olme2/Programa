@@ -1,8 +1,10 @@
+using ProductosVM;
 public interface IProductosRepository
 {
-    void CrearNuevoProducto(Productos producto);
-    void ModificarProducto(Productos producto);
-    List<Productos> ListarProductosRegistrados();
-    Productos ObtenerDetallesDeProductoPorId(int id);
-    void EliminarProductoPorId(int id);
+    IEnumerable<ListarProductosVM> ObtenerListadoProductos();
+    Productos? ObtenerPorId(int id);
+    void Crear(Productos producto);
+    void Actualizar(Productos producto);
+    void Eliminar(int id);
+    bool PuedeSerEliminado(int id);
 }

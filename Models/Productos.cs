@@ -2,41 +2,73 @@ using ProductosVM;
 
 public class Productos
 {
-    private int idProducto;
-    private int idProveedor;
-    private string producto;
-    private decimal stock;
-    private decimal costo;
-    private decimal precio;
-
-    public Productos()
+    public int IdProducto { get; private set; }
+    public int IdProveedor { get; private set; }
+    public string Producto { get; private set; }
+    public decimal Stock { get; private set; }
+    public decimal Costo { get; private set; }
+    public decimal Precio { get; private set; }
+    public bool Activo { get; private set; }
+    
+    public virtual Proveedores Proveedor { get; private set; }
+    private Productos()
     {
-        producto = string.Empty;
+        Producto = string.Empty;
+        Proveedor = null!;
+    }
+    private Productos(int idProveedor, string nombre, decimal stock, decimal costo, decimal precio)
+    {
+        IdProveedor = idProveedor;
+        Producto = nombre;
+        Stock = stock;
+        Costo = costo;
+        Precio = precio;
+        Activo = true;
+        Proveedor = null!;
     }
 
-    public Productos(AltaProductoVM productoVM)
+    public static Productos CrearDesdeViewModel(AltaProductoVM vm)
     {
-        idProveedor = productoVM.IdProveedor;
-        producto = productoVM.Producto;
-        stock = productoVM.Stock;
-        costo = productoVM.Costo;
-        precio = productoVM.Precio;
+        return new Productos(vm.IdProveedor, vm.Producto, vm.Stock, vm.Costo, vm.Precio);
     }
 
-    public Productos(ModificarProductoVM productoVM)
+    public void ActualizarDesdeViewModel(ModificarProductoVM vm)
     {
-        idProducto = productoVM.IdProducto;
-        idProveedor = productoVM.IdProveedor;
-        producto = productoVM.Producto;
-        stock = productoVM.Stock;
-        costo = productoVM.Costo;
-        precio = productoVM.Precio;
+        IdProveedor = vm.IdProveedor;
+        Producto = vm.Producto;
+        Stock = vm.Stock;
+        Costo = vm.Costo;
+        Precio = vm.Precio;
+        if (vm.Activo)
+        {
+            Activar();
+        }
+        else
+        {
+            Desactivar();
+        }
     }
 
-    public int IdProducto { get => idProducto; set => idProducto = value; }
-    public int IdProveedor { get => idProveedor; set => idProveedor = value; }
-    public string Producto { get => producto; set => producto = value; }
-    public decimal Stock { get => stock; set => stock = value; }
-    public decimal Costo { get => costo; set => costo = value; }
-    public decimal Precio { get => precio; set => precio = value; }
+    public void Activar()
+    {
+        Activo = true;
+    }
+
+    public void Desactivar()
+    {
+        Activo = false;
+    }
+    public decimal CalcularGanancia()
+    {
+        return Precio - Costo;
+    }
+
+    public decimal CalcularPorcentajeGanancia()
+    {
+        if (Costo <= 0)
+        {
+            return 0;
+        }
+        return CalcularGanancia() / Costo; 
+    }
 }

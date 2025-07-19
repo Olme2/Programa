@@ -1,23 +1,20 @@
+using System.ComponentModel.DataAnnotations;
 namespace ProveedoresVM;
 
 public class ListarProveedoresVM
 {
-    private int idProveedor;
-    private string proveedor;
-    private string? contacto;
+    public int IdProveedor { get; set; }
+    public string Proveedor { get; set; } = string.Empty;
+    public string? Contacto { get; set; }
+    [DataType(DataType.Currency)] 
+    public decimal Debo { get; set; } 
+    public ListarProveedoresVM() { }
 
-    public ListarProveedoresVM()
+    public ListarProveedoresVM(Proveedores proveedor)
     {
-        proveedor = string.Empty;
+        IdProveedor = proveedor.IdProveedor;
+        Proveedor = proveedor.Proveedor;
+        Contacto = proveedor.Contacto;
+        Debo = proveedor.Debo;
     }
-    public ListarProveedoresVM(Proveedores Proveedor)
-    {
-        idProveedor = Proveedor.IdProveedor;
-        proveedor = Proveedor.Proveedor;
-        contacto = Proveedor.Contacto;
-    }
-
-    public int IdProveedor { get => idProveedor; set => idProveedor = value; }
-    public string Proveedor { get => proveedor; set => proveedor = value; }
-    public string? Contacto { get => contacto; set => contacto = value; }
 }
