@@ -17,54 +17,47 @@ public class ProveedoresController : Controller
     {
         try
         {
-            // 1. Obtenemos la lista completa de proveedores.
-            IEnumerable<Proveedores> proveedores = _proveedoresRepo.ObtenerTodos();
+            IEnumerable<ListarProveedoresVM> proveedoresVM = _proveedoresRepo.ObtenerListadoProveedores();
 
-            // 2. Aplicamos el filtro de búsqueda por nombre.
+            // Aplicamos filtros...
             if (!string.IsNullOrEmpty(busqueda))
             {
-                proveedores = proveedores.Where(p => p.Proveedor.Contains(busqueda, StringComparison.CurrentCultureIgnoreCase));
+                proveedoresVM = proveedoresVM.Where(p => 
+                    p.Proveedor.Contains(busqueda, StringComparison.CurrentCultureIgnoreCase));
             }
-
-            // 3. Aplicamos el filtro de deuda.
             switch (filtroDeuda)
             {
                 case "conDeuda":
-                    proveedores = proveedores.Where(p => p.Debo > 0);
+                    proveedoresVM = proveedoresVM.Where(p => p.Debo > 0);
                     break;
                 case "sinDeuda":
-                    proveedores = proveedores.Where(p => p.Debo == 0);
-                    break;
-                // Si es "todos" o cualquier otro valor, no hacemos nada y mostramos todos.
-                default:
+                    proveedoresVM = proveedoresVM.Where(p => p.Debo == 0);
                     break;
             }
 
-            // 4. Aplicamos el ordenamiento.
-            IOrderedEnumerable<Proveedores> proveedoresOrdenados;
+            // Aplicamos ordenamiento...
+            IOrderedEnumerable<ListarProveedoresVM> proveedoresOrdenados;
             if (filtroDeuda == "todos")
             {
-                // Si mostramos todos, primero los que tienen deuda, luego los que no.
-                proveedoresOrdenados = proveedores.OrderByDescending(p => p.Debo > 0).ThenBy(p => p.Proveedor);
+                proveedoresOrdenados = proveedoresVM
+                    .OrderByDescending(p => p.Debo > 0)
+                    .ThenBy(p => p.Proveedor);
             }
             else
             {
-                // Para los otros filtros, solo ordenamos alfabéticamente.
-                proveedoresOrdenados = proveedores.OrderBy(p => p.Proveedor);
+                proveedoresOrdenados = proveedoresVM.OrderBy(p => p.Proveedor);
             }
 
-            // 5. Mapeamos a ViewModels.
-            var proveedoresVM = proveedoresOrdenados.Select(p => new ListarProveedoresVM(p)).ToList();
-
-            // 6. Pasamos los filtros actuales a la vista para que los controles mantengan su estado.
             ViewData["BusquedaActual"] = busqueda;
             ViewData["FiltroDeudaActual"] = filtroDeuda;
-            return View(proveedoresVM);
+
+            // ¡AHORA USAMOS LA VARIABLE CORRECTA!
+            return View(proveedoresOrdenados.ToList());
         }
         catch (Exception e)
         {
             _logger.LogError(e, "Error al obtener el listado de proveedores.");
-            ViewBag.ErrorMessage = "Ocurrió un error al cargar los proveedores.";
+            ViewData["ErrorMessage"] = "Ocurrió un error al cargar los proveedores.";
             return View(new List<ListarProveedoresVM>());
         }
     }
@@ -167,12 +160,12 @@ public class ProveedoresController : Controller
     {
         try
         {
-            var proveedor = _proveedoresRepo.ObtenerPorId(id);
-            if (proveedor == null)
+            var proveedorVM = _proveedoresRepo.ObtenerListadoProveedores()
+                                            .FirstOrDefault(p => p.IdProveedor == id);
+            if (proveedorVM == null)
             {
                 return NotFound();
             }
-            var proveedorVM = new ListarProveedoresVM(proveedor);
             return View(proveedorVM);
         }
         catch (Exception e)
@@ -190,11 +183,20 @@ public class ProveedoresController : Controller
     {
         try
         {
+             // ¡VERIFICACIÓN DE SEGURIDAD!
+            // Volvemos a consultar al repositorio para estar 100% seguros.
+            var proveedorParaEliminar = _proveedoresRepo.ObtenerListadoProveedores()
+                                                       .FirstOrDefault(p => p.IdProveedor == id);
+
+            if (proveedorParaEliminar != null && !proveedorParaEliminar.EsEliminable)
+            {
+                _logger.LogWarning("Intento de eliminación de proveedor en uso con ID {ProveedorId}", id);
+                TempData["ErrorMessage"] = "No se puede eliminar el proveedor porque tiene productos asociados.";
+                return RedirectToAction(nameof(Index));
+            }
+
             _proveedoresRepo.Eliminar(id);
-
-            // --- Mensaje de éxito ---
             TempData["SuccessMessage"] = "Proveedor eliminado correctamente.";
-
             return RedirectToAction(nameof(Index));
         }
         catch (Exception e)

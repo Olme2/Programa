@@ -1,0 +1,43 @@
+@model ProveedoresVM.ListarProveedoresVM
+@{
+    ViewData["Title"] = "Eliminar Proveedor";
+}
+
+<h1>Confirmar Eliminación</h1>
+
+<h3 class="text-danger">¿Está seguro que desea eliminar este proveedor?</h3>
+<p class="text-muted">Esta acción no se puede deshacer.</p>
+
+<hr />
+
+<div>
+    <h4>Proveedor a Eliminar:</h4>
+    <dl class="row">
+        <dt class="col-sm-3">
+            Nombre
+        </dt>
+        <dd class="col-sm-9">
+            @Model.Proveedor
+        </dd>
+        
+        <dt class="col-sm-3">
+            Contacto
+        </dt>
+        <dd class="col-sm-9">
+            @(Model.Contacto ?? "Sin datos")
+        </dd>
+        
+        <dt class="col-sm-3">
+            Saldo (Deuda)
+        </dt>
+        <dd class="col-sm-9">
+            @Model.Debo.ToString("C")
+        </dd>
+    </dl>
+    
+    <form asp-action="Eliminar" method="post">
+        <input type="hidden" asp-for="IdProveedor" />
+        <input type="submit" value="Eliminar Definitivamente" class="btn btn-danger" />
+        <a asp-action="Index" class="btn btn-secondary">Cancelar</a>
+    </form>
+</div>

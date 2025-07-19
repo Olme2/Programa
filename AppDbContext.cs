@@ -28,11 +28,11 @@ namespace entornoPolleria
                 entity.HasKey(e => e.IdProducto);
                 entity.Property(e => e.IdProducto).HasColumnName("id_producto").UseIdentityColumn();
                 entity.Property(e => e.IdProveedor).HasColumnName("id_proveedor").IsRequired();
-                entity.Property(e => e.Producto).HasColumnName("producto").HasMaxLength(75).IsRequired();
+                entity.Property(e => e.Producto).HasColumnName("producto").HasMaxLength(50).IsRequired();
                 entity.Property(e => e.Stock).HasColumnName("stock").HasColumnType("numeric(6,3)").IsRequired();
                 entity.Property(e => e.Costo).HasColumnName("costo_producto").HasColumnType("numeric(7,2)").IsRequired();
-                entity.Property(e => e.Precio).HasColumnName("precio_producto").HasColumnType("numeric(7,2)");
-                entity.Property("activo").HasColumnName("activo").HasColumnType("boolean").HasDefaultValue(true);
+                entity.Property(e => e.Precio).HasColumnName("precio_producto").HasColumnType("numeric(7,2)").IsRequired();
+                entity.Property(e => e.Activo).HasColumnName("activo").HasColumnType("boolean").HasDefaultValue(true);
             });
 
             // Proveedores
@@ -42,7 +42,7 @@ namespace entornoPolleria
                 entity.HasKey(e => e.IdProveedor);
                 entity.Property(e => e.IdProveedor).HasColumnName("id_proveedor").UseIdentityColumn();
                 entity.Property(e => e.Proveedor).HasColumnName("proveedor").HasMaxLength(50).IsRequired();
-                entity.Property(e => e.Contacto).HasColumnName("contacto").HasMaxLength(50);
+                entity.Property(e => e.Contacto).HasColumnName("contacto").HasMaxLength(100);
                 entity.Property(e => e.Debo).HasColumnName("debo").HasColumnType("numeric(9,2)").IsRequired();
             });
 

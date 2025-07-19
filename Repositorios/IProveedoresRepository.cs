@@ -1,6 +1,7 @@
+using ProveedoresVM;
 public interface IProveedoresRepository
 {
-    IEnumerable<Proveedores> ObtenerTodos();
+    IEnumerable<ListarProveedoresVM> ObtenerListadoProveedores();
     Proveedores? ObtenerPorId(int id);
     void Crear(Proveedores proveedor);
     void Actualizar(Proveedores proveedor);

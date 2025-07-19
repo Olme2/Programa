@@ -1,5 +1,5 @@
 using entornoPolleria;
-
+using ProveedoresVM;
 public class ProveedoresRepository : IProveedoresRepository
 {
     private readonly AppDbContext _context;
@@ -9,9 +9,20 @@ public class ProveedoresRepository : IProveedoresRepository
         _context = context;
     }
     
-    public IEnumerable<Proveedores> ObtenerTodos()
+    public IEnumerable<ListarProveedoresVM> ObtenerListadoProveedores()
     {
-        return _context.Proveedores.ToList();
+        // Proyectamos directamente a nuestro ViewModel
+        return _context.Proveedores
+            .Select(p => new ListarProveedoresVM
+            {
+                IdProveedor = p.IdProveedor,
+                Proveedor = p.Proveedor,
+                Contacto = p.Contacto,
+                Debo = p.Debo,
+                // Calculamos si el proveedor está referenciado en la tabla de productos.
+                EsEliminable = !_context.Productos.Any(prod => prod.IdProveedor == p.IdProveedor)
+            })
+            .ToList();
     }
 
     public Proveedores? ObtenerPorId(int id)

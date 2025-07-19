@@ -16,7 +16,7 @@ public class VentasController : Controller
         _productosRepo = productosRepo;
     }
 
-    [HttpGet]
+    /*[HttpGet]
     public IActionResult Index(FiltrarVentasVM filtros)
     {
         try
@@ -38,7 +38,7 @@ public class VentasController : Controller
             ViewBag.ErrorMessage = "No se cargo la lista de ventas correctamente";
             return RedirectToAction("AltaVenta", "Ventas");
         }
-    }
+    }*/
 
     [HttpGet]
     public IActionResult AltaVenta()

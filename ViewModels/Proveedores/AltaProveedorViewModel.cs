@@ -9,6 +9,7 @@ public class AltaProveedorVM
 
     [StringLength(100, ErrorMessage = "El contacto no puede exceder los 100 caracteres.")]
     public string? Contacto { get; set; }
+    [Required(ErrorMessage = "El saldo al proveedor es obligatorio.")]
     [Range(0, 9999999.99, ErrorMessage = "El saldo no puede ser negativo.")]
     public decimal Debo { get; set; } = 0;
 }

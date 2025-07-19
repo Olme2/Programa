@@ -8,6 +8,7 @@ public class ListarProveedoresVM
     public string? Contacto { get; set; }
     [DataType(DataType.Currency)] 
     public decimal Debo { get; set; } 
+    public bool EsEliminable { get; set; }
     public ListarProveedoresVM() { }
 
     public ListarProveedoresVM(Proveedores proveedor)
@@ -16,5 +17,6 @@ public class ListarProveedoresVM
         Proveedor = proveedor.Proveedor;
         Contacto = proveedor.Contacto;
         Debo = proveedor.Debo;
+        EsEliminable = false;
     }
 }

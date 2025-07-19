@@ -29,3 +29,16 @@ body {
 .form-floating > .form-control-plaintext:focus::placeholder, .form-floating > .form-control:focus::placeholder {
   text-align: start;
 }
+/* Estilo para el botón flotante de 'Añadir' */
+.btn-float {
+    position: fixed; /* Esto hace que se quede fijo en la pantalla */
+    bottom: 30px;    /* A 30px del borde inferior */
+    right: 30px;     /* A 30px del borde derecho */
+    width: 60px;
+    height: 60px;
+    border-radius: 50%; /* Esto lo hace redondo */
+    font-size: 24px;
+    line-height: 1.5;   /* Ayuda a centrar el signo '+' verticalmente */
+    z-index: 1000;      /* Asegura que esté por encima de otros elementos */
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2); /* Sombra sutil */
+}

@@ -64,8 +64,7 @@ public class ProductosController : Controller
     {
         try
         {
-            var proveedores = _proveedoresRepo.ObtenerTodos();
-            var proveedoresVM = proveedores.Select(p => new ListarProveedoresVM(p)).ToList();
+            var proveedoresVM = _proveedoresRepo.ObtenerListadoProveedores().ToList();
             var viewModel = new AltaProductoVM(proveedoresVM);
             return View(viewModel);
         }
@@ -87,8 +86,7 @@ public class ProductosController : Controller
             if (!ModelState.IsValid)
             {
                 // Si el modelo no es válido, debemos recargar los datos para la vista.
-                var proveedores = _proveedoresRepo.ObtenerTodos();
-                productoVM.Proveedores = proveedores.Select(p => new ListarProveedoresVM(p)).ToList();
+                productoVM.Proveedores = _proveedoresRepo.ObtenerListadoProveedores().ToList();
                 return View(productoVM);
             }
 
@@ -106,8 +104,7 @@ public class ProductosController : Controller
             ViewBag.ErrorMessage = "Ocurrió un error al guardar el producto.";
 
             // Si hay un error, también debemos recargar los datos para la vista.
-            var proveedores = _proveedoresRepo.ObtenerTodos();
-            productoVM.Proveedores = proveedores.Select(p => new ListarProveedoresVM(p)).ToList();
+            productoVM.Proveedores = _proveedoresRepo.ObtenerListadoProveedores().ToList();
             return View(productoVM);
         }
     }
@@ -125,8 +122,7 @@ public class ProductosController : Controller
                 return NotFound(); // Devuelve una página de error 404.
             }
 
-            var proveedores = _proveedoresRepo.ObtenerTodos();
-            var proveedoresVM = proveedores.Select(p => new ListarProveedoresVM(p)).ToList();
+            var proveedoresVM = _proveedoresRepo.ObtenerListadoProveedores().ToList();
             
             // Usamos el constructor que mapea desde el modelo.
             var productoVM = new ModificarProductoVM(producto, proveedoresVM);
@@ -149,8 +145,7 @@ public class ProductosController : Controller
         {
             if (!ModelState.IsValid)
             {
-                var proveedores = _proveedoresRepo.ObtenerTodos();
-                productoVM.Proveedores = proveedores.Select(p => new ListarProveedoresVM(p)).ToList();
+                productoVM.Proveedores = _proveedoresRepo.ObtenerListadoProveedores().ToList();
                 return View(productoVM);
             }
 
@@ -171,8 +166,7 @@ public class ProductosController : Controller
         {
             _logger.LogError(e, "Error al modificar el producto con ID {ProductoId}", productoVM.IdProducto);
             ViewBag.ErrorMessage = "Ocurrió un error al guardar los cambios.";
-            var proveedores = _proveedoresRepo.ObtenerTodos();
-            productoVM.Proveedores = proveedores.Select(p => new ListarProveedoresVM(p)).ToList();
+            productoVM.Proveedores = _proveedoresRepo.ObtenerListadoProveedores().ToList();
             return View(productoVM);
         }
     }

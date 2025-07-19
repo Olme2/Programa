@@ -1,0 +1,42 @@
+@model ProveedoresVM.AltaProveedorVM
+@{
+    ViewData["Title"] = "Crear Proveedor";
+}
+
+<h1>Crear Nuevo Proveedor</h1>
+<hr />
+
+<div class="row">
+    <div class="col-md-6">
+        <form asp-action="Alta" method="post">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            
+            <div class="form-group mb-3">
+                <label asp-for="Proveedor" class="control-label"></label>
+                <input asp-for="Proveedor" class="form-control" placeholder="Ej: Pollos SA" />
+                <span asp-validation-for="Proveedor" class="text-danger"></span>
+            </div>
+            
+            <div class="form-group mb-3">
+                <label asp-for="Contacto" class="control-label"></label>
+                <input asp-for="Contacto" class="form-control" placeholder="Ej: Juan Pérez, 381-123456" />
+                <span asp-validation-for="Contacto" class="text-danger"></span>
+            </div>
+
+            <div class="form-group mb-3">
+                <label asp-for="Debo" class="control-label">Saldo Inicial (Deuda)</label>
+                <input asp-for="Debo" class="form-control" type="number" step="0.01" />
+                <span asp-validation-for="Debo" class="text-danger"></span>
+            </div>
+            
+            <div class="form-group mt-4">
+                <input type="submit" value="Guardar Proveedor" class="btn btn-primary" />
+                <a asp-action="Index" class="btn btn-secondary">Cancelar</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

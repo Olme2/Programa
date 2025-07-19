@@ -1,7 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using entornoPolleria;
 using System.Globalization;
-
+using Microsoft.AspNetCore.Localization;
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddScoped<IProductosRepository, ProductosRepository>();
@@ -20,6 +20,19 @@ builder.Services.AddControllersWithViews();
 AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
 builder.Services.AddDbContext<AppDbContext>(options => 
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
+builder.Services.Configure<RequestLocalizationOptions>(options =>
+{
+    var supportedCultures = new[]
+    {
+        // Establecemos "es-AR" (Español, Argentina) como la cultura por defecto.
+        // Esta cultura usa el formato de número que necesitas.
+        new CultureInfo("es-AR")
+    };
+
+    options.DefaultRequestCulture = new RequestCulture("es-AR");
+    options.SupportedCultures = supportedCultures;
+    options.SupportedUICultures = supportedCultures;
+});
 var app = builder.Build();
 app.UseSession();
 // Configure the HTTP request pipeline.
@@ -34,7 +47,7 @@ CultureInfo.DefaultThreadCurrentCulture = cultureInfo;
 CultureInfo.DefaultThreadCurrentUICulture = cultureInfo;
 app.UseHttpsRedirection();
 app.UseStaticFiles();
-
+app.UseRequestLocalization();
 app.UseRouting();
 
 app.UseAuthorization();
