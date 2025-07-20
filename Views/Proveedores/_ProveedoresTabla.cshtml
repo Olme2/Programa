@@ -1,0 +1,37 @@
+@model List<ProveedoresVM.ListarProveedoresVM>
+@{
+    // Obtenemos el término de búsqueda para saber qué resaltar.
+    var busqueda = ViewData["BusquedaActual"] as string;
+
+    // Pequeña función local para hacer el resaltado.
+    Func<string, HtmlString> ResaltarCoincidencia = (texto) => 
+    {
+        if (string.IsNullOrEmpty(busqueda) || string.IsNullOrEmpty(texto) || !texto.Contains(busqueda, StringComparison.CurrentCultureIgnoreCase))
+        {
+            return new HtmlString(texto);
+        }
+        var regex = new System.Text.RegularExpressions.Regex(busqueda, System.Text.RegularExpressions.RegexOptions.IgnoreCase);
+        return new HtmlString(regex.Replace(texto, $"<span class='highlight'>$&</span>"));
+    };
+}
+
+@foreach (var proveedor in Model)
+{
+    string filaConDeudaClass = proveedor.Debo > 0 ? "table-danger" : "";
+    <tr class="@filaConDeudaClass">
+        <td>@ResaltarCoincidencia(proveedor.Proveedor)</td>
+        <td>@(proveedor.Contacto ?? "Sin datos")</td>
+        <td>@proveedor.Debo.ToString("C")</td>
+        <td>
+            <a asp-action="Modificar" asp-route-id="@proveedor.IdProveedor" class="btn btn-warning btn-sm">Modificar</a>
+            @if (proveedor.EsEliminable)
+            {
+                <a asp-action="Eliminar" asp-route-id="@proveedor.IdProveedor" class="btn btn-danger btn-sm">Eliminar</a>
+            }
+            else
+            {
+                <button class="btn btn-secondary btn-sm" disabled title="No se puede eliminar, tiene productos asociados.">Eliminar</button>
+            }
+        </td>
+    </tr>
+}

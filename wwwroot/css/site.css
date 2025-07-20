@@ -42,3 +42,8 @@ body {
     z-index: 1000;      /* Asegura que esté por encima de otros elementos */
     box-shadow: 0 4px 8px rgba(0,0,0,0.2); /* Sombra sutil */
 }
+/* Estilo para resaltar las coincidencias de búsqueda */
+.highlight {
+    background-color: yellow;
+    font-weight: bold;
+}

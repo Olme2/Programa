@@ -22,7 +22,7 @@ public class ProveedoresController : Controller
             // Aplicamos filtros...
             if (!string.IsNullOrEmpty(busqueda))
             {
-                proveedoresVM = proveedoresVM.Where(p => 
+                proveedoresVM = proveedoresVM.Where(p =>
                     p.Proveedor.Contains(busqueda, StringComparison.CurrentCultureIgnoreCase));
             }
             switch (filtroDeuda)
@@ -183,7 +183,7 @@ public class ProveedoresController : Controller
     {
         try
         {
-             // ¡VERIFICACIÓN DE SEGURIDAD!
+            // ¡VERIFICACIÓN DE SEGURIDAD!
             // Volvemos a consultar al repositorio para estar 100% seguros.
             var proveedorParaEliminar = _proveedoresRepo.ObtenerListadoProveedores()
                                                        .FirstOrDefault(p => p.IdProveedor == id);
@@ -205,6 +205,57 @@ public class ProveedoresController : Controller
             // Usamos TempData porque estamos redirigiendo. ViewBag se perdería.
             TempData["ErrorMessage"] = "Ocurrió un error al eliminar el proveedor. Es posible que esté asociado a productos existentes.";
             return RedirectToAction(nameof(Index));
+        }
+    }
+    
+     // --- NUEVA ACCIÓN PARA BÚSQUEDA DINÁMICA (AJAX) ---
+    // GET: /Proveedores/_BuscarProveedores
+    [HttpGet]
+    public IActionResult _BuscarProveedores(string busqueda, string filtroDeuda = "todos")
+    {
+        try
+        {
+            // La lógica de filtrado y ordenamiento es EXACTAMENTE la misma que en el Index.
+            IEnumerable<ListarProveedoresVM> proveedoresVM = _proveedoresRepo.ObtenerListadoProveedores();
+
+            if (!string.IsNullOrEmpty(busqueda))
+            {
+                proveedoresVM = proveedoresVM.Where(p => 
+                    p.Proveedor.Contains(busqueda, StringComparison.CurrentCultureIgnoreCase));
+            }
+            switch (filtroDeuda)
+            {
+                case "conDeuda":
+                    proveedoresVM = proveedoresVM.Where(p => p.Debo > 0);
+                    break;
+                case "sinDeuda":
+                    proveedoresVM = proveedoresVM.Where(p => p.Debo == 0);
+                    break;
+            }
+
+            IOrderedEnumerable<ListarProveedoresVM> proveedoresOrdenados;
+            if (filtroDeuda == "todos")
+            {
+                proveedoresOrdenados = proveedoresVM
+                    .OrderByDescending(p => p.Debo > 0)
+                    .ThenBy(p => p.Proveedor);
+            }
+            else
+            {
+                proveedoresOrdenados = proveedoresVM.OrderBy(p => p.Proveedor);
+            }
+
+            // Pasamos el término de búsqueda a la vista para poder resaltar las coincidencias.
+            ViewData["BusquedaActual"] = busqueda;
+
+            // En lugar de devolver una Vista completa, devolvemos una Vista Parcial.
+            return PartialView("_ProveedoresTabla", proveedoresOrdenados.ToList());
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, "Error en la búsqueda dinámica de proveedores.");
+            // En caso de error, devolvemos un código de error para que el JavaScript lo maneje.
+            return StatusCode(500);
         }
     }
 }

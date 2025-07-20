@@ -1,16 +1,16 @@
 ﻿<Project>
   <ItemGroup>
+    <StaticWebAssetEndpoint Include="_content/entornoPolleria/css/site.4kolcn42wx.css">
+      <AssetFile>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..\staticwebassets\css\site.css'))</AssetFile>
+      <Selectors><![CDATA[[]]]></Selectors>
+      <EndpointProperties><![CDATA[[{"Name":"fingerprint","Value":"4kolcn42wx"},{"Name":"integrity","Value":"sha256-bIj7eTFNTyKZW/3w1RGRfiXTvSZXSJ7405QfyAh3imU="},{"Name":"label","Value":"_content/entornoPolleria/css/site.css"}]]]></EndpointProperties>
+      <ResponseHeaders><![CDATA[[{"Name":"Accept-Ranges","Value":"bytes"},{"Name":"Cache-Control","Value":"max-age=31536000, immutable"},{"Name":"Content-Length","Value":"1371"},{"Name":"Content-Type","Value":"text/css"},{"Name":"ETag","Value":"\u0022bIj7eTFNTyKZW/3w1RGRfiXTvSZXSJ7405QfyAh3imU=\u0022"},{"Name":"Last-Modified","Value":"Sun, 20 Jul 2025 22:02:17 GMT"}]]]></ResponseHeaders>
+    </StaticWebAssetEndpoint>
     <StaticWebAssetEndpoint Include="_content/entornoPolleria/css/site.css">
       <AssetFile>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..\staticwebassets\css\site.css'))</AssetFile>
       <Selectors><![CDATA[[]]]></Selectors>
-      <EndpointProperties><![CDATA[[{"Name":"integrity","Value":"sha256-O6jQIX5vgHzdn0TA\u002BvdjP3zsexdumGEv3gr6XNTYsi0="}]]]></EndpointProperties>
-      <ResponseHeaders><![CDATA[[{"Name":"Accept-Ranges","Value":"bytes"},{"Name":"Cache-Control","Value":"no-cache"},{"Name":"Content-Length","Value":"1240"},{"Name":"Content-Type","Value":"text/css"},{"Name":"ETag","Value":"\u0022O6jQIX5vgHzdn0TA\u002BvdjP3zsexdumGEv3gr6XNTYsi0=\u0022"},{"Name":"Last-Modified","Value":"Sat, 19 Jul 2025 19:09:36 GMT"}]]]></ResponseHeaders>
-    </StaticWebAssetEndpoint>
-    <StaticWebAssetEndpoint Include="_content/entornoPolleria/css/site.h58iqx622w.css">
-      <AssetFile>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..\staticwebassets\css\site.css'))</AssetFile>
-      <Selectors><![CDATA[[]]]></Selectors>
-      <EndpointProperties><![CDATA[[{"Name":"fingerprint","Value":"h58iqx622w"},{"Name":"integrity","Value":"sha256-O6jQIX5vgHzdn0TA\u002BvdjP3zsexdumGEv3gr6XNTYsi0="},{"Name":"label","Value":"_content/entornoPolleria/css/site.css"}]]]></EndpointProperties>
-      <ResponseHeaders><![CDATA[[{"Name":"Accept-Ranges","Value":"bytes"},{"Name":"Cache-Control","Value":"max-age=31536000, immutable"},{"Name":"Content-Length","Value":"1240"},{"Name":"Content-Type","Value":"text/css"},{"Name":"ETag","Value":"\u0022O6jQIX5vgHzdn0TA\u002BvdjP3zsexdumGEv3gr6XNTYsi0=\u0022"},{"Name":"Last-Modified","Value":"Sat, 19 Jul 2025 19:09:36 GMT"}]]]></ResponseHeaders>
+      <EndpointProperties><![CDATA[[{"Name":"integrity","Value":"sha256-bIj7eTFNTyKZW/3w1RGRfiXTvSZXSJ7405QfyAh3imU="}]]]></EndpointProperties>
+      <ResponseHeaders><![CDATA[[{"Name":"Accept-Ranges","Value":"bytes"},{"Name":"Cache-Control","Value":"no-cache"},{"Name":"Content-Length","Value":"1371"},{"Name":"Content-Type","Value":"text/css"},{"Name":"ETag","Value":"\u0022bIj7eTFNTyKZW/3w1RGRfiXTvSZXSJ7405QfyAh3imU=\u0022"},{"Name":"Last-Modified","Value":"Sun, 20 Jul 2025 22:02:17 GMT"}]]]></ResponseHeaders>
     </StaticWebAssetEndpoint>
     <StaticWebAssetEndpoint Include="_content/entornoPolleria/entornoPolleria.bundle.scp.css">
       <AssetFile>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..\staticwebassets\entornoPolleria.unufmby4zg.bundle.scp.css'))</AssetFile>
@@ -39,14 +39,14 @@
     <StaticWebAssetEndpoint Include="_content/entornoPolleria/js/site.js">
       <AssetFile>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..\staticwebassets\js\site.js'))</AssetFile>
       <Selectors><![CDATA[[]]]></Selectors>
-      <EndpointProperties><![CDATA[[{"Name":"integrity","Value":"sha256-hRQyftXiu1lLX2P9Ly9xa4gHJgLeR1uGN5qegUobtGo="}]]]></EndpointProperties>
-      <ResponseHeaders><![CDATA[[{"Name":"Accept-Ranges","Value":"bytes"},{"Name":"Cache-Control","Value":"no-cache"},{"Name":"Content-Length","Value":"231"},{"Name":"Content-Type","Value":"text/javascript"},{"Name":"ETag","Value":"\u0022hRQyftXiu1lLX2P9Ly9xa4gHJgLeR1uGN5qegUobtGo=\u0022"},{"Name":"Last-Modified","Value":"Tue, 12 Nov 2024 01:43:58 GMT"}]]]></ResponseHeaders>
+      <EndpointProperties><![CDATA[[{"Name":"integrity","Value":"sha256-gnTGk5hJ5IyO0HH4sLoZJEoq2cKxfZfOBz1CUyEKWl0="}]]]></EndpointProperties>
+      <ResponseHeaders><![CDATA[[{"Name":"Accept-Ranges","Value":"bytes"},{"Name":"Cache-Control","Value":"no-cache"},{"Name":"Content-Length","Value":"1498"},{"Name":"Content-Type","Value":"text/javascript"},{"Name":"ETag","Value":"\u0022gnTGk5hJ5IyO0HH4sLoZJEoq2cKxfZfOBz1CUyEKWl0=\u0022"},{"Name":"Last-Modified","Value":"Sun, 20 Jul 2025 22:02:06 GMT"}]]]></ResponseHeaders>
     </StaticWebAssetEndpoint>
-    <StaticWebAssetEndpoint Include="_content/entornoPolleria/js/site.xtxxf3hu2r.js">
+    <StaticWebAssetEndpoint Include="_content/entornoPolleria/js/site.mia5j1z4gn.js">
       <AssetFile>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..\staticwebassets\js\site.js'))</AssetFile>
       <Selectors><![CDATA[[]]]></Selectors>
-      <EndpointProperties><![CDATA[[{"Name":"fingerprint","Value":"xtxxf3hu2r"},{"Name":"integrity","Value":"sha256-hRQyftXiu1lLX2P9Ly9xa4gHJgLeR1uGN5qegUobtGo="},{"Name":"label","Value":"_content/entornoPolleria/js/site.js"}]]]></EndpointProperties>
-      <ResponseHeaders><![CDATA[[{"Name":"Accept-Ranges","Value":"bytes"},{"Name":"Cache-Control","Value":"max-age=31536000, immutable"},{"Name":"Content-Length","Value":"231"},{"Name":"Content-Type","Value":"text/javascript"},{"Name":"ETag","Value":"\u0022hRQyftXiu1lLX2P9Ly9xa4gHJgLeR1uGN5qegUobtGo=\u0022"},{"Name":"Last-Modified","Value":"Tue, 12 Nov 2024 01:43:58 GMT"}]]]></ResponseHeaders>
+      <EndpointProperties><![CDATA[[{"Name":"fingerprint","Value":"mia5j1z4gn"},{"Name":"integrity","Value":"sha256-gnTGk5hJ5IyO0HH4sLoZJEoq2cKxfZfOBz1CUyEKWl0="},{"Name":"label","Value":"_content/entornoPolleria/js/site.js"}]]]></EndpointProperties>
+      <ResponseHeaders><![CDATA[[{"Name":"Accept-Ranges","Value":"bytes"},{"Name":"Cache-Control","Value":"max-age=31536000, immutable"},{"Name":"Content-Length","Value":"1498"},{"Name":"Content-Type","Value":"text/javascript"},{"Name":"ETag","Value":"\u0022gnTGk5hJ5IyO0HH4sLoZJEoq2cKxfZfOBz1CUyEKWl0=\u0022"},{"Name":"Last-Modified","Value":"Sun, 20 Jul 2025 22:02:06 GMT"}]]]></ResponseHeaders>
     </StaticWebAssetEndpoint>
     <StaticWebAssetEndpoint Include="_content/entornoPolleria/lib/bootstrap/dist/css/bootstrap-grid.agp80tu62r.css">
       <AssetFile>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..\staticwebassets\lib\bootstrap\dist\css\bootstrap-grid.css'))</AssetFile>
