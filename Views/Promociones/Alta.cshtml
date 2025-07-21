@@ -4,14 +4,6 @@
 }
 
 <form asp-action="Alta" method="post" id="form-promocion">
-    promo: @Model.Promocion
-    precio: @Model.Precio
-    inicio: @Model.Inicio
-    fin: @Model.Fin
-    @foreach(var detalle in Model.DetallesPromocion){
-        <p>idProducto detalle:</p> @detalle.IdProducto;
-        <p>cantidad detalle:</p>@detalle.Cantidad;
-    }
     <h1>Crear Nueva Promoción</h1>
     <hr />
 
