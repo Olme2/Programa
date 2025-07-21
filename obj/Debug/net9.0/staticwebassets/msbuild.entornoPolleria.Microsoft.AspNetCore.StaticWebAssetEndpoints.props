@@ -1,16 +1,16 @@
 ﻿<Project>
   <ItemGroup>
-    <StaticWebAssetEndpoint Include="_content/entornoPolleria/css/site.4kolcn42wx.css">
-      <AssetFile>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..\staticwebassets\css\site.css'))</AssetFile>
-      <Selectors><![CDATA[[]]]></Selectors>
-      <EndpointProperties><![CDATA[[{"Name":"fingerprint","Value":"4kolcn42wx"},{"Name":"integrity","Value":"sha256-bIj7eTFNTyKZW/3w1RGRfiXTvSZXSJ7405QfyAh3imU="},{"Name":"label","Value":"_content/entornoPolleria/css/site.css"}]]]></EndpointProperties>
-      <ResponseHeaders><![CDATA[[{"Name":"Accept-Ranges","Value":"bytes"},{"Name":"Cache-Control","Value":"max-age=31536000, immutable"},{"Name":"Content-Length","Value":"1371"},{"Name":"Content-Type","Value":"text/css"},{"Name":"ETag","Value":"\u0022bIj7eTFNTyKZW/3w1RGRfiXTvSZXSJ7405QfyAh3imU=\u0022"},{"Name":"Last-Modified","Value":"Sun, 20 Jul 2025 22:02:17 GMT"}]]]></ResponseHeaders>
-    </StaticWebAssetEndpoint>
     <StaticWebAssetEndpoint Include="_content/entornoPolleria/css/site.css">
       <AssetFile>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..\staticwebassets\css\site.css'))</AssetFile>
       <Selectors><![CDATA[[]]]></Selectors>
-      <EndpointProperties><![CDATA[[{"Name":"integrity","Value":"sha256-bIj7eTFNTyKZW/3w1RGRfiXTvSZXSJ7405QfyAh3imU="}]]]></EndpointProperties>
-      <ResponseHeaders><![CDATA[[{"Name":"Accept-Ranges","Value":"bytes"},{"Name":"Cache-Control","Value":"no-cache"},{"Name":"Content-Length","Value":"1371"},{"Name":"Content-Type","Value":"text/css"},{"Name":"ETag","Value":"\u0022bIj7eTFNTyKZW/3w1RGRfiXTvSZXSJ7405QfyAh3imU=\u0022"},{"Name":"Last-Modified","Value":"Sun, 20 Jul 2025 22:02:17 GMT"}]]]></ResponseHeaders>
+      <EndpointProperties><![CDATA[[{"Name":"integrity","Value":"sha256-pPPaWg8AHmpCFdnUqzaAh1Yjw29gx1Y39F6LKg39QsM="}]]]></EndpointProperties>
+      <ResponseHeaders><![CDATA[[{"Name":"Accept-Ranges","Value":"bytes"},{"Name":"Cache-Control","Value":"no-cache"},{"Name":"Content-Length","Value":"1819"},{"Name":"Content-Type","Value":"text/css"},{"Name":"ETag","Value":"\u0022pPPaWg8AHmpCFdnUqzaAh1Yjw29gx1Y39F6LKg39QsM=\u0022"},{"Name":"Last-Modified","Value":"Mon, 21 Jul 2025 16:51:50 GMT"}]]]></ResponseHeaders>
+    </StaticWebAssetEndpoint>
+    <StaticWebAssetEndpoint Include="_content/entornoPolleria/css/site.ksyinjxfv4.css">
+      <AssetFile>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..\staticwebassets\css\site.css'))</AssetFile>
+      <Selectors><![CDATA[[]]]></Selectors>
+      <EndpointProperties><![CDATA[[{"Name":"fingerprint","Value":"ksyinjxfv4"},{"Name":"integrity","Value":"sha256-pPPaWg8AHmpCFdnUqzaAh1Yjw29gx1Y39F6LKg39QsM="},{"Name":"label","Value":"_content/entornoPolleria/css/site.css"}]]]></EndpointProperties>
+      <ResponseHeaders><![CDATA[[{"Name":"Accept-Ranges","Value":"bytes"},{"Name":"Cache-Control","Value":"max-age=31536000, immutable"},{"Name":"Content-Length","Value":"1819"},{"Name":"Content-Type","Value":"text/css"},{"Name":"ETag","Value":"\u0022pPPaWg8AHmpCFdnUqzaAh1Yjw29gx1Y39F6LKg39QsM=\u0022"},{"Name":"Last-Modified","Value":"Mon, 21 Jul 2025 16:51:50 GMT"}]]]></ResponseHeaders>
     </StaticWebAssetEndpoint>
     <StaticWebAssetEndpoint Include="_content/entornoPolleria/entornoPolleria.bundle.scp.css">
       <AssetFile>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..\staticwebassets\entornoPolleria.unufmby4zg.bundle.scp.css'))</AssetFile>

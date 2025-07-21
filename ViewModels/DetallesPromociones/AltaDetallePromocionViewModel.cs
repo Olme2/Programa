@@ -8,5 +8,5 @@ public class AltaDetallePromocionVM
         public int IdProducto { get; set; }
         [Required(ErrorMessage = "La cantidad es obligatoria.")]
         [Range(0.001, 999.999, ErrorMessage = "La cantidad debe ser como mínimo 0,001 y maximo 999,999.")]
-        public int Cantidad { get; set; }
+        public decimal Cantidad { get; set; }
     }

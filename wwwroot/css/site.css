@@ -46,4 +46,26 @@ body {
 .highlight {
     background-color: yellow;
     font-weight: bold;
+}    
+.summary-card {
+    background-color: #f8f9fa;
+    border-radius: .5rem;
+    padding: 1.5rem;
+    position: sticky;
+    top: 20px;
+}
+
+.summary-item {
+     display: flex;
+     justify-content: space-between;
+     font-size: 1.1rem;
+     margin-bottom: 0.5rem;
+}
+
+.summary-item.total {
+      font-weight: bold;
+      font-size: 1.3rem;
+      border-top: 2px solid #dee2e6;
+      padding-top: 1rem;
+      margin-top: 1rem;
 }

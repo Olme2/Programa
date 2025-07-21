@@ -1,0 +1,258 @@
+@model PromocionesVM.AltaPromocionVM
+@{
+    ViewData["Title"] = "Nueva Promoción";
+}
+
+<form asp-action="Alta" method="post" id="form-promocion">
+    promo: @Model.Promocion
+    precio: @Model.Precio
+    inicio: @Model.Inicio
+    fin: @Model.Fin
+    @foreach(var detalle in Model.DetallesPromocion){
+        <p>idProducto detalle:</p> @detalle.IdProducto;
+        <p>cantidad detalle:</p>@detalle.Cantidad;
+    }
+    <h1>Crear Nueva Promoción</h1>
+    <hr />
+
+    <div class="row">
+        <div class="col-md-7">
+            <div class="card shadow-sm mb-4">
+                <div class="card-header">
+                    <h4>Datos Generales</h4>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <label asp-for="Promocion" class="form-label"></label>
+                        <input asp-for="Promocion" class="form-control" placeholder="Ej: Combo Alitas BBQ" />
+                        <span asp-validation-for="Promocion" class="text-danger"></span>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-sm-6 mb-3">
+                            <label asp-for="Inicio" class="form-label"></label>
+                            <input asp-for="Inicio" type="date" class="form-control" />
+                            <span asp-validation-for="Inicio" class="text-danger"></span>
+                        </div>
+                        <div class="col-sm-6 mb-3">
+                        <label asp-for="Fin" class="form-label"></label>
+                        <input asp-for="Fin" type="date" class="form-control" />
+                            <span asp-validation-for="Fin" class="text-danger"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card shadow-sm">
+                <div class="card-header">
+                    <h4>Productos Incluidos</h4>
+                </div>
+                <div class="card-body">
+                    <div id="detalles-container">
+                        @for (var i = 0; i < Model.DetallesPromocion.Count; i++)
+                        {
+                            @* Esto renderiza la primera fila inicial *@
+                            <partial name="_DetallePromocionItem" model="Model.DetallesPromocion[i]" view-data='new ViewDataDictionary(ViewData) { { "index", i } }' />
+                        }
+                    </div>
+                    
+                    <button type="button" id="btn-agregar-detalle" class="btn btn-success w-100 mt-2">
+                        + Añadir Producto
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-5">
+            <div class="summary-card">
+                @* ... (El contenido del summary-card es el mismo) ... *@
+                <h4>Resumen de la Promoción</h4>
+                <hr>
+                <div class="mb-3">
+                    <label asp-for="Precio" class="form-label fs-5">Precio de Venta Final</label>
+                    <div class="input-group">
+                        <span class="input-group-text">$</span>
+                        <input asp-for="Precio" type="number" step="0.01" class="form-control form-control-lg" />
+                    </div>
+                    <span asp-validation-for="Precio" class="text-danger"></span>
+                </div>
+                
+                <div class="summary-item">
+                    <span>Costo Total:</span>
+                    <span id="costo-total-display" class="fw-bold text-danger">$0.00</span>
+                </div>
+                
+                <div class="summary-item total">
+                    <span>GANANCIA:</span>
+                    <span id="ganancia-total-display" class="text-success">$0.00</span>
+                </div>
+
+                <div class="summary-item">
+                    <span>% Ganancia:</span>
+                    <span id="porcentaje-ganancia-display" class="fw-bold">0.00%</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="mt-4">
+        <button type="submit" class="btn btn-primary btn-lg">Guardar Promoción</button>
+        <a asp-action="Index" class="btn btn-secondary btn-lg">Cancelar</a>
+    </div>
+</form>
+
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+
+    <script type="text/javascript">
+        $(document).ready(function () {
+
+            // --- FUNCIÓN CENTRAL DE CÁLCULO (Mejorada para leer números con coma) ---
+            function recalcularTotales(origenDelCambio) {
+                let costoTotal = 0;
+                let precioTexto = $('#Precio').val() || '0';
+                let precioPromocion = parseFloat(precioTexto.replace(',', '.')) || 0;
+
+                $('.detalle-item').each(function () {
+                    const fila = $(this);
+                    const selectProducto = fila.find('.producto-search');
+                    const inputCantidad = fila.find('.cantidad-producto');
+                    const costoUnitario = parseFloat(selectProducto.data('costo')) || 0;
+                    
+                    // Leemos la cantidad, reemplazando la coma por un punto para que JS lo entienda siempre.
+                    const cantidadTexto = inputCantidad.val() || '0';
+                    const cantidad = parseFloat(cantidadTexto.replace(',', '.')) || 0;
+                    const costoDetalle = costoUnitario * cantidad;
+
+                    fila.find('.costo-detalle-display').text(costoDetalle.toLocaleString('es-AR', { style: 'currency', currency: 'ARS' }));
+                    costoTotal += costoDetalle;
+                });
+                
+                if (origenDelCambio !== 'precio' && precioPromocion <= costoTotal) {
+                    precioPromocion = costoTotal + 1;
+                    $('#Precio').val(precioPromocion.toFixed(2));
+                }
+
+                const ganancia = precioPromocion - costoTotal;
+                const porcentajeGanancia = costoTotal > 0 ? (ganancia / costoTotal) * 100 : 0;
+                
+                $('#costo-total-display').text(costoTotal.toLocaleString('es-AR', { style: 'currency', currency: 'ARS' }));
+                $('#ganancia-total-display').text(ganancia.toLocaleString('es-AR', { style: 'currency', currency: 'ARS' }));
+                $('#porcentaje-ganancia-display').text(porcentajeGanancia.toFixed(2).replace('.', ',') + '%');
+            }
+
+            // --- MANEJADOR DE ENVÍO DEL FORMULARIO (LA SOLUCIÓN PRINCIPAL) ---
+            $('#form-promocion').on('submit', function(e) {
+                
+                // 1. Limpiamos el campo de precio para asegurar el formato correcto
+                const precioInput = $('#Precio');
+                if (precioInput.val()) {
+                    const valorNeutralPrecio = precioInput.val().replace(',', '.');
+                    precioInput.val(valorNeutralPrecio);
+                }
+
+                // 2. Iteramos por cada fila de detalle para limpiar la CANTIDAD
+                $('.detalle-item').each(function() {
+                    const fila = $(this);
+                    const selectProducto = fila.find('.producto-search');
+                    const cantidadInput = fila.find('.cantidad-producto');
+
+                    // Si la fila no tiene producto, la eliminamos
+                    if (!selectProducto.val() || selectProducto.val() === "0") {
+                        fila.remove();
+                    } else {
+                        // ¡LA SOLUCIÓN! Limpiamos el campo de cantidad de esta fila
+                        if (cantidadInput.val()) {
+                            const valorNeutralCantidad = cantidadInput.val().replace(',', '.');
+                            cantidadInput.val(valorNeutralCantidad);
+                        }
+                    }
+                });
+
+                // 3. Re-indexamos las filas restantes
+                reindexarFilas();
+            });
+
+            // (El resto de funciones como inicializarSelect2, añadir/eliminar, etc., no cambian)
+            function inicializarSelect2(selector) {
+                selector.select2({
+                    placeholder: "-- Buscar producto --",
+                    ajax: {
+                        url: '@Url.Action("BuscarProductosParaPromocion", "Promociones")',
+                        dataType: 'json',
+                        delay: 250,
+                        data: function (params) {
+                            var idsExcluidos = [];
+                            var currentSelect = $(this);
+                            $('.producto-search').not(currentSelect).each(function() {
+                                var selectedId = $(this).val();
+                                if (selectedId) { idsExcluidos.push(selectedId); }
+                            });
+                            return { term: params.term, excluir: idsExcluidos };
+                        },
+                        processResults: function (data) { return { results: data }; },
+                        cache: true
+                    }
+                }).on('select2:select', function (e) {
+                    $(this).data('costo', e.params.data.costo);
+                    recalcularTotales('detalle');
+                });
+            }
+
+            $('#btn-agregar-detalle').on('click', function() {
+                const container = $('#detalles-container');
+                const nuevoIndex = container.find('.detalle-item').length;
+                $.get('@Url.Action("ObtenerVistaDetallePromocion")', { index: nuevoIndex }, function(nuevaFilaHtml) {
+                    const nuevaFila = $(nuevaFilaHtml);
+                    container.append(nuevaFila);
+                    inicializarSelect2(nuevaFila.find('.producto-search'));
+                    actualizarVisibilidadBotonEliminar();
+                });
+            });
+
+            $('#detalles-container').on('click', '.btn-eliminar-detalle', function () {
+                $(this).closest('.detalle-item').remove();
+                reindexarFilas();
+                actualizarVisibilidadBotonEliminar();
+                recalcularTotales('detalle');
+            });
+
+            function reindexarFilas() {
+                $('#detalles-container .detalle-item').each(function(index, item) {
+                    $(item).find('[name^="DetallesPromocion"]').each(function() {
+                        const oldName = $(this).attr('name');
+                        const newName = oldName.replace(/\[\d+\]/, `[${index}]`);
+                        $(this).attr('name', newName);
+                    });
+                });
+            }
+
+            function actualizarVisibilidadBotonEliminar() {
+                const filas = $('#detalles-container .detalle-item');
+                filas.find('.btn-eliminar-detalle').toggle(filas.length > 1);
+            }
+            
+            $('#form-promocion').on('keydown', '.cantidad-producto', function(e) {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    $(this).trigger('change');
+                }
+            });
+
+            $('#Precio').on('input', function() {
+                recalcularTotales('precio');
+            });
+
+            $('#detalles-container').on('change', '.cantidad-producto', function() {
+                 recalcularTotales('detalle');
+            });
+            
+            inicializarSelect2($('.producto-search'));
+            actualizarVisibilidadBotonEliminar();
+            recalcularTotales('detalle');
+        });
+    </script>
+}

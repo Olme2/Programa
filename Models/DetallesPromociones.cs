@@ -34,6 +34,6 @@ public class DetallesPromociones
         {
             throw new InvalidOperationException("El producto no fue cargado para calcular el costo.");
         }
-        return Producto.Precio * Cantidad;
+        return Producto.Costo * Cantidad;
     }
 }

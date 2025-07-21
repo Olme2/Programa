@@ -1,0 +1,44 @@
+@model IEnumerable<PromocionesVM.ListarPromocionesVM>
+
+@{
+    var busqueda = ViewData["BusquedaActual"] as string;
+
+    Func<string, HtmlString> ResaltarCoincidencia = (texto) => 
+    {
+        if (string.IsNullOrEmpty(busqueda) || string.IsNullOrEmpty(texto) || !texto.Contains(busqueda, StringComparison.CurrentCultureIgnoreCase))
+        {
+            return new HtmlString(texto);
+        }
+        var regex = new System.Text.RegularExpressions.Regex(busqueda, System.Text.RegularExpressions.RegexOptions.IgnoreCase);
+        return new HtmlString(regex.Replace(texto, $"<span class='highlight'>$&</span>"));
+    };
+}
+
+@foreach (var item in Model)
+{
+    <tr>
+        <td>@ResaltarCoincidencia(item.Promocion)</td>
+        <td>@ResaltarCoincidencia(item.ProductosConcatenados)</td>
+        <td>@item.Costo.ToString("C")</td>
+        <td>@item.Precio.ToString("C")</td>
+        <td>@item.Ganancia.ToString("C")</td>
+        <td>@item.PorcentajeGanancia.ToString("P2")</td>
+        <td>@item.Inicio.ToString("dd/MM/yyyy")</td>
+        <td>@(item.Fin?.ToString("dd/MM/yyyy") ?? "-")</td>
+        <td>
+            @if (item.Activa)
+            {
+                <span class="badge bg-success">Activa</span>
+            }
+            else
+            {
+                <span class="badge bg-secondary">Inactiva</span>
+            }
+        </td>
+        <td>
+            <a asp-action="VerDetalles" asp-route-id="@item.IdPromocion" class="btn btn-info btn-sm">Ver</a>
+            <a asp-action="Modificar" asp-route-id="@item.IdPromocion" class="btn btn-warning btn-sm">Modificar</a>
+            <a asp-action="Eliminar" asp-route-id="@item.IdPromocion" class="btn btn-danger btn-sm">Eliminar</a>
+        </td>
+    </tr>
+}

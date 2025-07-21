@@ -1,0 +1,21 @@
+@model DetallesPromocionesVM.AltaDetallePromocionVM
+@{
+    var index = ViewData["index"];
+}
+<div class="row detalle-item align-items-center mb-3 p-2 border rounded">
+    <div class="col-md-6">
+        <label class="form-label">Producto</label>
+        <select name="DetallesPromocion[@index].IdProducto" class="form-control producto-search"></select>
+    </div>
+    <div class="col-md-3">
+        <label class="form-label">Cantidad</label>
+        <input name="DetallesPromocion[@index].Cantidad" type="number" step="0.001" min="0.001" class="form-control cantidad-producto"/>
+    </div>
+    <div class="col-md-2">
+        <label class="form-label">Costo</label>
+        <p class="form-control-plaintext fw-bold costo-detalle-display">$0.00</p>
+    </div>
+    <div class="col-md-1 text-end">
+        <button type="button" class="btn btn-danger btn-sm btn-eliminar-detalle">&times;</button>
+    </div>
+</div>

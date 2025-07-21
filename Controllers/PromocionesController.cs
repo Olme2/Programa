@@ -44,94 +44,119 @@ public class PromocionesController : Controller
         {
             _logger.LogError(e, "Error al obtener el listado de promociones.");
             ViewBag.ErrorMessage = "Ocurrió un error al cargar las promociones.";
+            TempData["ErrorMessage"] = "Ocurrió un error al cargar las promociones.";
             return View(new List<ListarPromocionesVM>());
         }
     }
 
+    // 1. ACCIÓN GET PARA MOSTRAR EL FORMULARIO
     [HttpGet]
     public IActionResult Alta()
     {
         try
         {
-            // 1. Obtenemos los ViewModels de productos LISTOS desde el repositorio.
-            var productosVM = _productosRepo.ObtenerListadoProductos().ToList();
+            // Pasamos la lista de todos los productos a la vista.
+            // El ViewModel los necesita para el primer selector de productos.
+            var productosDisponibles = _productosRepo.ObtenerListadoProductos()
+                                                     .Where(p => p.Activo)
+                                                     .ToList();
 
-            // 2. Creamos el ViewModel principal.
-            var viewModel = new AltaPromocionVM(productosVM);
+            var viewModel = new AltaPromocionVM(productosDisponibles);
 
-            // 3. Añadimos el primer detalle vacío para la vista.
+            // Agregamos un primer detalle vacío por defecto, como solicitaste.
             viewModel.DetallesPromocion.Add(new AltaDetallePromocionVM());
 
             return View(viewModel);
         }
         catch (Exception e)
         {
-            _logger.LogError(e, "Error al preparar el formulario de Alta de Promoción.");
-            TempData["ErrorMessage"] = "Ocurrió un error al cargar el formulario.";
+            _logger.LogError(e, "Error al cargar el formulario de alta de promoción.");
+            TempData["ErrorMessage"] = "Ocurrió un error al preparar el formulario.";
             return RedirectToAction(nameof(Index));
         }
     }
 
-    // POST: /Promociones/Alta
-    // Procesa los datos del formulario al guardar.
+    // 2. ACCIÓN POST PARA RECIBIR LOS DATOS
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public IActionResult Alta(AltaPromocionVM promocionVM)
+    public IActionResult Alta(AltaPromocionVM viewModel)
     {
+        // Re-validamos que el costo no supere el precio en el servidor.
+        // (Este es un ejemplo de validación de servidor que veremos en el "Consejo de Mentor")
+
+        if (!ModelState.IsValid)
+        {
+            // Si el modelo no es válido, volvemos a cargar la lista de productos y devolvemos la vista.
+            var productosDisponibles = _productosRepo.ObtenerListadoProductos().Where(p => p.Activo).ToList();
+            viewModel.Productos = productosDisponibles;
+            return View(viewModel);
+        }
+
         try
         {
-            // ... (Validación de productos duplicados, como ya la teníamos) ...
-
-            if (!ModelState.IsValid)
-            {
-                // Si la validación falla, recargamos la lista de productos
-                // usando el método eficiente.
-                promocionVM.Productos = _productosRepo.ObtenerListadoProductos().ToList();
-                return View(promocionVM);
-            }
-
-            var nuevaPromocion = Promociones.CrearDesdeViewModel(promocionVM);
+            var nuevaPromocion = Promociones.CrearDesdeViewModel(viewModel);
             _promocionesRepo.Crear(nuevaPromocion);
 
-            TempData["SuccessMessage"] = "Promoción creada correctamente.";
+            TempData["SuccessMessage"] = "¡Promoción creada exitosamente!";
             return RedirectToAction(nameof(Index));
         }
         catch (Exception e)
         {
-            _logger.LogError(e, "Error al crear la nueva promoción.");
-            ViewBag.ErrorMessage = "Ocurrió un error al guardar la promoción.";
-
-            // Si hay un error, también recargamos usando el método eficiente.
-            promocionVM.Productos = _productosRepo.ObtenerListadoProductos().ToList();
-            return View(promocionVM);
+            _logger.LogError(e, "Error al guardar la nueva promoción.");
+            TempData["ErrorMessage"] = "Ocurrió un error al guardar la promoción.";
+            var productosDisponibles = _productosRepo.ObtenerListadoProductos().Where(p => p.Activo).ToList();
+            viewModel.Productos = productosDisponibles;
+            return View(viewModel);
         }
     }
 
-    // --- ENDPOINT PARA FUNCIONALIDAD DINÁMICA (AJAX) ---
-
-    // GET: /Promociones/ObtenerProducto/{id}
-    // Devuelve los datos de un producto en formato JSON para que JavaScript los use.
+    // 3. NUEVO ENDPOINT PARA BÚSQUEDA AJAX DE PRODUCTOS
     [HttpGet]
-    public IActionResult ObtenerProducto(int id)
+    public IActionResult BuscarProductosParaPromocion(string term, [FromQuery] int[] excluir)
     {
         try
         {
-            var producto = _productosRepo.ObtenerPorId(id);
-            if (producto == null)
+            var query = _productosRepo.ObtenerListadoProductos().Where(p => p.Activo);
+
+            if (!string.IsNullOrEmpty(term))
             {
-                return NotFound(new { message = "Producto no encontrado." });
+                query = query.Where(p => p.Producto.Contains(term, StringComparison.CurrentCultureIgnoreCase));
             }
-            
-            return Json(new { costo = producto.Costo, precio = producto.Precio });
-        }
-        catch (Exception e)
-        {
-            _logger.LogError(e, "Error al obtener datos del producto con ID {ProductoId}", id);
-            return StatusCode(500, new { message = "Ocurrió un error en el servidor." });
-        }
+           
+           // ¡La lógica clave de exclusión!
+           if (excluir != null && excluir.Length > 0)
+           {
+               query = query.Where(p => !excluir.Contains(p.IdProducto));
+           }
+
+           var productos = query
+               .OrderBy(p => p.Producto)
+               // Devolvemos datos extra (precio, costo) que nuestro JavaScript usará.
+               .Select(p => new { 
+                   id = p.IdProducto, 
+                   text = p.Producto,
+                   costo = p.Costo,
+                   precio = p.Precio
+               })
+               .Take(10) // Limitamos a 10 resultados para no sobrecargar
+               .ToList();
+
+           return Json(productos);
+       }
+       catch (Exception e)
+       {
+           _logger.LogError(e, "Error en la búsqueda de productos para promoción.");
+           return StatusCode(500);
+       }
     }
 
-    
+    [HttpGet]
+    public IActionResult ObtenerVistaDetallePromocion(int index)
+    {
+        // Pasamos el índice a la vista parcial para que genere los nombres de input correctos
+        ViewData["index"] = index;
+        return PartialView("Views/Shared/_DetallePromocionItem.cshtml", new DetallesPromocionesVM.AltaDetallePromocionVM());
+    }
     // --- ACCIONES PARA MODIFICAR PROMOCIÓN ---
 
     // GET: /Promociones/Modificar
@@ -230,13 +255,13 @@ public class PromocionesController : Controller
                 _logger.LogWarning("Se intentó ver los detalles de una promoción inexistente con ID {PromocionId}", id);
                 return NotFound();
             }
-    
+
             // 2. Verificamos si la promoción puede ser eliminada.
             bool esEliminable = _promocionesRepo.PuedeSerEliminada(id);
-    
+
             // 3. Mapeamos la entidad de dominio a nuestro nuevo ViewModel específico para esta vista.
             var viewModel = new VerDetallesPromocionVM(promocion, esEliminable);
-    
+
             return View(viewModel);
         }
         catch (Exception e)
@@ -291,6 +316,37 @@ public class PromocionesController : Controller
             _logger.LogError(e, "Error al eliminar la promoción con ID {PromocionId}", id);
             TempData["ErrorMessage"] = "Ocurrió un error al eliminar la promoción.";
             return RedirectToAction(nameof(Index));
+        }
+    }
+    
+    [HttpGet]
+    public IActionResult _BuscarPromociones(string busqueda)
+    {
+        try
+        {
+            IEnumerable<ListarPromocionesVM> promocionesVM = _promocionesRepo.ObtenerListadoPromociones();
+
+            if (!string.IsNullOrEmpty(busqueda))
+            {
+                promocionesVM = promocionesVM.Where(p =>
+                    p.Promocion.Contains(busqueda, StringComparison.CurrentCultureIgnoreCase) ||
+                    p.ProductosConcatenados.Contains(busqueda, StringComparison.CurrentCultureIgnoreCase)
+                );
+            }
+
+            var promocionesOrdenadas = promocionesVM
+                .OrderByDescending(p => p.Activa)
+                .ThenByDescending(p => p.Inicio);
+
+            // Pasamos el término de búsqueda a la vista parcial para que sepa qué resaltar.
+            ViewData["BusquedaActual"] = busqueda;
+
+            return PartialView("_PromocionesTabla", promocionesOrdenadas.ToList());
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, "Error en la búsqueda dinámica de promociones.");
+            return StatusCode(500); // Devuelve un error interno del servidor
         }
     }
 }
