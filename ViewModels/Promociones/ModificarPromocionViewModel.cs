@@ -27,18 +27,14 @@ public class ModificarPromocionVM
         Productos = new List<ListarProductosVM>();
     }
 
-    public ModificarPromocionVM(Promociones promocion, List<ListarProductosVM> productos)
+    public ModificarPromocionVM(Promociones promocion)
     {
         IdPromocion = promocion.IdPromocion;
         Promocion = promocion.Promocion;
         Precio = promocion.Precio;
         Inicio = promocion.Inicio;
         Fin = promocion.Fin;
-        DetallesPromocion = promocion.DetallesPromocion.Select(d => new ModificarDetallePromocionVM
-                                                            {
-                                                                IdProducto = d.IdProducto,
-                                                                Cantidad = d.Cantidad
-                                                            }).ToList();
-        Productos = productos;
+        DetallesPromocion = promocion.DetallesPromocion.Select(d => new ModificarDetallePromocionVM(d)).ToList();
+        Productos = new List<ListarProductosVM>();
     }
 }

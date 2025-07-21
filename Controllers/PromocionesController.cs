@@ -166,77 +166,61 @@ public class PromocionesController : Controller
     {
         try
         {
-            // 1. Obtenemos la promoción a modificar, con todos sus datos.
             var promocion = _promocionesRepo.ObtenerPorId(id);
             if (promocion == null)
             {
-                _logger.LogWarning("Se intentó modificar una promoción inexistente con ID {PromocionId}", id);
                 return NotFound();
             }
-
-            // 2. Obtenemos la lista de productos para los menús desplegables.
-            var productosVM = _productosRepo.ObtenerListadoProductos().ToList();
-
-            // 3. Usamos el constructor del ViewModel que mapea la entidad y la lista de productos.
-            var viewModel = new ModificarPromocionVM(promocion, productosVM);
-
+    
+            // Mapeamos la entidad al ViewModel.
+            var viewModel = new ModificarPromocionVM(promocion);
+    
+            // ¡EL PASO CLAVE QUE FALTABA! Cargamos la lista de todos los productos.
+            viewModel.Productos = _productosRepo.ObtenerListadoProductos().ToList();
+    
             return View(viewModel);
         }
         catch (Exception e)
         {
-            _logger.LogError(e, "Error al preparar el formulario de modificación para la promoción con ID {PromocionId}", id);
+            _logger.LogError(e, "Error al cargar el formulario de modificación para la promoción ID {id}", id);
             TempData["ErrorMessage"] = "Ocurrió un error al cargar la promoción.";
             return RedirectToAction(nameof(Index));
         }
     }
-
-    // POST: /Promociones/Modificar
-    // Procesa los datos del formulario de modificación.
+    
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public IActionResult Modificar(ModificarPromocionVM promocionVM)
+    public IActionResult Modificar(ModificarPromocionVM viewModel)
     {
+        if (!ModelState.IsValid)
+        {
+            // Si la validación falla, DEBEMOS recargar la lista de productos.
+            viewModel.Productos = _productosRepo.ObtenerListadoProductos().ToList();
+            return View(viewModel);
+        }
+    
         try
         {
-            // Validación de seguridad para productos duplicados.
-            if (promocionVM.DetallesPromocion != null)
-            {
-                var productosIds = promocionVM.DetallesPromocion.Select(d => d.IdProducto);
-                if (productosIds.Count() != productosIds.Distinct().Count())
-                {
-                    ModelState.AddModelError("DetallesPromocion", "No se puede seleccionar el mismo producto más de una vez.");
-                }
-            }
-
-            if (!ModelState.IsValid)
-            {
-                // Si la validación falla, recargamos la lista de productos para la vista.
-                promocionVM.Productos = _productosRepo.ObtenerListadoProductos().ToList();
-                return View(promocionVM);
-            }
-
-            // Aplicamos el patrón "Obtener, Actualizar, Guardar".
-            var promocionExistente = _promocionesRepo.ObtenerPorId(promocionVM.IdPromocion);
-            if (promocionExistente == null)
+            var promocion = _promocionesRepo.ObtenerPorId(viewModel.IdPromocion);
+            if (promocion == null)
             {
                 return NotFound();
             }
-
-            // Usamos el método de nuestro modelo de dominio para aplicar los cambios.
-            promocionExistente.ActualizarDesdeViewModel(promocionVM);
-
-            _promocionesRepo.Actualizar(promocionExistente);
-
-            TempData["SuccessMessage"] = "Promoción modificada correctamente.";
+    
+            promocion.ActualizarDesdeViewModel(viewModel);
+            _promocionesRepo.Actualizar(promocion);
+    
+            TempData["SuccessMessage"] = "Promoción modificada exitosamente!";
             return RedirectToAction(nameof(Index));
         }
         catch (Exception e)
         {
-            _logger.LogError(e, "Error al modificar la promoción con ID {PromocionId}", promocionVM.IdPromocion);
-            ViewBag.ErrorMessage = "Ocurrió un error al guardar los cambios.";
-
-            promocionVM.Productos = _productosRepo.ObtenerListadoProductos().ToList();
-            return View(promocionVM);
+            _logger.LogError(e, "Error al modificar la promoción con ID {PromocionId}", viewModel.IdPromocion);
+            ModelState.AddModelError(string.Empty, "Ocurrió un error al guardar los cambios.");
+            
+            // También aquí recargamos los productos antes de mostrar el error.
+            viewModel.Productos = _productosRepo.ObtenerListadoProductos().ToList();
+            return View(viewModel);
         }
     }
 
