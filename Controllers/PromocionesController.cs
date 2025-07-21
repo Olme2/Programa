@@ -261,9 +261,9 @@ public class PromocionesController : Controller
     {
         try
         {
-            // Usamos el método de listado y filtramos para obtener el VM ya listo.
+            // Usamos el mismo ViewModel del listado para mostrar los datos.
             var promocionVM = _promocionesRepo.ObtenerListadoPromociones()
-                                            .FirstOrDefault(p => p.IdPromocion == id);
+                                              .FirstOrDefault(p => p.IdPromocion == id);
             if (promocionVM == null)
             {
                 return NotFound();
@@ -284,13 +284,13 @@ public class PromocionesController : Controller
     {
         try
         {
-            if (!_promocionesRepo.PuedeSerEliminada(id))
-            {
-                _logger.LogWarning("Intento de eliminación de promoción en uso con ID {PromocionId}", id);
-                TempData["ErrorMessage"] = "No se puede eliminar la promoción porque ya ha sido registrada en una o más ventas.";
-                return RedirectToAction(nameof(Index));
-            }
-
+            // REGLA DE NEGOCIO: Antes de borrar, verificamos si la promoción fue usada en ventas.
+            //if (!_promocionesRepo.PuedeSerEliminada(id))
+            //{
+            //    _logger.LogWarning("Intento de eliminación de promoción en uso con ID {PromocionId}", id);
+            //    TempData["ErrorMessage"] = "No se puede eliminar la promoción porque ya ha sido registrada en una o más ventas.";
+            //    return RedirectToAction(nameof(Index));
+            //}
             _promocionesRepo.Eliminar(id);
             TempData["SuccessMessage"] = "Promoción eliminada correctamente.";
             return RedirectToAction(nameof(Index));
@@ -302,7 +302,7 @@ public class PromocionesController : Controller
             return RedirectToAction(nameof(Index));
         }
     }
-    
+
     [HttpGet]
     public IActionResult _BuscarPromociones(string busqueda)
     {

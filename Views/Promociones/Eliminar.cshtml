@@ -1,0 +1,39 @@
+@model PromocionesVM.ListarPromocionesVM
+@{
+    ViewData["Title"] = "Eliminar Promoción";
+}
+
+<h1>Confirmar Eliminación</h1>
+
+<h3 class="text-danger">¿Está seguro que desea eliminar esta promoción?</h3>
+<p class="text-muted">Esta acción no se puede deshacer.</p>
+
+<hr />
+
+<div class="card bg-light col-md-8">
+    <div class="card-body">
+        <h4 class="card-title">Promoción a Eliminar:</h4>
+        <dl class="row mt-3">
+            <dt class="col-sm-3">Nombre</dt>
+            <dd class="col-sm-9">@Model.Promocion</dd>
+
+            <dt class="col-sm-3">Productos</dt>
+            <dd class="col-sm-9">@Model.ProductosConcatenados</dd>
+
+            <dt class="col-sm-3">Costo</dt>
+            <dd class="col-sm-9">@Model.Costo.ToString("C")</dd>
+
+            <dt class="col-sm-3">Precio</dt>
+            <dd class="col-sm-9">@Model.Precio.ToString("C")</dd>
+
+            <dt class="col-sm-3">Vigencia</dt>
+            <dd class="col-sm-9">@Model.Inicio.ToString("dd/MM/yyyy") - @(Model.Fin?.ToString("dd/MM/yyyy") ?? "Indefinido")</dd>
+        </dl>
+    </div>
+</div>
+
+<form asp-action="Eliminar" method="post" class="mt-4">
+    <input type="hidden" asp-for="IdPromocion" />
+    <input type="submit" value="Eliminar Definitivamente" class="btn btn-danger" />
+    <a asp-action="Index" class="btn btn-secondary">Cancelar</a>
+</form>
