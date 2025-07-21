@@ -1,50 +1,99 @@
 @model ProductosVM.ModificarProductoVM
-@using Microsoft.AspNetCore.Mvc.Rendering
-
-
-@if(ViewBag.ErrorMessage != null){
-    <div class="error-message">
-        <p>@ViewBag.ErrorMessage</p>
-    </div>
+@{
+    ViewData["Title"] = "Modificar Producto";
 }
 
-<h3>Modificar producto</h3>
-<form asp-controller="Productos" asp-action="ModificarProducto" method="post" class="form">
-    <input type="hidden" asp-for="IdProducto" />
-    <div class="form-group">
-        <label asp-for="Producto">Nombre</label>
-        <input asp-for="Producto" class="form-control" required>
-        <span asp-validation-for="Producto" class="text-danger"></span>
+<h1>Modificar Producto</h1>
+<hr />
+
+<div class="row">
+    <div class="col-md-6">
+        <form asp-action="Modificar" method="post">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            
+            <input type="hidden" asp-for="IdProducto" />
+            
+            <div class="form-group mb-3">
+                <label asp-for="Producto" class="control-label"></label>
+                <input asp-for="Producto" class="form-control" />
+                <span asp-validation-for="Producto" class="text-danger"></span>
+            </div>
+            
+            <div class="form-group mb-3">
+                <label asp-for="IdProveedor" class="control-label"></label>
+                <select asp-for="IdProveedor" class="form-control" id="proveedor-search">
+                    @if (Model.IdProveedor > 0)
+                    {
+                        var proveedorSeleccionado = Model.Proveedores.FirstOrDefault(p => p.IdProveedor == Model.IdProveedor);
+                        if (proveedorSeleccionado != null)
+                        {
+                            <option value="@proveedorSeleccionado.IdProveedor" selected>@proveedorSeleccionado.Proveedor</option>
+                        }
+                    }
+                </select>
+                <span asp-validation-for="IdProveedor" class="text-danger"></span>
+            </div>
+
+            <div class="row">
+                <div class="col">
+                    <div class="form-group mb-3">
+                        <label asp-for="Stock" class="control-label"></label>
+                        <input asp-for="Stock" class="form-control" type="number" step="0.001" />
+                        <span asp-validation-for="Stock" class="text-danger"></span>
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="form-group mb-3">
+                        <label asp-for="Costo" class="control-label"></label>
+                        <input asp-for="Costo" class="form-control" type="number" step="0.01" />
+                        <span asp-validation-for="Costo" class="text-danger"></span>
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="form-group mb-3">
+                        <label asp-for="Precio" class="control-label"></label>
+                        <input asp-for="Precio" class="form-control" type="number" step="0.01" />
+                        <span asp-validation-for="Precio" class="text-danger"></span>
+                    </div>
+                </div>
+            </div>
+            <div class="form-group mb-3">
+                <div class="form-check form-switch">
+                    <input class="form-check-input" type="checkbox" asp-for="Activo">
+                    <label class="form-check-label" asp-for="Activo">¿Está activo?</label>
+                </div>
+                <span asp-validation-for="Activo" class="text-danger"></span>
+            </div>
+            
+            <div class="form-group mt-4">
+                <input type="submit" value="Guardar Cambios" class="btn btn-primary" />
+                <a asp-action="Index" class="btn btn-secondary">Cancelar</a>
+            </div>
+        </form>
     </div>
-    <div class="form-group">
-        <label asp-for="IdProveedor">Proveedor</label>
-        <select asp-for="IdProveedor" class="form-control" required>
-            <option value="">Seleccione un proveedor</option>
-            @foreach (var proveedor in Model.Proveedores)
-            {
-                <option value="@proveedor.IdProveedor">@proveedor.Proveedor</option>
-            }
-        </select>
-        <span asp-validation-for="IdProveedor" class="text-danger"></span>
-    </div>
-    <div class="form-group">
-        <label asp-for="Stock">Stock</label>
-        <input asp-for="Stock" class="form-control" required>
-        <span asp-validation-for="Stock" class="text-danger"></span>
-    </div>
-    <div class="form-group">
-        <label asp-for="Costo">Costo</label>
-        <input asp-for="Costo" class="form-control" required>
-        <span asp-validation-for="Costo" class="text-danger"></span>
-    </div>
-    <div class="form-group">
-        <label asp-for="Precio">Precio</label>
-        <input asp-for="Precio" class="form-control" required>
-        <span asp-validation-for="Precio" class="text-danger"></span>
-    </div>
-    <div class="mt-3">
-        <button type="submit" class="btn btn-primary">Guardar</button>
-        <a asp-action="Index" class="btn btn-danger">Cancelar</a>
-    </div>
-</form>
-@section Scripts{<partial name="_ValidationScriptsPartial"/>}
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+
+    <script type="text/javascript">
+        $(document).ready(function() {
+            $('#proveedor-search').select2({
+                placeholder: "-- Escriba para buscar un proveedor --",
+                minimumInputLength: 0,
+                ajax: {
+                    url: '@Url.Action("BuscarProveedores", "Proveedores")',
+                    dataType: 'json',
+                    delay: 250,
+                    data: function (params) {
+                        return { term: params.term };
+                    },
+                    processResults: function (data) {
+                        return { results: data };
+                    },
+                    cache: true
+                }
+            });
+        });
+    </script>
+}

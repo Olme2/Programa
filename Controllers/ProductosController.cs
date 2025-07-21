@@ -169,6 +169,7 @@ public class ProductosController : Controller
         {
             _logger.LogError(e, "Error al modificar el producto con ID {ProductoId}", productoVM.IdProducto);
             ViewBag.ErrorMessage = "Ocurrió un error al guardar los cambios.";
+            TempData["ErrorMessage"] = "Ocurrió un error al guardar los cambios.";
             productoVM.Proveedores = _proveedoresRepo.ObtenerListadoProveedores().ToList();
             return View(productoVM);
         }

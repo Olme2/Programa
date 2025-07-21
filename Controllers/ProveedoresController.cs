@@ -207,8 +207,8 @@ public class ProveedoresController : Controller
             return RedirectToAction(nameof(Index));
         }
     }
-    
-     // --- NUEVA ACCIÓN PARA BÚSQUEDA DINÁMICA (AJAX) ---
+
+    // --- NUEVA ACCIÓN PARA BÚSQUEDA DINÁMICA (AJAX) ---
     // GET: /Proveedores/_BuscarProveedores
     [HttpGet]
     public IActionResult _BuscarProveedores(string busqueda, string filtroDeuda = "todos")
@@ -220,7 +220,7 @@ public class ProveedoresController : Controller
 
             if (!string.IsNullOrEmpty(busqueda))
             {
-                proveedoresVM = proveedoresVM.Where(p => 
+                proveedoresVM = proveedoresVM.Where(p =>
                     p.Proveedor.Contains(busqueda, StringComparison.CurrentCultureIgnoreCase));
             }
             switch (filtroDeuda)
@@ -255,6 +255,34 @@ public class ProveedoresController : Controller
         {
             _logger.LogError(e, "Error en la búsqueda dinámica de proveedores.");
             // En caso de error, devolvemos un código de error para que el JavaScript lo maneje.
+            return StatusCode(500);
+        }
+    }
+    
+    // --- ENDPOINT PARA AUTOCOMPLETE (AJAX) ---
+    // --- ENDPOINT PARA AUTOCOMPLETE (AJAX) ---
+    [HttpGet]
+    public IActionResult BuscarProveedores(string term)
+    {
+        try
+        {
+            var query = _proveedoresRepo.ObtenerListadoProveedores();
+
+            if (!string.IsNullOrEmpty(term))
+            {
+                query = query.Where(p => p.Proveedor.Contains(term, StringComparison.CurrentCultureIgnoreCase));
+            }
+
+            var proveedores = query
+                .OrderBy(p => p.Proveedor)
+                .Select(p => new { id = p.IdProveedor, text = p.Proveedor }) // Formato que espera Select2
+                .ToList();
+
+            return Json(proveedores);
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, "Error en la búsqueda de proveedores para autocomplete.");
             return StatusCode(500);
         }
     }
