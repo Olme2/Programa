@@ -86,10 +86,8 @@
     </div>
 </form>
 
-@* Plantilla oculta para añadir nuevas filas limpias *@
-<div id="detalle-template" style="display: none;">
-    <partial name="_DetallePromocionItem" model="new DetallesPromocionesVM.AltaDetallePromocionVM()" view-data='new ViewDataDictionary(ViewData) { { "index", "__INDEX__" } }' />
-</div>
+
+
 
 @section Scripts {
     @{ await Html.RenderPartialAsync("_ValidationScriptsPartial"); }
@@ -162,11 +160,14 @@
             $('#btn-agregar-detalle').on('click', function() {
                 const container = $('#detalles-container');
                 const nuevoIndex = container.find('.detalle-item').length;
-                const templateHtml = $('#detalle-template').html().replace(/__INDEX__/g, nuevoIndex);
-                const nuevaFila = $(templateHtml);
-                container.append(nuevaFila);
-                inicializarSelect2(nuevaFila.find('.producto-search'));
-                actualizarVisibilidadBotonEliminar();
+            
+                // Usamos la misma llamada AJAX que en Alta.cshtml. Es más robusta.
+                $.get('@Url.Action("ObtenerVistaDetallePromocion", "Promociones")', { index: nuevoIndex }, function(nuevaFilaHtml) {
+                    const nuevaFila = $(nuevaFilaHtml);
+                    container.append(nuevaFila);
+                    inicializarSelect2(nuevaFila.find('.producto-search'));
+                    actualizarVisibilidadBotonEliminar();
+                });
             });
 
             $('#detalles-container').on('click', '.btn-eliminar-detalle', function () {
@@ -213,9 +214,14 @@
             $('#Precio').on('input', () => recalcularTotales('precio'));
             $('#detalles-container').on('change', '.cantidad-producto', () => recalcularTotales('detalle'));
             
-            // --- INICIALIZACIÓN PARA MODIFICAR ---
-            $('.producto-search').each(function() { inicializarSelect2($(this)); });
+            // --- INICIALIZACIÓN UNIFICADA ---
+            // 1. Inicializamos los buscadores para TODAS las filas (viejas y nuevas).
+            $('.producto-search').each(function() {
+                inicializarSelect2($(this));
+            });
+            // 2. Ajustamos la visibilidad de los botones de eliminar.
             actualizarVisibilidadBotonEliminar();
+            // 3. Lanzamos el primer cálculo para que los totales iniciales aparezcan correctamente.
             recalcularTotales('detalle');
         });
     </script>
