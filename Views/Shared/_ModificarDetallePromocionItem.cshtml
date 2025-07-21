@@ -1,11 +1,13 @@
 @model DetallesPromocionesVM.ModificarDetallePromocionVM
 @{
+    // Nos aseguramos de que la cantidad siempre use un punto para el 'value' del input.
     var cantidadValue = Model.Cantidad.ToString(System.Globalization.CultureInfo.InvariantCulture);
 }
 <div class="row detalle-item align-items-center mb-3 p-2 border rounded">
     <div class="col-md-6">
         <label class="form-label">Producto</label>
         <select asp-for="IdProducto" class="form-control producto-search">
+            @* Esta opción inicial permite a Select2 mostrar el valor actual al cargar la página *@
             @if(Model.IdProducto > 0)
             {
                 <option value="@Model.IdProducto" selected>@Model.NombreProducto</option>

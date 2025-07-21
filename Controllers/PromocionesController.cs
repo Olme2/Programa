@@ -171,13 +171,12 @@ public class PromocionesController : Controller
             {
                 return NotFound();
             }
-    
-            // Mapeamos la entidad al ViewModel.
+
             var viewModel = new ModificarPromocionVM(promocion);
-    
-            // ¡EL PASO CLAVE QUE FALTABA! Cargamos la lista de todos los productos.
+
+            // ¡EL PASO CLAVE! Cargamos la lista de todos los productos disponibles.
             viewModel.Productos = _productosRepo.ObtenerListadoProductos().ToList();
-    
+
             return View(viewModel);
         }
         catch (Exception e)
@@ -187,18 +186,19 @@ public class PromocionesController : Controller
             return RedirectToAction(nameof(Index));
         }
     }
-    
+
+
     [HttpPost]
     [ValidateAntiForgeryToken]
     public IActionResult Modificar(ModificarPromocionVM viewModel)
     {
         if (!ModelState.IsValid)
         {
-            // Si la validación falla, DEBEMOS recargar la lista de productos.
+            // Si la validación falla, DEBEMOS recargar la lista de productos antes de devolver la vista.
             viewModel.Productos = _productosRepo.ObtenerListadoProductos().ToList();
             return View(viewModel);
         }
-    
+
         try
         {
             var promocion = _promocionesRepo.ObtenerPorId(viewModel.IdPromocion);
@@ -206,10 +206,10 @@ public class PromocionesController : Controller
             {
                 return NotFound();
             }
-    
+
             promocion.ActualizarDesdeViewModel(viewModel);
             _promocionesRepo.Actualizar(promocion);
-    
+
             TempData["SuccessMessage"] = "Promoción modificada exitosamente!";
             return RedirectToAction(nameof(Index));
         }
@@ -217,7 +217,7 @@ public class PromocionesController : Controller
         {
             _logger.LogError(e, "Error al modificar la promoción con ID {PromocionId}", viewModel.IdPromocion);
             ModelState.AddModelError(string.Empty, "Ocurrió un error al guardar los cambios.");
-            
+
             // También aquí recargamos los productos antes de mostrar el error.
             viewModel.Productos = _productosRepo.ObtenerListadoProductos().ToList();
             return View(viewModel);

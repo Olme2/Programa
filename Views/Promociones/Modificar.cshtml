@@ -5,8 +5,6 @@
 
 <form asp-action="Modificar" method="post" id="form-promocion">
     <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
-    
-    @* Campo oculto para el ID, crucial para la actualización *@
     <input type="hidden" asp-for="IdPromocion" />
 
     <h1>Modificar Promoción: @Model.Promocion</h1>
@@ -56,7 +54,6 @@
         @* --- COLUMNA DE RESUMEN --- *@
         <div class="col-md-5">
             <div class="summary-card">
-                @* ... (El contenido del summary-card es el mismo) ... *@
                 <h4>Resumen de la Promoción</h4>
                 <hr>
                 <div class="mb-3">
@@ -67,17 +64,14 @@
                     </div>
                     <span asp-validation-for="Precio" class="text-danger"></span>
                 </div>
-                
                 <div class="summary-item">
                     <span>Costo Total:</span>
                     <span id="costo-total-display" class="fw-bold text-danger">$0.00</span>
                 </div>
-                
                 <div class="summary-item total">
                     <span>GANANCIA:</span>
                     <span id="ganancia-total-display" class="text-success">$0.00</span>
                 </div>
-
                 <div class="summary-item">
                     <span>% Ganancia:</span>
                     <span id="porcentaje-ganancia-display" class="fw-bold">0.00%</span>
@@ -92,35 +86,32 @@
     </div>
 </form>
 
-@* Crea una plantilla para los nuevos items que se añaden con JS *@
+@* Plantilla oculta para añadir nuevas filas limpias *@
 <div id="detalle-template" style="display: none;">
     <partial name="_DetallePromocionItem" model="new DetallesPromocionesVM.AltaDetallePromocionVM()" view-data='new ViewDataDictionary(ViewData) { { "index", "__INDEX__" } }' />
 </div>
-
 
 @section Scripts {
     @{ await Html.RenderPartialAsync("_ValidationScriptsPartial"); }
     
     <script>
-        // El script de JavaScript de Alta.cshtml se puede reutilizar casi por completo.
-        // La principal diferencia es cómo se agregan nuevas filas.
-        
         $(document).ready(function () {
-            // --- FUNCIÓN CENTRAL DE CÁLCULO (Mejorada para leer números con coma) ---
+            
+            function parseLocalFloat(valor) {
+                if (!valor) return 0;
+                return parseFloat(String(valor).replace(',', '.')) || 0;
+            }
+
             function recalcularTotales(origenDelCambio) {
                 let costoTotal = 0;
-                let precioTexto = $('#Precio').val() || '0';
-                let precioPromocion = parseFloat(precioTexto.replace(',', '.')) || 0;
+                let precioPromocion = parseLocalFloat($('#Precio').val());
 
                 $('.detalle-item').each(function () {
                     const fila = $(this);
                     const selectProducto = fila.find('.producto-search');
                     const inputCantidad = fila.find('.cantidad-producto');
-                    const costoUnitario = parseFloat(selectProducto.data('costo')) || 0;
-                    
-                    // Leemos la cantidad, reemplazando la coma por un punto para que JS lo entienda siempre.
-                    const cantidadTexto = inputCantidad.val() || '0';
-                    const cantidad = parseFloat(cantidadTexto.replace(',', '.')) || 0;
+                    const costoUnitario = parseLocalFloat(selectProducto.data('costo'));
+                    const cantidad = parseLocalFloat(inputCantidad.val());
                     const costoDetalle = costoUnitario * cantidad;
 
                     fila.find('.costo-detalle-display').text(costoDetalle.toLocaleString('es-AR', { style: 'currency', currency: 'ARS' }));
@@ -133,47 +124,17 @@
                 }
 
                 const ganancia = precioPromocion - costoTotal;
-                const porcentajeGanancia = costoTotal > 0 ? (ganancia / costoTotal) * 100 : 0;
+                const porcentajeGanancia = costoTotal > 0 ? (ganancia / costoTotal) : 0;
                 
                 $('#costo-total-display').text(costoTotal.toLocaleString('es-AR', { style: 'currency', currency: 'ARS' }));
                 $('#ganancia-total-display').text(ganancia.toLocaleString('es-AR', { style: 'currency', currency: 'ARS' }));
-                $('#porcentaje-ganancia-display').text(porcentajeGanancia.toFixed(2).replace('.', ',') + '%');
+                $('#porcentaje-ganancia-display').text(porcentajeGanancia.toLocaleString('es-AR', { style: 'percent', minimumFractionDigits: 2 }));
             }
 
-            // --- MANEJADOR DE ENVÍO DEL FORMULARIO (LA SOLUCIÓN PRINCIPAL) ---
-            $('#form-promocion').on('submit', function(e) {
-                
-                // 1. Limpiamos el campo de precio para asegurar el formato correcto
-                const precioInput = $('#Precio');
-                if (precioInput.val()) {
-                    const valorNeutralPrecio = precioInput.val().replace(',', '.');
-                    precioInput.val(valorNeutralPrecio);
-                }
-
-                // 2. Iteramos por cada fila de detalle para limpiar la CANTIDAD
-                $('.detalle-item').each(function() {
-                    const fila = $(this);
-                    const selectProducto = fila.find('.producto-search');
-                    const cantidadInput = fila.find('.cantidad-producto');
-
-                    // Si la fila no tiene producto, la eliminamos
-                    if (!selectProducto.val() || selectProducto.val() === "0") {
-                        fila.remove();
-                    } else {
-                        // ¡LA SOLUCIÓN! Limpiamos el campo de cantidad de esta fila
-                        if (cantidadInput.val()) {
-                            const valorNeutralCantidad = cantidadInput.val().replace(',', '.');
-                            cantidadInput.val(valorNeutralCantidad);
-                        }
-                    }
-                });
-
-                // 3. Re-indexamos las filas restantes
-                reindexarFilas();
-            });
-
-            // (El resto de funciones como inicializarSelect2, añadir/eliminar, etc., no cambian)
             function inicializarSelect2(selector) {
+                if (selector.hasClass("select2-hidden-accessible")) {
+                    selector.select2('destroy');
+                }
                 selector.select2({
                     placeholder: "-- Buscar producto --",
                     ajax: {
@@ -198,15 +159,11 @@
                 });
             }
 
-            // Reemplaza la función de click de 'btn-agregar-detalle' con esta:
             $('#btn-agregar-detalle').on('click', function() {
                 const container = $('#detalles-container');
                 const nuevoIndex = container.find('.detalle-item').length;
-                
-                // Obtenemos el HTML de nuestra nueva plantilla
                 const templateHtml = $('#detalle-template').html().replace(/__INDEX__/g, nuevoIndex);
                 const nuevaFila = $(templateHtml);
-
                 container.append(nuevaFila);
                 inicializarSelect2(nuevaFila.find('.producto-search'));
                 actualizarVisibilidadBotonEliminar();
@@ -233,25 +190,32 @@
                 const filas = $('#detalles-container .detalle-item');
                 filas.find('.btn-eliminar-detalle').toggle(filas.length > 1);
             }
-            
+
+            $('#form-promocion').on('submit', function(e) {
+                $('#Precio, .cantidad-producto').each(function() {
+                    const input = $(this);
+                    if (input.val()) {
+                        const valorNeutral = input.val().replace(',', '.');
+                        input.val(valorNeutral);
+                    }
+                });
+                $('.detalle-item').each(function() {
+                    const selectProducto = $(this).find('.producto-search');
+                    if (!selectProducto.val() || selectProducto.val() === "0") { $(this).remove(); }
+                });
+                reindexarFilas();
+            });
+
             $('#form-promocion').on('keydown', '.cantidad-producto', function(e) {
-                if (e.key === 'Enter') {
-                    e.preventDefault();
-                    $(this).trigger('change');
-                }
+                if (e.key === 'Enter') { e.preventDefault(); $(this).trigger('change'); }
             });
 
-            $('#Precio').on('input', function() {
-                recalcularTotales('precio');
-            });
-
-            $('#detalles-container').on('change', '.cantidad-producto', function() {
-                 recalcularTotales('detalle');
-            });
+            $('#Precio').on('input', () => recalcularTotales('precio'));
+            $('#detalles-container').on('change', '.cantidad-producto', () => recalcularTotales('detalle'));
             
-            inicializarSelect2($('.producto-search'));
+            // --- INICIALIZACIÓN PARA MODIFICAR ---
+            $('.producto-search').each(function() { inicializarSelect2($(this)); });
             actualizarVisibilidadBotonEliminar();
-            // Llama a esto al final para calcular los totales iniciales al cargar la página.
             recalcularTotales('detalle');
         });
     </script>

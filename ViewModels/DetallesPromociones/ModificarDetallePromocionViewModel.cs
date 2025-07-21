@@ -5,16 +5,29 @@ namespace DetallesPromocionesVM;
 public class ModificarDetallePromocionVM
 {
     [Required]
-    [Range(1, int.MaxValue, ErrorMessage = "Debe seleccionar un producto válido.")]
+    [Range(1, int.MaxValue)]
     public int IdProducto { get; set; }
+
     [Required]
-    [Range(0.001, 999.999, ErrorMessage = "La cantidad debe ser al menos 0,001 y como maximo 999,999.")]
+    [Range(0.001, 99999.999)]
     public decimal Cantidad { get; set; }
-    public string NombreProducto { get; set; }
-    public ModificarDetallePromocionVM(DetallesPromociones detallePromocion)
+
+    public string? NombreProducto { get; set; }
+    
+    // Propiedad clave para que la vista conozca el costo inicial del producto.
+    public decimal Costo { get; set; }
+
+    public ModificarDetallePromocionVM() { }
+
+    // Constructor que facilita el mapeo desde la entidad en el controlador.
+    public ModificarDetallePromocionVM(DetallesPromociones detalle)
     {
-        IdProducto = detallePromocion.IdProducto;
-        Cantidad = detallePromocion.Cantidad;
-        NombreProducto = detallePromocion.Producto.Producto;
+        IdProducto = detalle.IdProducto;
+        Cantidad = detalle.Cantidad;
+        if (detalle.Producto != null)
+        {
+            NombreProducto = detalle.Producto.Producto;
+            Costo = detalle.Producto.Costo;
+        }
     }
 }
