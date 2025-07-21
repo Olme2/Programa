@@ -44,6 +44,10 @@ namespace entornoPolleria
                 entity.Property(e => e.Proveedor).HasColumnName("proveedor").HasMaxLength(50).IsRequired();
                 entity.Property(e => e.Contacto).HasColumnName("contacto").HasMaxLength(100);
                 entity.Property(e => e.Debo).HasColumnName("debo").HasColumnType("numeric(9,2)").IsRequired();
+                entity.HasMany(p => p.Productos)
+                        .WithOne(prod => prod.Proveedor) // Cada Producto tiene un Proveedor.
+                        .HasForeignKey(prod => prod.IdProveedor) // La clave foránea está en Productos.
+                        .IsRequired();
             });
 
             // Compras
@@ -108,6 +112,11 @@ namespace entornoPolleria
                 entity.Property(e => e.Fecha).HasColumnName("fecha").IsRequired();
                 entity.Property(e => e.Hora).HasColumnName("hora").IsRequired();
                 entity.Property(e => e.Detalle).HasColumnName("detalle").HasMaxLength(100);
+                entity.HasMany(v => v.DetallesVenta)
+                    .WithOne(dv => dv.Venta)
+                    .HasForeignKey(dv => dv.IdVenta)
+                    .IsRequired()
+                    .OnDelete(DeleteBehavior.Cascade);
             });
 
             // DetallesVentas

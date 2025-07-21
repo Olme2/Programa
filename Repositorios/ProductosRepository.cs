@@ -12,27 +12,20 @@ public class ProductosRepository : IProductosRepository
 
     public IEnumerable<ListarProductosVM> ObtenerListadoProductos()
     {
-        var unaSemanaAtras = DateOnly.FromDateTime(DateTime.Now.AddDays(-7));
-
-        // Esta consulta se traduce a SQL y se ejecuta en la base de datos.
-        return _context.Productos.Include(p => p.Proveedor).Select(p => new ListarProductosVM
-        {
-            IdProducto = p.IdProducto,
-            Producto = p.Producto,
-            Proveedor = p.Proveedor.Proveedor,
-            Stock = p.Stock,
-            Costo = p.Costo,
-            Precio = p.Precio,
-            Activo = p.Activo,
-            Ganancia = p.Precio - p.Costo,
-            PorcentajeGanancia = (p.Costo > 0) ? ((p.Precio - p.Costo) / p.Costo) : 0,
-            // Calculamos si el producto está referenciado en alguna otra tabla
-            EsEliminable = !_context.DetallesVentas.Any(dv => dv.IdProducto == p.IdProducto) &&
-                               !_context.DetallesPromociones.Any(dp => dp.IdProducto == p.IdProducto) &&
-                               !_context.DetallesCompras.Any(dc => dc.IdProducto == p.IdProducto),
-            // Sumamos la cantidad de productos vendidos en la última semana
-            VendidosSemana = _context.DetallesVentas.Where(dv => dv.IdProducto == p.IdProducto && dv.Venta.Fecha >= unaSemanaAtras).Sum(dv => (int)dv.Cantidad)
-        })
+        return _context.Productos
+            .Include(p => p.Proveedor)
+            .Select(p => new ListarProductosVM
+            {
+                IdProducto = p.IdProducto,
+                Producto = p.Producto,
+                Proveedor = p.Proveedor.Proveedor,
+                Stock = p.Stock,
+                Costo = p.Costo,
+                Precio = p.Precio,
+                Activo = p.Activo,
+                Ganancia = p.Precio - p.Costo,
+                PorcentajeGanancia = (p.Costo > 0) ? ((p.Precio - p.Costo) / p.Costo) : 0,
+            })
             .ToList();
     }
 

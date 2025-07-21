@@ -11,10 +11,12 @@ public class Productos
     public bool Activo { get; private set; }
     
     public virtual Proveedores Proveedor { get; private set; }
+
+    // --- CONSTRUCTORES ---
     private Productos()
     {
         Producto = string.Empty;
-        Proveedor = null!;
+        Proveedor = null!; // Le decimos al compilador que EF se encargará de esto.
     }
     private Productos(int idProveedor, string nombre, decimal stock, decimal costo, decimal precio)
     {

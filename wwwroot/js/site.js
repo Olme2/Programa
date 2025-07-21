@@ -35,4 +35,31 @@ $(document).ready(function () {
     $('#filtro-deuda').on('change', function () {
         actualizarTablaProveedores();
     });
+    // --- LÓGICA NUEVA PARA PRODUCTOS ---
+
+    function actualizarTablaProductos() {
+        var busqueda = $('#buscador-producto').val();
+        var ordenarPor = $('#ordenar-por').val();
+
+        $.ajax({
+            url: '/Productos/_BuscarProductos', // URL de la nueva acción
+            type: 'GET',
+            data: {
+                busqueda: busqueda,
+                ordenarPor: ordenarPor
+            },
+            success: function (result) {
+                $('#tabla-productos-body').html(result);
+            },
+            error: function (err) {
+                console.error("Error al buscar productos:", err);
+                // Opcional: Mostrar un error al usuario
+            }
+        });
+    }
+
+    // Eventos que disparan la actualización
+    $('#buscador-producto').on('keyup', actualizarTablaProductos);
+    $('#ordenar-por').on('change', actualizarTablaProductos);
 });
+

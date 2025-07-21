@@ -1,46 +1,61 @@
 @model List<ProductosVM.ListarProductosVM>
-@using Microsoft.AspNetCore.Mvc.Rendering
-@using System.Globalization
-
 @{
-    var nf = new NumberFormatInfo {
-        NumberDecimalSeparator = ",",
-        NumberGroupSeparator = "."
-    };
+    ViewData["Title"] = "Productos";
 }
 
-<h2>Listado de Productos</h2>
-<table class="table">
-    <thead>
-        <tr>
-            <th>Nombre</th>
-            <th>Proveedor</th>
-            <th>Stock</th>
-            <th>Costo</th>
-            <th>Precio</th>
-            <th>Ganancia</th>
-            <th>% Ganancia</th>
-            <th>Acciones</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var producto in Model)
-        {
-            <tr>
-                <td>@producto.Producto</td>
-                <td>@producto.Proveedor</td>
-                <td>@producto.Stock.ToString("N2", nf) kg</td>
-                <td>$@producto.Costo.ToString("N2", nf)</td>
-                <td>$@producto.Precio.ToString("N2", nf)</td>
-                <td>$@producto.Ganancia.ToString("N2", nf)</td>
-                <td>@producto.PorcentajeGanancia %</td>
-                <td>
-                    <a asp-action="ModificarProducto" asp-route-id="@producto.IdProducto" class="btn btn-warning btn-sm">Modificar</a>
-                    <a asp-action="EliminarProducto" asp-route-id="@producto.IdProducto" class="btn btn-danger btn-sm">Eliminar</a>
-                </td>
-            </tr>
-        }
-    </tbody>
-</table>
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        @TempData["SuccessMessage"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        @TempData["ErrorMessage"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+<h1>Listado de Productos</h1>
 
-<a asp-action="AltaProducto" class="btn btn-primary">Agregar Producto</a>
+<div class="row g-3 align-items-center mb-3">
+    <div class="col-md-4">
+        <div class="input-group">
+            <span class="input-group-text">Ordenar por</span>
+            <select id="ordenar-por" name="ordenarPor" class="form-select">
+                <option value="alfabetico" selected="@(ViewData["OrdenActual"]?.ToString() == "alfabetico")">Nombre (A-Z)</option>
+                <option value="stock" selected="@(ViewData["OrdenActual"]?.ToString() == "stock")">Stock (Mayor a Menor)</option>
+            </select>
+        </div>
+    </div>
+    <div class="col-md-8">
+        <input type="text" id="buscador-producto" name="busqueda" class="form-control" placeholder="Buscar por Producto o Proveedor..." value="@ViewData["BusquedaActual"]" />
+    </div>
+</div>
+
+<div class="table-responsive">
+    <table class="table table-hover">
+        <thead class="table-dark">
+            <tr>
+                <th>Producto</th>
+                <th>Proveedor</th>
+                <th>Stock</th>
+                <th>Costo</th>
+                <th>Precio</th>
+                <th>Ganancia</th>
+                <th>% Ganancia</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody id="tabla-productos-body">
+            @await Html.PartialAsync("_ProductosTabla", Model)
+        </tbody>
+    </table>
+</div>
+
+<a asp-action="Alta" class="btn btn-success btn-lg btn-float">+</a>
+
+@section Scripts {
+    <script src="~/js/site.js" asp-append-version="true"></script>
+}

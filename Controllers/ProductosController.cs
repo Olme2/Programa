@@ -20,41 +20,44 @@ public class ProductosController : Controller
     {
         try
         {
-            // 1. Llamamos al nuevo método del repositorio. ¡Obtenemos los VMs directamente!
+            // 1. Obtenemos la lista completa de ViewModels desde el repositorio.
             IEnumerable<ListarProductosVM> productosVM = _productosRepo.ObtenerListadoProductos();
 
-            // 2. Aplicamos el filtro de búsqueda (ahora sobre el ViewModel).
+            // 2. Aplicamos el filtro de búsqueda.
             if (!string.IsNullOrEmpty(busqueda))
             {
-                productosVM = productosVM.Where(p => 
-                    p.Producto.Contains(busqueda, StringComparison.CurrentCultureIgnoreCase) || 
+                productosVM = productosVM.Where(p =>
+                    p.Producto.Contains(busqueda, StringComparison.CurrentCultureIgnoreCase) ||
                     p.Proveedor.Contains(busqueda, StringComparison.CurrentCultureIgnoreCase)
                 );
             }
 
-            // 3. Aplicamos el ordenamiento según el parámetro.
+            // 3. Aplicamos el ORDENAMIENTO COMPLEJO.
+            // Primero, SIEMPRE ordenamos por estado Activo (los activos primero).
+            var productosOrdenados = productosVM.OrderByDescending(p => p.Activo);
+
+            // Luego, aplicamos el segundo criterio de ordenamiento que eligió el usuario.
             switch (ordenarPor)
             {
                 case "stock":
-                    productosVM = productosVM.OrderBy(p => p.Stock);
-                    break;
-                case "vendidos":
-                    productosVM = productosVM.OrderByDescending(p => p.VendidosSemana);
+                    productosOrdenados = productosOrdenados.ThenByDescending(p => p.Stock);
                     break;
                 default: // "alfabetico" y cualquier otro valor
-                    productosVM = productosVM.OrderBy(p => p.Producto);
+                    productosOrdenados = productosOrdenados.ThenBy(p => p.Producto);
                     break;
             }
 
-            // 4. Pasamos los filtros y ordenamiento a la vista.
+            // 4. Pasamos los filtros actuales a la vista.
             ViewData["BusquedaActual"] = busqueda;
             ViewData["OrdenActual"] = ordenarPor;
-            return View(productosVM.ToList());
+
+            return View(productosOrdenados.ToList());
         }
         catch (Exception e)
         {
             _logger.LogError(e, "Error al obtener el listado de productos.");
             ViewBag.ErrorMessage = "Ocurrió un error al cargar los productos.";
+            TempData["ErrorMessage"] = "Ocurrió un error al cargar los productos.";
             return View(new List<ListarProductosVM>());
         }
     }
@@ -123,10 +126,10 @@ public class ProductosController : Controller
             }
 
             var proveedoresVM = _proveedoresRepo.ObtenerListadoProveedores().ToList();
-            
+
             // Usamos el constructor que mapea desde el modelo.
             var productoVM = new ModificarProductoVM(producto, proveedoresVM);
-            
+
             return View(productoVM);
         }
         catch (Exception e)
@@ -219,4 +222,50 @@ public class ProductosController : Controller
             return RedirectToAction(nameof(Index));
         }
     }
+    // --- ACCIÓN PARA BÚSQUEDA DINÁMICA (AJAX) ---
+    [HttpGet]
+    public IActionResult _BuscarProductos(string busqueda, string ordenarPor = "alfabetico")
+    {
+        try
+        {
+            // La lógica de filtrado y ordenamiento que ya teníamos es correcta.
+            IEnumerable<ListarProductosVM> productosVM = _productosRepo.ObtenerListadoProductos();
+
+            if (!string.IsNullOrEmpty(busqueda))
+            {
+                productosVM = productosVM.Where(p =>
+                    p.Producto.Contains(busqueda, StringComparison.CurrentCultureIgnoreCase) ||
+                    p.Proveedor.Contains(busqueda, StringComparison.CurrentCultureIgnoreCase)
+                );
+            }
+
+            var productosOrdenados = productosVM.OrderByDescending(p => p.Activo);
+
+            switch (ordenarPor)
+            {
+                case "stock":
+                    productosOrdenados = productosOrdenados.ThenByDescending(p => p.Stock);
+                    break;
+                case "vendidos":
+                    // Lógica de vendidos comentada, como acordamos.
+                    // productosOrdenados = productosOrdenados.ThenByDescending(p => p.VendidosSemana);
+                    break;
+                default:
+                    productosOrdenados = productosOrdenados.ThenBy(p => p.Producto);
+                    break;
+            }
+
+            // --- LÍNEA CLAVE AÑADIDA ---
+            // Pasamos el término de búsqueda a la vista parcial para que sepa qué resaltar.
+            ViewData["BusquedaActual"] = busqueda;
+
+            return PartialView("_ProductosTabla", productosOrdenados.ToList());
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, "Error en la búsqueda dinámica de productos.");
+            return StatusCode(500);
+        }
+    }
+    
 }

@@ -6,10 +6,11 @@ public class Proveedores
     public string Proveedor { get; private set; }
     public string? Contacto { get; private set; }
     public decimal Debo { get; private set; }
-
+    public virtual ICollection<Productos> Productos { get; private set; }
     private Proveedores()
     {
         Proveedor = string.Empty;
+        Productos = new List<Productos>();
     }
 
     private Proveedores(string proveedor, string? contacto, decimal deboInicial)
@@ -17,6 +18,7 @@ public class Proveedores
         Proveedor = proveedor;
         Contacto = contacto;
         Debo = deboInicial;
+        Productos = null!;
     }
 
     public static Proveedores CrearDesdeViewModel(AltaProveedorVM vm)

@@ -1,0 +1,35 @@
+@model List<ProductosVM.ListarProductosVM>
+
+@{
+    // Obtenemos el término de búsqueda para saber qué resaltar.
+    var busqueda = ViewData["BusquedaActual"] as string;
+
+    // Pequeña función local para hacer el resaltado.
+    Func<string, HtmlString> ResaltarCoincidencia = (texto) => 
+    {
+        if (string.IsNullOrEmpty(busqueda) || string.IsNullOrEmpty(texto) || !texto.Contains(busqueda, StringComparison.CurrentCultureIgnoreCase))
+        {
+            return new HtmlString(texto);
+        }
+        var regex = new System.Text.RegularExpressions.Regex(busqueda, System.Text.RegularExpressions.RegexOptions.IgnoreCase);
+        return new HtmlString(regex.Replace(texto, $"<span class='highlight'>$&</span>"));
+    };
+}
+
+@foreach (var producto in Model)
+{
+    string filaInactivaClass = !producto.Activo ? "table-secondary" : "";
+    <tr class="@filaInactivaClass">
+        <td>@ResaltarCoincidencia(producto.Producto)</td>
+        <td>@ResaltarCoincidencia(producto.Proveedor)</td>
+        <td>@producto.Stock</td>
+        <td>@producto.Costo.ToString("C")</td>
+        <td>@producto.Precio.ToString("C")</td>
+        <td>@producto.Ganancia.ToString("C")</td>
+        <td>@producto.PorcentajeGanancia.ToString("P2")</td>
+        <td>
+            <a asp-action="Modificar" asp-route-id="@producto.IdProducto" class="btn btn-warning btn-sm">Modificar</a>
+            <a asp-action="Eliminar" asp-route-id="@producto.IdProducto" class="btn btn-danger btn-sm">Eliminar</a>
+        </td>
+    </tr>
+}

@@ -1,0 +1,60 @@
+@model ProductosVM.AltaProductoVM
+@{
+    ViewData["Title"] = "Nuevo Producto";
+}
+
+<h1>Crear Nuevo Producto</h1>
+<hr />
+
+<div class="row">
+    <div class="col-md-6">
+        <form asp-action="Alta" method="post">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            
+            <div class="form-group mb-3">
+                <label asp-for="Producto" class="control-label"></label>
+                <input asp-for="Producto" class="form-control" placeholder="Ej: Milanesa de Pollo" />
+                <span asp-validation-for="Producto" class="text-danger"></span>
+            </div>
+            
+            <div class="form-group mb-3">
+                <label asp-for="IdProveedor" class="control-label"></label>
+                <select asp-for="IdProveedor" class="form-control" id="proveedor-search"></select>
+                <span asp-validation-for="IdProveedor" class="text-danger"></span>
+            </div>
+
+            <div class="row">
+                <div class="col">
+                    <div class="form-group mb-3">
+                        <label asp-for="Stock" class="control-label"></label>
+                        <input asp-for="Stock" class="form-control" type="number" step="0.001"  placeholder="Ej: 1.000,000"/>
+                        <span asp-validation-for="Stock" class="text-danger"></span>
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="form-group mb-3">
+                        <label asp-for="Costo" class="control-label"></label>
+                        <input asp-for="Costo" class="form-control" type="number" step="0.01" placeholder="Ej: 1.000,00"/>
+                        <span asp-validation-for="Costo" class="text-danger"></span>
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="form-group mb-3">
+                        <label asp-for="Precio" class="control-label"></label>
+                        <input asp-for="Precio" class="form-control" type="number" step="0.01" placeholder="Ej: 1.000,00"/>
+                        <span asp-validation-for="Precio" class="text-danger"></span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="form-group mt-4">
+                <input type="submit" value="Guardar Producto" class="btn btn-primary" />
+                <a asp-action="Index" class="btn btn-secondary">Cancelar</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}
