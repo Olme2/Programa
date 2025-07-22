@@ -24,13 +24,13 @@
         <td>@proveedor.Debo.ToString("C")</td>
         <td>
             <a asp-action="Modificar" asp-route-id="@proveedor.IdProveedor" class="btn btn-warning btn-sm">Modificar</a>
-            @if (proveedor.EsEliminable)
+            @if (!proveedor.EsEliminable || proveedor.Debo>0)
             {
-                <a asp-action="Eliminar" asp-route-id="@proveedor.IdProveedor" class="btn btn-danger btn-sm">Eliminar</a>
+                <button class="btn btn-secondary btn-sm" disabled title="No se puede eliminar, tiene productos asociados.">Eliminar</button>
             }
             else
             {
-                <button class="btn btn-secondary btn-sm" disabled title="No se puede eliminar, tiene productos asociados.">Eliminar</button>
+                <a asp-action="Eliminar" asp-route-id="@proveedor.IdProveedor" class="btn btn-danger btn-sm">Eliminar</a>
             }
         </td>
     </tr>

@@ -11,7 +11,6 @@ public class ProveedoresRepository : IProveedoresRepository
     
     public IEnumerable<ListarProveedoresVM> ObtenerListadoProveedores()
     {
-        // Proyectamos directamente a nuestro ViewModel
         return _context.Proveedores
             .Select(p => new ListarProveedoresVM
             {
@@ -19,10 +18,9 @@ public class ProveedoresRepository : IProveedoresRepository
                 Proveedor = p.Proveedor,
                 Contacto = p.Contacto,
                 Debo = p.Debo,
-                // Calculamos si el proveedor está referenciado en la tabla de productos.
-                EsEliminable = !_context.Productos.Any(prod => prod.IdProveedor == p.IdProveedor)
-            })
-            .ToList();
+                EsEliminable = !_context.Productos.Any(prod => prod.IdProveedor == p.IdProveedor),            
+                ProductosReferenciados = string.Join(", ", _context.Productos.Where(prod => prod.IdProveedor == p.IdProveedor).Select(prod => prod.Producto))
+            }).ToList();
     }
 
     public Proveedores? ObtenerPorId(int id)

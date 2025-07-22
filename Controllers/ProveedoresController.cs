@@ -13,51 +13,17 @@ public class ProveedoresController : Controller
     }
 
     [HttpGet]
-    public IActionResult Index(string busqueda, string filtroDeuda = "todos")
+    public IActionResult Index()
     {
         try
         {
-            IEnumerable<ListarProveedoresVM> proveedoresVM = _proveedoresRepo.ObtenerListadoProveedores();
-
-            // Aplicamos filtros...
-            if (!string.IsNullOrEmpty(busqueda))
-            {
-                proveedoresVM = proveedoresVM.Where(p =>
-                    p.Proveedor.Contains(busqueda, StringComparison.CurrentCultureIgnoreCase));
-            }
-            switch (filtroDeuda)
-            {
-                case "conDeuda":
-                    proveedoresVM = proveedoresVM.Where(p => p.Debo > 0);
-                    break;
-                case "sinDeuda":
-                    proveedoresVM = proveedoresVM.Where(p => p.Debo == 0);
-                    break;
-            }
-
-            // Aplicamos ordenamiento...
-            IOrderedEnumerable<ListarProveedoresVM> proveedoresOrdenados;
-            if (filtroDeuda == "todos")
-            {
-                proveedoresOrdenados = proveedoresVM
-                    .OrderByDescending(p => p.Debo > 0)
-                    .ThenBy(p => p.Proveedor);
-            }
-            else
-            {
-                proveedoresOrdenados = proveedoresVM.OrderBy(p => p.Proveedor);
-            }
-
-            ViewData["BusquedaActual"] = busqueda;
-            ViewData["FiltroDeudaActual"] = filtroDeuda;
-
-            // ¡AHORA USAMOS LA VARIABLE CORRECTA!
-            return View(proveedoresOrdenados.ToList());
+            var proveedoresVM = _proveedoresRepo.ObtenerListadoProveedores();
+            return View(proveedoresVM.OrderByDescending(p => p.Debo).ThenBy(p => p.Proveedor).ToList());
         }
         catch (Exception e)
         {
             _logger.LogError(e, "Error al obtener el listado de proveedores.");
-            ViewData["ErrorMessage"] = "Ocurrió un error al cargar los proveedores.";
+            TempData["ErrorMessage"] = "No se pudo cargar el listado de proveedores.";
             return View(new List<ListarProveedoresVM>());
         }
     }
@@ -70,37 +36,28 @@ public class ProveedoresController : Controller
 
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public IActionResult Alta(AltaProveedorVM proveedorVM)
+    public IActionResult Alta(AltaProveedorVM viewModel)
     {
+        if (!ModelState.IsValid)
+        {
+            return View(viewModel);
+        }
+
         try
         {
-            // 1. Validamos que los datos del formulario cumplan las reglas.
-            if (!ModelState.IsValid)
-            {
-                // Si no son válidos, volvemos a mostrar el formulario con los errores.
-                return View(proveedorVM);
-            }
-
-            // 2. Usamos el Factory Method de nuestro modelo de dominio.
-            //    Aquí ocurre la transformación de ViewModel a Modelo.
-            var nuevoProveedor = Proveedores.CrearDesdeViewModel(proveedorVM);
-
-            // 3. Usamos el método estandarizado del repositorio para guardar.
-            _proveedoresRepo.Crear(nuevoProveedor);
-
-            // 4. Redirigimos al Index (Patrón Post-Redirect-Get).
-            TempData["SuccessMessage"] = "Proveedor creado correctamente.";
+            var proveedor = Proveedores.CrearDesdeViewModel(viewModel);
+            _proveedoresRepo.Crear(proveedor);
+            TempData["SuccessMessage"] = "Proveedor creado exitosamente.";
             return RedirectToAction(nameof(Index));
         }
         catch (Exception e)
         {
-            _logger.LogError(e, "Error al crear el nuevo proveedor.");
-            ViewBag.ErrorMessage = "Ocurrió un error al guardar el proveedor.";
-            return View(proveedorVM);
+            _logger.LogError(e, "Error al crear el proveedor.");
+            TempData["ErrorMessage"] = "Ocurrió un error al crear el proveedor.";
+            return View(viewModel);
         }
     }
 
-    // --- ACCIONES DE MODIFICACIÓN ---
     [HttpGet]
     public IActionResult Modificar(int id)
     {
@@ -109,92 +66,88 @@ public class ProveedoresController : Controller
             var proveedor = _proveedoresRepo.ObtenerPorId(id);
             if (proveedor == null)
             {
-                _logger.LogWarning("Se intentó modificar un proveedor inexistente con ID {ProveedorId}", id);
-                return NotFound();
+                TempData["ErrorMessage"] = "No existe proveedor con ese id.";
+                return RedirectToAction(nameof(Index));
             }
-            var proveedorVM = new ModificarProveedorVM(proveedor);
-            return View(proveedorVM);
+            var viewModel = new ModificarProveedorVM(proveedor);
+            return View(viewModel);
         }
         catch (Exception e)
         {
-            _logger.LogError(e, "Error al cargar el proveedor con ID {ProveedorId} para modificar.", id);
-            TempData["ErrorMessage"] = "Error al cargar el proveedor. Intente de nuevo."; // Usar TempData para errores en redirección
+            _logger.LogError(e, "Error al obtener el proveedor con ID {ProveedorId} para modificar.", id);
+            TempData["ErrorMessage"] = "No se pudo cargar el proveedor para modificar.";
             return RedirectToAction(nameof(Index));
         }
     }
 
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public IActionResult Modificar(ModificarProveedorVM proveedorVM)
+    public IActionResult Modificar(ModificarProveedorVM viewModel)
     {
+        if (!ModelState.IsValid)
+        {
+            return View(viewModel);
+        }
+
         try
         {
-            if (!ModelState.IsValid)
+            var proveedor = _proveedoresRepo.ObtenerPorId(viewModel.IdProveedor);
+            if (proveedor == null)
             {
-                return View(proveedorVM);
+                TempData["ErrorMessage"] = "No existe proveedor con ese id.";
+                return RedirectToAction(nameof(Index));
             }
-            var proveedorExistente = _proveedoresRepo.ObtenerPorId(proveedorVM.IdProveedor);
-            if (proveedorExistente == null)
-            {
-                return NotFound();
-            }
-            proveedorExistente.ActualizarDesdeViewModel(proveedorVM);
-            _proveedoresRepo.Actualizar(proveedorExistente);
 
-            // --- Mensaje de éxito ---
-            TempData["SuccessMessage"] = "Proveedor modificado correctamente.";
-
+            proveedor.ActualizarDesdeViewModel(viewModel);
+            _proveedoresRepo.Actualizar(proveedor);
+            TempData["SuccessMessage"] = "Proveedor modificado exitosamente.";
             return RedirectToAction(nameof(Index));
         }
         catch (Exception e)
         {
-            _logger.LogError(e, "Error al modificar el proveedor con ID {ProveedorId}", proveedorVM.IdProveedor);
-            ViewBag.ErrorMessage = "Ocurrió un error al guardar los cambios.";
-            return View(proveedorVM);
+            _logger.LogError(e, "Error al modificar el proveedor con ID {ProveedorId}", viewModel.IdProveedor);
+            TempData["ErrorMessage"] = "Ocurrió un error al modificar el proveedor.";
+            return View(viewModel);
         }
     }
 
-    // --- ACCIONES DE ELIMINACIÓN ---
     [HttpGet]
     public IActionResult Eliminar(int id)
     {
         try
         {
-            var proveedorVM = _proveedoresRepo.ObtenerListadoProveedores()
-                                            .FirstOrDefault(p => p.IdProveedor == id);
+            var proveedorVM = _proveedoresRepo.ObtenerListadoProveedores().FirstOrDefault(p => p.IdProveedor == id);
             if (proveedorVM == null)
             {
-                return NotFound();
+                TempData["ErrorMessage"] = "No existe proveedor con ese id.";
+                return RedirectToAction(nameof(Index));
+            }
+            if (!proveedorVM.EsEliminable)
+            {
+                TempData["ErrorMessage"] = "No se puede eliminar el proveedor " + proveedorVM.Proveedor + ", es referenciado en los productos " + proveedorVM.ProductosReferenciados + ".";
+                return RedirectToAction(nameof(Index));
+            }
+            if (proveedorVM.Debo > 0)
+            {
+                TempData["ErrorMessage"] = "No se puede eliminar el proveedor " + proveedorVM.Proveedor + " ya que todavia tiene una deuda.";
+                return RedirectToAction(nameof(Index));
             }
             return View(proveedorVM);
         }
         catch (Exception e)
         {
-            _logger.LogError(e, "Error al cargar el proveedor con ID {ProveedorId} para eliminar.", id);
-            TempData["ErrorMessage"] = "Error al cargar el proveedor para eliminar.";
+            _logger.LogError(e, "Error al obtener el proveedor con ID {ProveedorId} para eliminar.", id);
+            TempData["ErrorMessage"] = "No se pudo cargar el proveedor para eliminar.";
             return RedirectToAction(nameof(Index));
         }
     }
 
     [HttpPost, ActionName("Eliminar")]
     [ValidateAntiForgeryToken]
-    // Cambiamos el nombre del parámetro a 'id' para que coincida con la convención de routing
     public IActionResult EliminarConfirmado(int id)
     {
         try
         {
-            // ¡VERIFICACIÓN DE SEGURIDAD!
-            // Volvemos a consultar al repositorio para estar 100% seguros.
-            var proveedorParaEliminar = _proveedoresRepo.ObtenerListadoProveedores()
-                                                       .FirstOrDefault(p => p.IdProveedor == id);
-
-            if (proveedorParaEliminar != null && !proveedorParaEliminar.EsEliminable)
-            {
-                _logger.LogWarning("Intento de eliminación de proveedor en uso con ID {ProveedorId}", id);
-                TempData["ErrorMessage"] = "No se puede eliminar el proveedor porque tiene productos asociados.";
-                return RedirectToAction(nameof(Index));
-            }
-
             _proveedoresRepo.Eliminar(id);
             TempData["SuccessMessage"] = "Proveedor eliminado correctamente.";
             return RedirectToAction(nameof(Index));
@@ -202,21 +155,17 @@ public class ProveedoresController : Controller
         catch (Exception e)
         {
             _logger.LogError(e, "Error al eliminar el proveedor con ID {ProveedorId}", id);
-            // Usamos TempData porque estamos redirigiendo. ViewBag se perdería.
-            TempData["ErrorMessage"] = "Ocurrió un error al eliminar el proveedor. Es posible que esté asociado a productos existentes.";
+            TempData["ErrorMessage"] = "Ocurrió un error al eliminar el proveedor. Es posible que esté en uso.";
             return RedirectToAction(nameof(Index));
         }
     }
 
-    // --- NUEVA ACCIÓN PARA BÚSQUEDA DINÁMICA (AJAX) ---
-    // GET: /Proveedores/_BuscarProveedores
     [HttpGet]
-    public IActionResult _BuscarProveedores(string busqueda, string filtroDeuda = "todos")
+    public IActionResult _BuscarProveedores(string busqueda, string filtroDeuda)
     {
         try
         {
-            // La lógica de filtrado y ordenamiento es EXACTAMENTE la misma que en el Index.
-            IEnumerable<ListarProveedoresVM> proveedoresVM = _proveedoresRepo.ObtenerListadoProveedores();
+            var proveedoresVM = _proveedoresRepo.ObtenerListadoProveedores();
 
             if (!string.IsNullOrEmpty(busqueda))
             {
@@ -233,51 +182,32 @@ public class ProveedoresController : Controller
                     break;
             }
 
-            IOrderedEnumerable<ListarProveedoresVM> proveedoresOrdenados;
-            if (filtroDeuda == "todos")
-            {
-                proveedoresOrdenados = proveedoresVM
-                    .OrderByDescending(p => p.Debo > 0)
-                    .ThenBy(p => p.Proveedor);
-            }
-            else
-            {
-                proveedoresOrdenados = proveedoresVM.OrderBy(p => p.Proveedor);
-            }
-
-            // Pasamos el término de búsqueda a la vista para poder resaltar las coincidencias.
+            var proveedoresOrdenados = proveedoresVM.OrderByDescending(p=> p.Debo).ThenBy(p => p.Proveedor);
             ViewData["BusquedaActual"] = busqueda;
-
-            // En lugar de devolver una Vista completa, devolvemos una Vista Parcial.
             return PartialView("_ProveedoresTabla", proveedoresOrdenados.ToList());
         }
         catch (Exception e)
         {
             _logger.LogError(e, "Error en la búsqueda dinámica de proveedores.");
-            // En caso de error, devolvemos un código de error para que el JavaScript lo maneje.
             return StatusCode(500);
         }
     }
-    
-    // --- ENDPOINT PARA AUTOCOMPLETE (AJAX) ---
-    // --- ENDPOINT PARA AUTOCOMPLETE (AJAX) ---
+
     [HttpGet]
     public IActionResult BuscarProveedores(string term)
     {
+        // Esta acción es para AJAX (Select2), por lo que no necesita TempData.
         try
         {
             var query = _proveedoresRepo.ObtenerListadoProveedores();
-
             if (!string.IsNullOrEmpty(term))
             {
                 query = query.Where(p => p.Proveedor.Contains(term, StringComparison.CurrentCultureIgnoreCase));
             }
-
             var proveedores = query
                 .OrderBy(p => p.Proveedor)
-                .Select(p => new { id = p.IdProveedor, text = p.Proveedor }) // Formato que espera Select2
+                .Select(p => new { id = p.IdProveedor, text = p.Proveedor })
                 .ToList();
-
             return Json(proveedores);
         }
         catch (Exception e)

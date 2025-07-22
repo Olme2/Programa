@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using ProductosVM;
 namespace ProveedoresVM;
 
 public class ListarProveedoresVM
@@ -9,14 +10,6 @@ public class ListarProveedoresVM
     [DataType(DataType.Currency)] 
     public decimal Debo { get; set; } 
     public bool EsEliminable { get; set; }
+    public string ProductosReferenciados { get; set; } = string.Empty;
     public ListarProveedoresVM() { }
-
-    public ListarProveedoresVM(Proveedores proveedor)
-    {
-        IdProveedor = proveedor.IdProveedor;
-        Proveedor = proveedor.Proveedor;
-        Contacto = proveedor.Contacto;
-        Debo = proveedor.Debo;
-        EsEliminable = false;
-    }
 }

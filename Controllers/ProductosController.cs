@@ -1,6 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
 using ProductosVM;
-using ProveedoresVM;
 
 public class ProductosController : Controller
 {
@@ -16,48 +15,17 @@ public class ProductosController : Controller
     }
 
     [HttpGet]
-    public IActionResult Index(string busqueda, string ordenarPor = "alfabetico")
+    public IActionResult Index()
     {
         try
         {
-            // 1. Obtenemos la lista completa de ViewModels desde el repositorio.
-            IEnumerable<ListarProductosVM> productosVM = _productosRepo.ObtenerListadoProductos();
-
-            // 2. Aplicamos el filtro de búsqueda.
-            if (!string.IsNullOrEmpty(busqueda))
-            {
-                productosVM = productosVM.Where(p =>
-                    p.Producto.Contains(busqueda, StringComparison.CurrentCultureIgnoreCase) ||
-                    p.Proveedor.Contains(busqueda, StringComparison.CurrentCultureIgnoreCase)
-                );
-            }
-
-            // 3. Aplicamos el ORDENAMIENTO COMPLEJO.
-            // Primero, SIEMPRE ordenamos por estado Activo (los activos primero).
-            var productosOrdenados = productosVM.OrderByDescending(p => p.Activo);
-
-            // Luego, aplicamos el segundo criterio de ordenamiento que eligió el usuario.
-            switch (ordenarPor)
-            {
-                case "stock":
-                    productosOrdenados = productosOrdenados.ThenByDescending(p => p.Stock);
-                    break;
-                default: // "alfabetico" y cualquier otro valor
-                    productosOrdenados = productosOrdenados.ThenBy(p => p.Producto);
-                    break;
-            }
-
-            // 4. Pasamos los filtros actuales a la vista.
-            ViewData["BusquedaActual"] = busqueda;
-            ViewData["OrdenActual"] = ordenarPor;
-
-            return View(productosOrdenados.ToList());
+            var productosVM = _productosRepo.ObtenerListadoProductos();
+            return View(productosVM.OrderByDescending(p => p.Activo).ThenBy(p => p.Producto).ToList());
         }
         catch (Exception e)
         {
             _logger.LogError(e, "Error al obtener el listado de productos.");
-            ViewBag.ErrorMessage = "Ocurrió un error al cargar los productos.";
-            TempData["ErrorMessage"] = "Ocurrió un error al cargar los productos.";
+            TempData["ErrorMessage"] = "No se pudo cargar el listado de productos.";
             return View(new List<ListarProductosVM>());
         }
     }
@@ -65,54 +33,36 @@ public class ProductosController : Controller
     [HttpGet]
     public IActionResult Alta()
     {
-        try
-        {
-            var proveedoresVM = _proveedoresRepo.ObtenerListadoProveedores().ToList();
-            var viewModel = new AltaProductoVM(proveedoresVM);
-            return View(viewModel);
-        }
-        catch (Exception e)
-        {
-            _logger.LogError(e, "Error al preparar el formulario de alta de producto.");
-            // Usamos TempData para que el mensaje sobreviva la redirección al Index
-            TempData["ErrorMessage"] = "Ocurrió un error al cargar el formulario.";
-            return RedirectToAction(nameof(Index));
-        }
+        // Para el formulario de Alta, preparamos el ViewModel.
+        // El dropdown de proveedores se carga dinámicamente con Select2,
+        // por lo que no es necesario pasar la lista aquí.
+        return View(new AltaProductoVM());
     }
 
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public IActionResult Alta(AltaProductoVM productoVM)
+    public IActionResult Alta(AltaProductoVM viewModel)
     {
+        if (!ModelState.IsValid)
+        {
+            return View(viewModel);
+        }
+
         try
         {
-            if (!ModelState.IsValid)
-            {
-                // Si el modelo no es válido, debemos recargar los datos para la vista.
-                productoVM.Proveedores = _proveedoresRepo.ObtenerListadoProveedores().ToList();
-                return View(productoVM);
-            }
-
-            var nuevoProducto = Productos.CrearDesdeViewModel(productoVM);
-            _productosRepo.Crear(nuevoProducto);
-
-            // Añadimos el mensaje de éxito para una experiencia de usuario consistente.
-            TempData["SuccessMessage"] = "Producto creado correctamente.";
-
+            var producto = Productos.CrearDesdeViewModel(viewModel);
+            _productosRepo.Crear(producto);
+            TempData["SuccessMessage"] = "Producto creado exitosamente.";
             return RedirectToAction(nameof(Index));
         }
         catch (Exception e)
         {
-            _logger.LogError(e, "Error al crear el nuevo producto.");
-            ViewBag.ErrorMessage = "Ocurrió un error al guardar el producto.";
-
-            // Si hay un error, también debemos recargar los datos para la vista.
-            productoVM.Proveedores = _proveedoresRepo.ObtenerListadoProveedores().ToList();
-            return View(productoVM);
+            _logger.LogError(e, "Error al crear el producto.");
+            TempData["ErrorMessage"] = "Ocurrió un error al crear el producto.";
+            return View(viewModel);
         }
     }
-
-    // --- ACCIONES DE MODIFICACIÓN ---
+    
     [HttpGet]
     public IActionResult Modificar(int id)
     {
@@ -121,99 +71,92 @@ public class ProductosController : Controller
             var producto = _productosRepo.ObtenerPorId(id);
             if (producto == null)
             {
-                _logger.LogWarning("Se intentó modificar un producto inexistente con ID {ProductoId}", id);
-                return NotFound(); // Devuelve una página de error 404.
+                TempData["ErrorMessage"] = "No existe producto con ese id.";
+                return RedirectToAction(nameof(Index));
             }
-
-            var proveedoresVM = _proveedoresRepo.ObtenerListadoProveedores().ToList();
-
-            // Usamos el constructor que mapea desde el modelo.
-            var productoVM = new ModificarProductoVM(producto, proveedoresVM);
-
-            return View(productoVM);
+            
+            // Pasamos la lista de proveedores para el dropdown.
+            var proveedores = _proveedoresRepo.ObtenerListadoProveedores().ToList();
+            var viewModel = new ModificarProductoVM(producto, proveedores);
+            return View(viewModel);
         }
         catch (Exception e)
         {
-            _logger.LogError(e, "Error al cargar el producto con ID {ProductoId} para modificar.", id);
-            ViewBag.ErrorMessage = "Ocurrió un error al cargar el producto.";
+            _logger.LogError(e, "Error al obtener el producto con ID {ProductoId} para modificar.", id);
+            TempData["ErrorMessage"] = "No se pudo cargar el producto para modificar.";
             return RedirectToAction(nameof(Index));
         }
     }
 
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public IActionResult Modificar(ModificarProductoVM productoVM)
+    public IActionResult Modificar(ModificarProductoVM viewModel)
     {
+        if (!ModelState.IsValid)
+        {
+            // Si la validación falla, recargamos la lista de proveedores.
+            viewModel.Proveedores = _proveedoresRepo.ObtenerListadoProveedores().ToList();
+            return View(viewModel);
+        }
+        
         try
         {
-            if (!ModelState.IsValid)
+            var producto = _productosRepo.ObtenerPorId(viewModel.IdProducto);
+            if (producto == null)
             {
-                productoVM.Proveedores = _proveedoresRepo.ObtenerListadoProveedores().ToList();
-                return View(productoVM);
+                TempData["ErrorMessage"] = "No existe producto con ese id.";
+                return RedirectToAction(nameof(Index));
             }
 
-            var productoExistente = _productosRepo.ObtenerPorId(productoVM.IdProducto);
-            if (productoExistente == null)
-            {
-                return NotFound();
-            }
-
-            productoExistente.ActualizarDesdeViewModel(productoVM);
-            _productosRepo.Actualizar(productoExistente);
-
-            TempData["SuccessMessage"] = "Producto modificado correctamente.";
-
+            producto.ActualizarDesdeViewModel(viewModel);
+            _productosRepo.Actualizar(producto);
+            TempData["SuccessMessage"] = "Producto modificado exitosamente.";
             return RedirectToAction(nameof(Index));
         }
         catch (Exception e)
         {
-            _logger.LogError(e, "Error al modificar el producto con ID {ProductoId}", productoVM.IdProducto);
-            ViewBag.ErrorMessage = "Ocurrió un error al guardar los cambios.";
-            TempData["ErrorMessage"] = "Ocurrió un error al guardar los cambios.";
-            productoVM.Proveedores = _proveedoresRepo.ObtenerListadoProveedores().ToList();
-            return View(productoVM);
+            _logger.LogError(e, "Error al modificar el producto con ID {ProductoId}", viewModel.IdProducto);
+            TempData["ErrorMessage"] = "Ocurrió un error al modificar el producto.";
+            viewModel.Proveedores = _proveedoresRepo.ObtenerListadoProveedores().ToList();
+            return View(viewModel);
         }
     }
-
-    // --- ACCIONES DE ELIMINACIÓN ---
+    
     [HttpGet]
     public IActionResult Eliminar(int id)
     {
         try
         {
-            var producto = _productosRepo.ObtenerPorId(id);
-            if (producto == null)
+            var productoVM = _productosRepo.ObtenerListadoProductos().FirstOrDefault(p => p.IdProducto == id);
+            if (productoVM == null)
             {
-                return NotFound();
+                TempData["ErrorMessage"] = "No existe producto con ese id.";
+                return RedirectToAction(nameof(Index));
             }
-            // Reutilizamos el ListarProductosVM para mostrar los datos de confirmación.
-            var productoVM = new ListarProductosVM(producto);
             return View(productoVM);
         }
         catch (Exception e)
         {
-            _logger.LogError(e, "Error al cargar el producto con ID {ProductoId} para eliminar.", id);
+            _logger.LogError(e, "Error al obtener el producto con ID {ProductoId} para eliminar.", id);
+            TempData["ErrorMessage"] = "No se pudo cargar el producto para eliminar.";
             return RedirectToAction(nameof(Index));
         }
     }
 
     [HttpPost, ActionName("Eliminar")]
     [ValidateAntiForgeryToken]
-    public IActionResult EliminarConfirmado(int id) // Parámetro simplificado a 'id'
+    public IActionResult EliminarConfirmado(int id)
     {
         try
         {
             if (!_productosRepo.PuedeSerEliminado(id))
             {
-                _logger.LogWarning("Intento de eliminación de producto en uso con ID {ProductoId}", id);
-                TempData["ErrorMessage"] = "No se puede eliminar el producto porque está siendo utilizado en ventas, compras o promociones.";
+                TempData["ErrorMessage"] = "No se puede eliminar el producto porque está en uso en promociones, ventas o compras.";
                 return RedirectToAction(nameof(Index));
             }
-
+            
             _productosRepo.Eliminar(id);
-
             TempData["SuccessMessage"] = "Producto eliminado correctamente.";
-
             return RedirectToAction(nameof(Index));
         }
         catch (Exception e)
@@ -223,14 +166,13 @@ public class ProductosController : Controller
             return RedirectToAction(nameof(Index));
         }
     }
-    // --- ACCIÓN PARA BÚSQUEDA DINÁMICA (AJAX) ---
+
     [HttpGet]
-    public IActionResult _BuscarProductos(string busqueda, string ordenarPor = "alfabetico")
+    public IActionResult _BuscarProductos(string busqueda, string ordenarPor)
     {
         try
         {
-            // La lógica de filtrado y ordenamiento que ya teníamos es correcta.
-            IEnumerable<ListarProductosVM> productosVM = _productosRepo.ObtenerListadoProductos();
+            var productosVM = _productosRepo.ObtenerListadoProductos();
 
             if (!string.IsNullOrEmpty(busqueda))
             {
@@ -247,19 +189,12 @@ public class ProductosController : Controller
                 case "stock":
                     productosOrdenados = productosOrdenados.ThenByDescending(p => p.Stock);
                     break;
-                case "vendidos":
-                    // Lógica de vendidos comentada, como acordamos.
-                    // productosOrdenados = productosOrdenados.ThenByDescending(p => p.VendidosSemana);
-                    break;
                 default:
                     productosOrdenados = productosOrdenados.ThenBy(p => p.Producto);
                     break;
             }
 
-            // --- LÍNEA CLAVE AÑADIDA ---
-            // Pasamos el término de búsqueda a la vista parcial para que sepa qué resaltar.
             ViewData["BusquedaActual"] = busqueda;
-
             return PartialView("_ProductosTabla", productosOrdenados.ToList());
         }
         catch (Exception e)
@@ -268,5 +203,4 @@ public class ProductosController : Controller
             return StatusCode(500);
         }
     }
-    
 }
