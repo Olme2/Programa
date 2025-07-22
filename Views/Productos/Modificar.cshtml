@@ -42,12 +42,14 @@
                         <span asp-validation-for="Stock" class="text-danger"></span>
                     </div>
                 </div>
-                <div class="col">
-                    <div class="form-group mb-3">
-                        <label asp-for="Costo" class="control-label"></label>
-                        <input asp-for="Costo" class="form-control" type="number" step="0.01" />
-                        <span asp-validation-for="Costo" class="text-danger"></span>
-                    </div>
+                <div class="form-group mb-3">
+                    <label asp-for="Stock" class="control-label">Stock (Calculado)</label>
+                    @*
+                      Añadimos un id="stock-no-editable" para identificar este campo en JavaScript.
+                      No le ponemos 'readonly' aquí para que no se vea diferente al resto.
+                    *@
+                    <input asp-for="Stock" class="form-control" type="number" step="0.001" id="stock-no-editable" />
+                    <span asp-validation-for="Stock" class="text-danger"></span>
                 </div>
                 <div class="col">
                     <div class="form-group mb-3">
@@ -94,6 +96,20 @@
                     cache: true
                 }
             });
+            // --- LÓGICA PARA BLOQUEAR EL CAMPO STOCK ---
+    
+            // 1. Seleccionamos el campo de stock por su ID y lo hacemos de solo lectura.
+            const stockInput = $('#stock-no-editable');
+            stockInput.prop('readonly', true);
+        
+            // 2. Agregamos un evento para cuando el usuario haga clic en él.
+            stockInput.on('click', function() {
+                alert("No se puede modificar. El valor es calculado a partir de las ventas y compras.");
+            });
+        
+            // 3. (Opcional) Cambiamos el cursor para que parezca no editable.
+            stockInput.css('cursor', 'not-allowed');
+
         });
     </script>
 }

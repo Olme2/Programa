@@ -13,7 +13,7 @@ public class AltaProductoVM
         public int IdProveedor { get; set; }
 
         [Required(ErrorMessage = "El stock inicial es obligatorio.")]
-        [Range(0.001, 99999.999, ErrorMessage = "El stock no puede ser negativo ni mayor a 99.999,999.")]
+        [Range(0, 99999.999, ErrorMessage = "El stock no puede ser negativo ni mayor a 99.999,999.")]
         public decimal Stock { get; set; }
 
         [Required(ErrorMessage = "El costo es obligatorio.")]
