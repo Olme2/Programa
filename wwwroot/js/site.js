@@ -40,13 +40,14 @@ $(document).ready(function () {
     function actualizarTablaProductos() {
         var busqueda = $('#buscador-producto').val();
         var ordenarPor = $('#ordenar-por').val();
-
+        var inactivos = $('#mostrar-inactivos').is(':checked');
         $.ajax({
             url: '/Productos/_BuscarProductos', // URL de la nueva acción
             type: 'GET',
             data: {
                 busqueda: busqueda,
-                ordenarPor: ordenarPor
+                ordenarPor: ordenarPor,
+                inactivos: inactivos
             },
             success: function (result) {
                 $('#tabla-productos-body').html(result);
@@ -61,5 +62,6 @@ $(document).ready(function () {
     // Eventos que disparan la actualización
     $('#buscador-producto').on('keyup', actualizarTablaProductos);
     $('#ordenar-por').on('change', actualizarTablaProductos);
+    $('#mostrar-inactivos').on('change', actualizarTablaProductos);
 });
 

@@ -15,9 +15,15 @@
             </select>
         </div>
     </div>
-    <div class="col-md-8">
+    <div class="col-md-6">
         <input type="text" id="buscador-producto" name="busqueda" class="form-control" placeholder="Buscar por Producto o Proveedor..." value="@ViewData["BusquedaActual"]" />
     </div>
+    <div class="col-md-2">
+    <div class="form-check form-switch bg-light border rounded p-2 d-flex justify-content-center align-items-center h-100">
+        <input class="form-check-input me-2" id="mostrar-inactivos" type="checkbox" name="Inactivos">
+        <label class="form-check-label" for="mostrar-inactivos">Ver Inactivos</label>
+    </div>
+</div>
 </div>
 
 <div class="table-responsive">

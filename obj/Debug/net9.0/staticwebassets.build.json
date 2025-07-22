@@ -1,6 +1,6 @@
 {
   "Version": 1,
-  "Hash": "0JT+StZ9xDgbuCr7Ntfv1nsG5xMXpD5yc24tI784MoE=",
+  "Hash": "d9dx7G5Oeb0GJ1yqvKDjMnXaUIsSX/nVPFyU+9BfTGo=",
   "Source": "entornoPolleria",
   "BasePath": "_content/entornoPolleria",
   "Mode": "Default",
@@ -38,12 +38,12 @@
       "OriginalItemSpec": "C:\\Users\\Valentino\\OneDrive\\Desktop\\Polleria\\Programa\\wwwroot\\lib\\jquery-validation-unobtrusive\\jquery.validate.unobtrusive.js"
     },
     {
-      "Identity": "C:\\Users\\Valentino\\OneDrive\\Desktop\\Polleria\\Programa\\obj\\Debug\\net9.0\\compressed\\0lbsggp66v-xifffxdmyf.gz",
+      "Identity": "C:\\Users\\Valentino\\OneDrive\\Desktop\\Polleria\\Programa\\obj\\Debug\\net9.0\\compressed\\0lbsggp66v-2bqgk4g6hm.gz",
       "SourceId": "entornoPolleria",
       "SourceType": "Discovered",
       "ContentRoot": "C:\\Users\\Valentino\\OneDrive\\Desktop\\Polleria\\Programa\\obj\\Debug\\net9.0\\compressed\\",
       "BasePath": "_content/entornoPolleria",
-      "RelativePath": "js/site#[.{fingerprint=xifffxdmyf}]?.js.gz",
+      "RelativePath": "js/site#[.{fingerprint=2bqgk4g6hm}]?.js.gz",
       "AssetKind": "All",
       "AssetMode": "All",
       "AssetRole": "Alternative",
@@ -52,8 +52,8 @@
       "RelatedAsset": "C:\\Users\\Valentino\\OneDrive\\Desktop\\Polleria\\Programa\\wwwroot\\js\\site.js",
       "AssetTraitName": "Content-Encoding",
       "AssetTraitValue": "gzip",
-      "Fingerprint": "dyvcqsx1kz",
-      "Integrity": "OzlDJ2HBH+SK16Nc7TNlNXGGSw8Gfm9ZzoirQ4pgsIU=",
+      "Fingerprint": "5q2n3ho7gq",
+      "Integrity": "jXRHstSK8rJA0tLgGHbr2ZKlNqvM0eNnFnAluqW+irw=",
       "CopyToOutputDirectory": "Never",
       "CopyToPublishDirectory": "PreserveNewest",
       "OriginalItemSpec": "C:\\Users\\Valentino\\OneDrive\\Desktop\\Polleria\\Programa\\wwwroot\\js\\site.js"
@@ -1396,8 +1396,8 @@
       "RelatedAsset": "",
       "AssetTraitName": "",
       "AssetTraitValue": "",
-      "Fingerprint": "xifffxdmyf",
-      "Integrity": "Wd81b53lSj0OiT+dAn5hnxgHO4CBI7DtsMPO9iWNxc4=",
+      "Fingerprint": "2bqgk4g6hm",
+      "Integrity": "0nLZIbf8cUuGarYc0vRIkQq3doAenJwGEPxJP7dW4bc=",
       "CopyToOutputDirectory": "Never",
       "CopyToPublishDirectory": "PreserveNewest",
       "OriginalItemSpec": "wwwroot\\js\\site.js"
@@ -3794,13 +3794,13 @@
       ]
     },
     {
-      "Route": "js/site.js",
-      "AssetFile": "C:\\Users\\Valentino\\OneDrive\\Desktop\\Polleria\\Programa\\obj\\Debug\\net9.0\\compressed\\0lbsggp66v-xifffxdmyf.gz",
+      "Route": "js/site.2bqgk4g6hm.js",
+      "AssetFile": "C:\\Users\\Valentino\\OneDrive\\Desktop\\Polleria\\Programa\\obj\\Debug\\net9.0\\compressed\\0lbsggp66v-2bqgk4g6hm.gz",
       "Selectors": [
         {
           "Name": "Content-Encoding",
           "Value": "gzip",
-          "Quality": "0,001233045623"
+          "Quality": "0,001179245283"
         }
       ],
       "ResponseHeaders": [
@@ -3810,19 +3810,19 @@
         },
         {
           "Name": "Content-Length",
-          "Value": "810"
+          "Value": "847"
         },
         {
           "Name": "ETag",
-          "Value": "\"OzlDJ2HBH+SK16Nc7TNlNXGGSw8Gfm9ZzoirQ4pgsIU=\""
+          "Value": "\"jXRHstSK8rJA0tLgGHbr2ZKlNqvM0eNnFnAluqW+irw=\""
         },
         {
           "Name": "Last-Modified",
-          "Value": "Sun, 20 Jul 2025 22:37:59 GMT"
+          "Value": "Tue, 22 Jul 2025 10:52:50 GMT"
         },
         {
           "Name": "Cache-Control",
-          "Value": "no-cache"
+          "Value": "max-age=31536000, immutable"
         },
         {
           "Name": "Content-Encoding",
@@ -3838,18 +3838,26 @@
         },
         {
           "Name": "ETag",
-          "Value": "W/\"Wd81b53lSj0OiT+dAn5hnxgHO4CBI7DtsMPO9iWNxc4=\""
+          "Value": "W/\"0nLZIbf8cUuGarYc0vRIkQq3doAenJwGEPxJP7dW4bc=\""
         }
       ],
       "EndpointProperties": [
         {
+          "Name": "fingerprint",
+          "Value": "2bqgk4g6hm"
+        },
+        {
+          "Name": "label",
+          "Value": "js/site.js"
+        },
+        {
           "Name": "integrity",
-          "Value": "sha256-Wd81b53lSj0OiT+dAn5hnxgHO4CBI7DtsMPO9iWNxc4="
+          "Value": "sha256-0nLZIbf8cUuGarYc0vRIkQq3doAenJwGEPxJP7dW4bc="
         }
       ]
     },
     {
-      "Route": "js/site.js",
+      "Route": "js/site.2bqgk4g6hm.js",
       "AssetFile": "C:\\Users\\Valentino\\OneDrive\\Desktop\\Polleria\\Programa\\wwwroot\\js\\site.js",
       "Selectors": [],
       "ResponseHeaders": [
@@ -3859,7 +3867,7 @@
         },
         {
           "Name": "Content-Length",
-          "Value": "2427"
+          "Value": "2598"
         },
         {
           "Name": "Content-Type",
@@ -3867,121 +3875,21 @@
         },
         {
           "Name": "ETag",
-          "Value": "\"Wd81b53lSj0OiT+dAn5hnxgHO4CBI7DtsMPO9iWNxc4=\""
+          "Value": "\"0nLZIbf8cUuGarYc0vRIkQq3doAenJwGEPxJP7dW4bc=\""
         },
         {
           "Name": "Last-Modified",
-          "Value": "Sun, 20 Jul 2025 22:37:59 GMT"
-        },
-        {
-          "Name": "Cache-Control",
-          "Value": "no-cache"
-        }
-      ],
-      "EndpointProperties": [
-        {
-          "Name": "integrity",
-          "Value": "sha256-Wd81b53lSj0OiT+dAn5hnxgHO4CBI7DtsMPO9iWNxc4="
-        }
-      ]
-    },
-    {
-      "Route": "js/site.js.gz",
-      "AssetFile": "C:\\Users\\Valentino\\OneDrive\\Desktop\\Polleria\\Programa\\obj\\Debug\\net9.0\\compressed\\0lbsggp66v-xifffxdmyf.gz",
-      "Selectors": [],
-      "ResponseHeaders": [
-        {
-          "Name": "Accept-Ranges",
-          "Value": "bytes"
-        },
-        {
-          "Name": "Content-Length",
-          "Value": "810"
-        },
-        {
-          "Name": "Content-Type",
-          "Value": "text/javascript"
-        },
-        {
-          "Name": "ETag",
-          "Value": "\"OzlDJ2HBH+SK16Nc7TNlNXGGSw8Gfm9ZzoirQ4pgsIU=\""
-        },
-        {
-          "Name": "Last-Modified",
-          "Value": "Sun, 20 Jul 2025 22:37:59 GMT"
-        },
-        {
-          "Name": "Cache-Control",
-          "Value": "no-cache"
-        },
-        {
-          "Name": "Content-Encoding",
-          "Value": "gzip"
-        },
-        {
-          "Name": "Vary",
-          "Value": "Content-Encoding"
-        }
-      ],
-      "EndpointProperties": [
-        {
-          "Name": "integrity",
-          "Value": "sha256-OzlDJ2HBH+SK16Nc7TNlNXGGSw8Gfm9ZzoirQ4pgsIU="
-        }
-      ]
-    },
-    {
-      "Route": "js/site.xifffxdmyf.js",
-      "AssetFile": "C:\\Users\\Valentino\\OneDrive\\Desktop\\Polleria\\Programa\\obj\\Debug\\net9.0\\compressed\\0lbsggp66v-xifffxdmyf.gz",
-      "Selectors": [
-        {
-          "Name": "Content-Encoding",
-          "Value": "gzip",
-          "Quality": "0,001233045623"
-        }
-      ],
-      "ResponseHeaders": [
-        {
-          "Name": "Accept-Ranges",
-          "Value": "bytes"
-        },
-        {
-          "Name": "Content-Length",
-          "Value": "810"
-        },
-        {
-          "Name": "ETag",
-          "Value": "\"OzlDJ2HBH+SK16Nc7TNlNXGGSw8Gfm9ZzoirQ4pgsIU=\""
-        },
-        {
-          "Name": "Last-Modified",
-          "Value": "Sun, 20 Jul 2025 22:37:59 GMT"
+          "Value": "Tue, 22 Jul 2025 10:52:50 GMT"
         },
         {
           "Name": "Cache-Control",
           "Value": "max-age=31536000, immutable"
-        },
-        {
-          "Name": "Content-Encoding",
-          "Value": "gzip"
-        },
-        {
-          "Name": "Vary",
-          "Value": "Content-Encoding"
-        },
-        {
-          "Name": "Content-Type",
-          "Value": "text/javascript"
-        },
-        {
-          "Name": "ETag",
-          "Value": "W/\"Wd81b53lSj0OiT+dAn5hnxgHO4CBI7DtsMPO9iWNxc4=\""
         }
       ],
       "EndpointProperties": [
         {
           "Name": "fingerprint",
-          "Value": "xifffxdmyf"
+          "Value": "2bqgk4g6hm"
         },
         {
           "Name": "label",
@@ -3989,13 +3897,13 @@
         },
         {
           "Name": "integrity",
-          "Value": "sha256-Wd81b53lSj0OiT+dAn5hnxgHO4CBI7DtsMPO9iWNxc4="
+          "Value": "sha256-0nLZIbf8cUuGarYc0vRIkQq3doAenJwGEPxJP7dW4bc="
         }
       ]
     },
     {
-      "Route": "js/site.xifffxdmyf.js",
-      "AssetFile": "C:\\Users\\Valentino\\OneDrive\\Desktop\\Polleria\\Programa\\wwwroot\\js\\site.js",
+      "Route": "js/site.2bqgk4g6hm.js.gz",
+      "AssetFile": "C:\\Users\\Valentino\\OneDrive\\Desktop\\Polleria\\Programa\\obj\\Debug\\net9.0\\compressed\\0lbsggp66v-2bqgk4g6hm.gz",
       "Selectors": [],
       "ResponseHeaders": [
         {
@@ -4004,7 +3912,7 @@
         },
         {
           "Name": "Content-Length",
-          "Value": "2427"
+          "Value": "847"
         },
         {
           "Name": "Content-Type",
@@ -4012,56 +3920,11 @@
         },
         {
           "Name": "ETag",
-          "Value": "\"Wd81b53lSj0OiT+dAn5hnxgHO4CBI7DtsMPO9iWNxc4=\""
+          "Value": "\"jXRHstSK8rJA0tLgGHbr2ZKlNqvM0eNnFnAluqW+irw=\""
         },
         {
           "Name": "Last-Modified",
-          "Value": "Sun, 20 Jul 2025 22:37:59 GMT"
-        },
-        {
-          "Name": "Cache-Control",
-          "Value": "max-age=31536000, immutable"
-        }
-      ],
-      "EndpointProperties": [
-        {
-          "Name": "fingerprint",
-          "Value": "xifffxdmyf"
-        },
-        {
-          "Name": "label",
-          "Value": "js/site.js"
-        },
-        {
-          "Name": "integrity",
-          "Value": "sha256-Wd81b53lSj0OiT+dAn5hnxgHO4CBI7DtsMPO9iWNxc4="
-        }
-      ]
-    },
-    {
-      "Route": "js/site.xifffxdmyf.js.gz",
-      "AssetFile": "C:\\Users\\Valentino\\OneDrive\\Desktop\\Polleria\\Programa\\obj\\Debug\\net9.0\\compressed\\0lbsggp66v-xifffxdmyf.gz",
-      "Selectors": [],
-      "ResponseHeaders": [
-        {
-          "Name": "Accept-Ranges",
-          "Value": "bytes"
-        },
-        {
-          "Name": "Content-Length",
-          "Value": "810"
-        },
-        {
-          "Name": "Content-Type",
-          "Value": "text/javascript"
-        },
-        {
-          "Name": "ETag",
-          "Value": "\"OzlDJ2HBH+SK16Nc7TNlNXGGSw8Gfm9ZzoirQ4pgsIU=\""
-        },
-        {
-          "Name": "Last-Modified",
-          "Value": "Sun, 20 Jul 2025 22:37:59 GMT"
+          "Value": "Tue, 22 Jul 2025 10:52:50 GMT"
         },
         {
           "Name": "Cache-Control",
@@ -4079,7 +3942,7 @@
       "EndpointProperties": [
         {
           "Name": "fingerprint",
-          "Value": "xifffxdmyf"
+          "Value": "2bqgk4g6hm"
         },
         {
           "Name": "label",
@@ -4087,7 +3950,144 @@
         },
         {
           "Name": "integrity",
-          "Value": "sha256-OzlDJ2HBH+SK16Nc7TNlNXGGSw8Gfm9ZzoirQ4pgsIU="
+          "Value": "sha256-jXRHstSK8rJA0tLgGHbr2ZKlNqvM0eNnFnAluqW+irw="
+        }
+      ]
+    },
+    {
+      "Route": "js/site.js",
+      "AssetFile": "C:\\Users\\Valentino\\OneDrive\\Desktop\\Polleria\\Programa\\obj\\Debug\\net9.0\\compressed\\0lbsggp66v-2bqgk4g6hm.gz",
+      "Selectors": [
+        {
+          "Name": "Content-Encoding",
+          "Value": "gzip",
+          "Quality": "0,001179245283"
+        }
+      ],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "847"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"jXRHstSK8rJA0tLgGHbr2ZKlNqvM0eNnFnAluqW+irw=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Tue, 22 Jul 2025 10:52:50 GMT"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "no-cache"
+        },
+        {
+          "Name": "Content-Encoding",
+          "Value": "gzip"
+        },
+        {
+          "Name": "Vary",
+          "Value": "Content-Encoding"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "text/javascript"
+        },
+        {
+          "Name": "ETag",
+          "Value": "W/\"0nLZIbf8cUuGarYc0vRIkQq3doAenJwGEPxJP7dW4bc=\""
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "integrity",
+          "Value": "sha256-0nLZIbf8cUuGarYc0vRIkQq3doAenJwGEPxJP7dW4bc="
+        }
+      ]
+    },
+    {
+      "Route": "js/site.js",
+      "AssetFile": "C:\\Users\\Valentino\\OneDrive\\Desktop\\Polleria\\Programa\\wwwroot\\js\\site.js",
+      "Selectors": [],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "2598"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "text/javascript"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"0nLZIbf8cUuGarYc0vRIkQq3doAenJwGEPxJP7dW4bc=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Tue, 22 Jul 2025 10:52:50 GMT"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "no-cache"
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "integrity",
+          "Value": "sha256-0nLZIbf8cUuGarYc0vRIkQq3doAenJwGEPxJP7dW4bc="
+        }
+      ]
+    },
+    {
+      "Route": "js/site.js.gz",
+      "AssetFile": "C:\\Users\\Valentino\\OneDrive\\Desktop\\Polleria\\Programa\\obj\\Debug\\net9.0\\compressed\\0lbsggp66v-2bqgk4g6hm.gz",
+      "Selectors": [],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "847"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "text/javascript"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"jXRHstSK8rJA0tLgGHbr2ZKlNqvM0eNnFnAluqW+irw=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Tue, 22 Jul 2025 10:52:50 GMT"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "no-cache"
+        },
+        {
+          "Name": "Content-Encoding",
+          "Value": "gzip"
+        },
+        {
+          "Name": "Vary",
+          "Value": "Content-Encoding"
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "integrity",
+          "Value": "sha256-jXRHstSK8rJA0tLgGHbr2ZKlNqvM0eNnFnAluqW+irw="
         }
       ]
     },

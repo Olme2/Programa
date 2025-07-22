@@ -20,7 +20,7 @@ public class PromocionesController : Controller
     {
         try
         {
-            var promocionesVM = _promocionesRepo.ObtenerListadoPromociones();
+            var promocionesVM = _promocionesRepo.ObtenerListadoPromociones().Where(p => p.Activa).OrderByDescending(p => p.Inicio).ThenBy(p => p.Promocion);
             return View(promocionesVM.ToList());
         }
         catch (Exception e)
@@ -71,7 +71,8 @@ public class PromocionesController : Controller
             var promocion = _promocionesRepo.ObtenerPorId(id);
             if (promocion == null)
             {
-                return NotFound();
+                TempData["ErrorMessage"] = "No existe promocion con este id.";
+                return RedirectToAction(nameof(Index));
             }
             var viewModel = new ModificarPromocionVM(promocion);
             return View(viewModel);
@@ -98,7 +99,8 @@ public class PromocionesController : Controller
             var promocion = _promocionesRepo.ObtenerPorId(viewModel.IdPromocion);
             if (promocion == null)
             {
-                return NotFound();
+                TempData["ErrorMessage"] = "No existe promocion con este id.";
+                return RedirectToAction(nameof(Index));
             }
 
             promocion.ActualizarDesdeViewModel(viewModel);
@@ -122,7 +124,8 @@ public class PromocionesController : Controller
             var promocionVM = _promocionesRepo.ObtenerListadoPromociones().FirstOrDefault(p => p.IdPromocion == id);
             if (promocionVM == null)
             {
-                return NotFound();
+                TempData["ErrorMessage"] = "No existe promocion con este id.";
+                return RedirectToAction(nameof(Index));
             }
             return View(promocionVM);
         }
@@ -140,12 +143,11 @@ public class PromocionesController : Controller
     {
         try
         {
-            if (!_promocionesRepo.PuedeSerEliminada(id))
-            {
-                TempData["ErrorMessage"] = "No se puede eliminar la promoción porque ya ha sido registrada en una o más ventas.";
-                return RedirectToAction(nameof(Index));
-            }
-
+            //if (!_promocionesRepo.PuedeSerEliminada(id))
+            //{
+            //    TempData["ErrorMessage"] = "No se puede eliminar la promoción porque ya ha sido registrada en una o más ventas.";
+            //    return RedirectToAction(nameof(Index));
+            //}
             _promocionesRepo.Eliminar(id);
             TempData["SuccessMessage"] = "Promoción eliminada correctamente.";
             return RedirectToAction(nameof(Index));
@@ -159,11 +161,15 @@ public class PromocionesController : Controller
     }
 
     [HttpGet]
-    public IActionResult _BuscarPromociones(string busqueda)
+    public IActionResult _BuscarPromociones(string busqueda, bool inactivos)
     {
         try
         {
             var promocionesVM = _promocionesRepo.ObtenerListadoPromociones();
+            if (!inactivos)
+            {
+                promocionesVM = promocionesVM.Where(p => p.Activa);
+            }
             if (!string.IsNullOrEmpty(busqueda))
             {
                 promocionesVM = promocionesVM.Where(p =>

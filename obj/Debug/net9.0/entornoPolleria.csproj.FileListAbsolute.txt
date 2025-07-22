@@ -165,5 +165,5 @@ C:\Users\Valentino\OneDrive\Desktop\Polleria\Programa\obj\Debug\net9.0\refint\en
 C:\Users\Valentino\OneDrive\Desktop\Polleria\Programa\obj\Debug\net9.0\entornoPolleria.pdb
 C:\Users\Valentino\OneDrive\Desktop\Polleria\Programa\obj\Debug\net9.0\entornoPolleria.genruntimeconfig.cache
 C:\Users\Valentino\OneDrive\Desktop\Polleria\Programa\obj\Debug\net9.0\ref\entornoPolleria.dll
-C:\Users\Valentino\OneDrive\Desktop\Polleria\Programa\obj\Debug\net9.0\compressed\0lbsggp66v-xifffxdmyf.gz
 C:\Users\Valentino\OneDrive\Desktop\Polleria\Programa\obj\Debug\net9.0\compressed\m2bgq4xnl9-ksyinjxfv4.gz
+C:\Users\Valentino\OneDrive\Desktop\Polleria\Programa\obj\Debug\net9.0\compressed\0lbsggp66v-2bqgk4g6hm.gz

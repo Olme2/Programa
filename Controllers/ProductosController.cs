@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 using ProductosVM;
 
@@ -6,12 +7,13 @@ public class ProductosController : Controller
     private readonly ILogger<ProductosController> _logger;
     private readonly IProductosRepository _productosRepo;
     private readonly IProveedoresRepository _proveedoresRepo;
-
-    public ProductosController(ILogger<ProductosController> logger, IProductosRepository productosRepo, IProveedoresRepository proveedoresRepo)
+    private readonly IPromocionesRepository _promocionesRepo;
+    public ProductosController(ILogger<ProductosController> logger, IProductosRepository productosRepo, IProveedoresRepository proveedoresRepo, IPromocionesRepository promocionesRepo)
     {
         _logger = logger;
         _productosRepo = productosRepo;
         _proveedoresRepo = proveedoresRepo;
+        _promocionesRepo = promocionesRepo;
     }
 
     [HttpGet]
@@ -19,8 +21,8 @@ public class ProductosController : Controller
     {
         try
         {
-            var productosVM = _productosRepo.ObtenerListadoProductos();
-            return View(productosVM.OrderByDescending(p => p.Activo).ThenBy(p => p.Producto).ToList());
+            var productosVM = _productosRepo.ObtenerListadoProductos().Where(p => p.Activo).OrderBy(p => p.Producto).ToList();                
+            return View(productosVM);
         }
         catch (Exception e)
         {
@@ -107,7 +109,20 @@ public class ProductosController : Controller
                 TempData["ErrorMessage"] = "No existe producto con ese id.";
                 return RedirectToAction(nameof(Index));
             }
-
+            if (producto.Activo && !viewModel.Activo)
+            {
+                try
+                {
+                    _promocionesRepo.DesactivarPorIdProducto(producto.IdProducto);
+                }
+                catch (Exception e)
+                {
+                    _logger.LogError(e, "Error al modificar la promocion");
+                    TempData["ErrorMessage"] = "Ocurrió un error al desactivar la promocion.";
+                    viewModel.Proveedores = _proveedoresRepo.ObtenerListadoProveedores().ToList();
+                    return View(viewModel);
+                }
+            }
             producto.ActualizarDesdeViewModel(viewModel);
             _productosRepo.Actualizar(producto);
             TempData["SuccessMessage"] = "Producto modificado exitosamente.";
@@ -133,6 +148,11 @@ public class ProductosController : Controller
                 TempData["ErrorMessage"] = "No existe producto con ese id.";
                 return RedirectToAction(nameof(Index));
             }
+            if (!_productosRepo.PuedeSerEliminado(id))
+            {
+                TempData["ErrorMessage"] = "No se puede eliminar el producto porque está en uso en promociones, ventas o compras.";
+                return RedirectToAction(nameof(Index));
+            }
             return View(productoVM);
         }
         catch (Exception e)
@@ -149,12 +169,6 @@ public class ProductosController : Controller
     {
         try
         {
-            if (!_productosRepo.PuedeSerEliminado(id))
-            {
-                TempData["ErrorMessage"] = "No se puede eliminar el producto porque está en uso en promociones, ventas o compras.";
-                return RedirectToAction(nameof(Index));
-            }
-            
             _productosRepo.Eliminar(id);
             TempData["SuccessMessage"] = "Producto eliminado correctamente.";
             return RedirectToAction(nameof(Index));
@@ -168,39 +182,53 @@ public class ProductosController : Controller
     }
 
     [HttpGet]
-    public IActionResult _BuscarProductos(string busqueda, string ordenarPor)
+    public IActionResult _BuscarProductos(string? busqueda, string ordenarPor, bool inactivos)
     {
         try
         {
-            var productosVM = _productosRepo.ObtenerListadoProductos();
+            // 1. Empezamos con la consulta base.
+            var query = _productosRepo.ObtenerListadoProductos();
 
+            // 2. Aplicamos el filtro de inactivos.
+            // Si el checkbox NO está marcado, filtramos para mostrar solo los activos.
+            if (!inactivos)
+            {
+                query = query.Where(p => p.Activo);
+            }
+
+            // 3. Aplicamos el filtro de búsqueda por texto.
             if (!string.IsNullOrEmpty(busqueda))
             {
-                productosVM = productosVM.Where(p =>
+                query = query.Where(p =>
                     p.Producto.Contains(busqueda, StringComparison.CurrentCultureIgnoreCase) ||
                     p.Proveedor.Contains(busqueda, StringComparison.CurrentCultureIgnoreCase)
                 );
             }
 
-            var productosOrdenados = productosVM.OrderByDescending(p => p.Activo);
+            // 4. Aplicamos el ordenamiento.
+            // Usamos IOrderedEnumerable para poder encadenar el ordenamiento.
+            IOrderedEnumerable<ListarProductosVM> productosOrdenados;
 
             switch (ordenarPor)
             {
                 case "stock":
-                    productosOrdenados = productosOrdenados.ThenByDescending(p => p.Stock);
+                    // Siempre ordenamos por Activo descendente primero.
+                    productosOrdenados = query.OrderByDescending(p => p.Activo).ThenByDescending(p => p.Stock);
                     break;
-                default:
-                    productosOrdenados = productosOrdenados.ThenBy(p => p.Producto);
+                default: // "alfabetico"
+                    productosOrdenados = query.OrderByDescending(p => p.Activo).ThenBy(p => p.Producto);
                     break;
             }
 
             ViewData["BusquedaActual"] = busqueda;
+            
+            // 5. Devolvemos la vista parcial con la lista filtrada y ordenada.
             return PartialView("_ProductosTabla", productosOrdenados.ToList());
         }
         catch (Exception e)
         {
             _logger.LogError(e, "Error en la búsqueda dinámica de productos.");
-            return StatusCode(500);
+            return StatusCode(500); // Es una buena práctica devolver un código de error para AJAX.
         }
     }
 }

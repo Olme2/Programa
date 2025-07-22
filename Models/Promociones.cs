@@ -7,7 +7,7 @@ public class Promociones
     public decimal Precio { get; private set; }
     public DateOnly Inicio { get; private set; }
     public DateOnly? Fin { get; private set; }
-    private List<DetallesPromociones> _detallesPromocion = new List<DetallesPromociones>();    
+    private List<DetallesPromociones> _detallesPromocion = new List<DetallesPromociones>();
     public IReadOnlyCollection<DetallesPromociones> DetallesPromocion => _detallesPromocion.AsReadOnly();
 
     private Promociones()
@@ -23,7 +23,7 @@ public class Promociones
         Fin = fin;
         _detallesPromocion = detalles;
     }
-    
+
     public static Promociones CrearDesdeViewModel(AltaPromocionVM promocionVM)
     {
         var detalles = promocionVM.DetallesPromocion.Select(DetallesPromociones.CrearDesdeViewModel).ToList();
@@ -43,7 +43,7 @@ public class Promociones
             AgregarDetalle(detalle);
         }
     }
-    
+
     public void LimpiarDetalles()
     {
         _detallesPromocion.Clear();
@@ -57,5 +57,10 @@ public class Promociones
     public decimal CalcularCostoTotal()
     {
         return _detallesPromocion.Sum(detalle => detalle.CalcularCosto());
+    }
+
+    public void Desactivar()
+    {
+        Fin = DateOnly.FromDateTime(DateTime.Now);
     }
 }

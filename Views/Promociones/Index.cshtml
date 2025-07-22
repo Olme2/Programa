@@ -7,8 +7,14 @@
 <p>Gestiona las ofertas y combos especiales.</p>
 
 <div class="row g-3 align-items-center mb-3">
-    <div class="col-md-12">
+    <div class="col-md-9">
         <input type="text" id="buscador-promocion" name="busqueda" class="form-control" placeholder="Buscar por nombre de promoción o producto..." value="@ViewData["BusquedaActual"]" />
+    </div>
+    <div class="col-md-3">
+        <div class="form-check form-switch bg-light border rounded p-2 d-flex justify-content-center align-items-center h-100">
+            <input class="form-check-input me-2" id="mostrar-inactivos" type="checkbox" name="Inactivos">
+            <label class="form-check-label" for="mostrar-inactivos">Ver Inactivas</label>
+        </div>
     </div>
 </div>
 
@@ -44,12 +50,13 @@
             
             function actualizarTablaPromociones() {
                 var busqueda = $('#buscador-promocion').val();
-
+                var inactivos = $('#mostrar-inactivos').is(':checked');
                 $.ajax({
                     url: '@Url.Action("_BuscarPromociones", "Promociones")',
                     type: 'GET',
                     data: {
-                        busqueda: busqueda
+                        busqueda: busqueda,
+                        inactivos: inactivos
                     },
                     success: function (result) {
                         $('#tabla-promociones-body').html(result);
@@ -62,9 +69,8 @@
             }
 
             // Disparamos la búsqueda cada vez que el usuario escribe en el input
-            $('#buscador-promocion').on('keyup', function () {
-                actualizarTablaPromociones();
-            });
+            $('#buscador-promocion').on('keyup', actualizarTablaPromociones);
+            $('#mostrar-inactivos').on('change', actualizarTablaPromociones);
 
         });
     </script>

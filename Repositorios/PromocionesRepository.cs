@@ -27,7 +27,7 @@ public class PromocionesRepository : IPromocionesRepository
                 Fin = p.Fin,
                 Costo = p.DetallesPromocion.Sum(d => d.Producto.Costo * d.Cantidad),
                 ProductosConcatenados = string.Join(", ", p.DetallesPromocion.Select(d => d.Producto.Producto)),
-                Activa = !p.Fin.HasValue || p.Fin.Value >= hoy,
+                Activa = !p.Fin.HasValue || p.Fin.Value > hoy,
                 //EsEliminable = !_context.VentasPromociones.Any(vp => vp.IdPromocion == p.IdPromocion),
                 Ganancia = p.Precio - p.DetallesPromocion.Sum(d => d.Producto.Costo * d.Cantidad),
                 PorcentajeGanancia = (p.DetallesPromocion.Sum(d => d.Producto.Costo * d.Cantidad) > 0) ? (p.Precio - p.DetallesPromocion.Sum(d => d.Producto.Costo * d.Cantidad)) / p.DetallesPromocion.Sum(d => d.Producto.Costo * d.Cantidad) : 0
@@ -64,5 +64,23 @@ public class PromocionesRepository : IPromocionesRepository
     public bool PuedeSerEliminada(int id)
     {
         return !_context.VentasPromociones.Any(vp => vp.IdPromocion == id);
+    }
+    public void DesactivarPorIdProducto(int id)
+    {
+        var hoy = DateOnly.FromDateTime(DateTime.Now);
+        var promocionesReferenciadas = _context.Promociones.Where(p =>(!p.Fin.HasValue || p.Fin.Value > hoy) && p.DetallesPromocion.Any(d => d.IdProducto == id));
+        foreach (var promocion in promocionesReferenciadas)
+        {
+            if (promocion.Inicio > hoy)
+            {
+                _context.Remove(promocion);
+            }
+            else
+            {
+                promocion.Desactivar();
+                _context.Update(promocion);                
+            }
+        }
+        _context.SaveChanges();
     }
 }

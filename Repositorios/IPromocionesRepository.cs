@@ -7,4 +7,5 @@ public interface IPromocionesRepository
     void Actualizar(Promociones promocion);
     void Eliminar(int id);
     bool PuedeSerEliminada(int id);
+    void DesactivarPorIdProducto(int id);
 }
