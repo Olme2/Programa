@@ -26,7 +26,7 @@ public class PromocionesRepository : IPromocionesRepository
                 Inicio = p.Inicio,
                 Fin = p.Fin,
                 Costo = p.DetallesPromocion.Sum(d => d.Producto.Costo * d.Cantidad),
-                ProductosConcatenados = string.Join(", ", p.DetallesPromocion.Select(d => d.Producto.Producto)),
+                ProductosConcatenados = string.Join("\n", p.DetallesPromocion.Select(d => d.Producto.Producto)),
                 Activa = !p.Fin.HasValue || p.Fin.Value > hoy,
                 //EsEliminable = !_context.VentasPromociones.Any(vp => vp.IdPromocion == p.IdPromocion),
                 Ganancia = p.Precio - p.DetallesPromocion.Sum(d => d.Producto.Costo * d.Cantidad),

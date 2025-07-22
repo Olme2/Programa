@@ -1,5 +1,3 @@
-namespace entornoPolleria.Models;
-
 public class ErrorVM
 {
     private string? requestId;

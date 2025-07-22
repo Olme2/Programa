@@ -1,31 +1,81 @@
-using DetallesVentasVM;
+using VentasVM;
 
 public class Ventas
 {
-    private long idVenta;
-    private short idMetodo;
-    private decimal costo;
-    private decimal precio;
-    private DateOnly fecha;
-    private TimeOnly hora;
-    private string? detalle;
-    private List<DetallesVentas> detallesVenta;
-    private List<VentasPromociones> ventasPromociones;
-
-    public Ventas()
+    public long IdVenta { get; private set; }
+    public short IdMetodo { get; private set; }
+    public DateOnly Fecha { get; private set; }
+    public TimeOnly Hora { get; private set; }
+    public string? Detalle { get; private set; }
+    public List<DetallesVentas> _detallesVenta = new List<DetallesVentas>();
+    public IReadOnlyCollection<DetallesVentas> DetallesVenta => _detallesVenta.AsReadOnly();
+    public List<VentasPromociones> _ventaPromociones = new List<VentasPromociones>();
+    public IReadOnlyCollection<VentasPromociones> VentaPromociones => _ventaPromociones.AsReadOnly();
+    public virtual MetodosDePago Metodo { get; private set; }
+    private Ventas()
     {
-        detallesVenta = new List<DetallesVentas>();
-        ventasPromociones = new List<VentasPromociones>();
+        Metodo = null!;
     }
 
-    public long IdVenta { get => idVenta; set => idVenta = value; }
-    public short IdMetodo { get => idMetodo; set => idMetodo = value; }
-    public decimal Costo { get => costo; set => costo = value; }
-    public decimal Precio { get => precio; set => precio = value; }
-    public DateOnly Fecha { get => fecha; set => fecha = value; }
-    public TimeOnly Hora { get => hora; set => hora = value; }
-    public string? Detalle { get => detalle; set => detalle = value; }
-    public List<DetallesVentas> DetallesVenta { get => detallesVenta; set => detallesVenta = value; } 
-    public List<VentasPromociones> VentasPromociones { get => ventasPromociones; set => ventasPromociones = value; }
-}
+    private Ventas(short idMetodo, DateOnly fecha, TimeOnly hora, string? detalle, List<DetallesVentas> detalles, List<VentasPromociones> promociones)
+    {
+        IdMetodo = idMetodo;
+        Fecha = fecha;
+        Hora = hora;
+        Detalle = detalle;
+        _detallesVenta = detalles;
+        _ventaPromociones = promociones;
+        Metodo = null!;
+    }
 
+    public static Ventas CrearDesdeViewModel(AltaVentaVM ventaVM)
+    {
+        var detalles = ventaVM.DetallesVenta.Select(DetallesVentas.CrearDesdeViewModel).ToList();
+        var promociones = ventaVM.VentaPromociones.Select(VentasPromociones.CrearDesdeViewModel).ToList();
+        return new Ventas(ventaVM.IdMetodo, ventaVM.Fecha, ventaVM.Hora, ventaVM.Detalle, detalles, promociones);
+    }
+    public void ActualizarDesdeViewModel(ModificarVentaVM ventaVM)
+    {
+        IdMetodo = ventaVM.IdMetodo;
+        Fecha = ventaVM.Fecha;
+        Hora = ventaVM.Hora;
+        Detalle = ventaVM.Detalle;
+        LimpiarDetalles();
+        var detallesActualizados = ventaVM.DetallesVenta.Select(DetallesVentas.CrearDesdeViewModel).ToList();
+        var promocionesActualizadas = ventaVM.VentaPromociones.Select(VentasPromociones.CrearDesdeViewModel).ToList();
+        foreach (var detalle in detallesActualizados)
+        {
+            AgregarDetalle(detalle);
+        }
+        foreach (var promocion in promocionesActualizadas)
+        {
+            AgregarPromocion(promocion);
+        }
+    }
+
+    public void LimpiarDetalles()
+    {
+        _detallesVenta.Clear();
+        _ventaPromociones.Clear();
+    }
+
+    public void AgregarDetalle(DetallesVentas detalle)
+    {
+        _detallesVenta.Add(detalle);
+    }
+
+    public void AgregarPromocion(VentasPromociones promociones)
+    {
+        _ventaPromociones.Add(promociones);
+    }
+
+    public decimal CalcularCostoTotal()
+    {
+        return _detallesVenta.Sum(detalle => detalle.CalcularCosto()) + _ventaPromociones.Sum(promocion => promocion.CalcularCosto());
+    }
+
+    public decimal CalcularPrecioTotal()
+    {
+        return _detallesVenta.Sum(detalle => detalle.CalcularPrecio()) + _ventaPromociones.Sum(promocion => promocion.CalcularPrecio());
+    }
+}

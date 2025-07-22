@@ -1,21 +1,18 @@
-using Microsoft.AspNetCore.Mvc.Rendering;
-using ProductosVM;
+using System.ComponentModel.DataAnnotations;
 namespace DetallesVentasVM;
 
 public class AltaDetalleVentaVM
 {
-    private long idVenta;
-    private int idProducto;
-    private decimal cantidad;
-    private bool promocion;
-    private decimal precioPromo;
-    private decimal costoPromo;
-    private List<ListarProductosVM> productos;
-    public long IdVenta { get => idVenta; set => idVenta = value; }
-    public int IdProducto { get => idProducto; set => idProducto = value; }
-    public decimal Cantidad { get => cantidad; set => cantidad = value; }
-    public bool Promocion { get => promocion; set => promocion = value; }
-    public decimal PrecioPromo { get => precioPromo; set => precioPromo = value; }
-    public decimal CostoPromo { get => costoPromo; set => costoPromo = value; }
-    public List<ListarProductosVM> Productos { get => productos; set => productos = value; }
+    [Required(ErrorMessage = "Debe seleccionar un producto.")]
+    [Range(1, int.MaxValue, ErrorMessage = "Debe seleccionar un producto válido.")]
+    public int IdProducto { get; private set; }
+    [Required(ErrorMessage = "La cantidad es obligatoria.")]
+    [Range(0.001, 999.999, ErrorMessage = "La cantidad debe ser como mínimo 0,001 y maximo 999,999.")]
+    public decimal Cantidad { get; private set; }
+    [Required(ErrorMessage = "El costo unitario es obligatorio.")]
+    [Range(0.01, 99999.99, ErrorMessage = "El costo unitario debe ser como mínimo 0,01 y maximo 99999,99.")]
+    public decimal CostoUnitario { get; private set; }
+    [Required(ErrorMessage = "El precio unitario es obligatorio.")]
+    [Range(0.01, 99999.99, ErrorMessage = "El precio unitario debe ser como mínimo 0,01 y maximo 99999,99.")]
+    public decimal PrecioUnitario { get; private set; }
 }

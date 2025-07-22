@@ -28,7 +28,7 @@ namespace entornoPolleria
                 entity.HasKey(e => e.IdProducto);
                 entity.Property(e => e.IdProducto).HasColumnName("id_producto").UseIdentityColumn();
                 entity.Property(e => e.IdProveedor).HasColumnName("id_proveedor").IsRequired();
-                entity.Property(e => e.Producto).HasColumnName("producto").HasMaxLength(50).IsRequired();
+                entity.Property(e => e.Producto).HasColumnName("producto").HasMaxLength(75).IsRequired();
                 entity.Property(e => e.Stock).HasColumnName("stock").HasColumnType("numeric(6,3)").IsRequired();
                 entity.Property(e => e.Costo).HasColumnName("costo_producto").HasColumnType("numeric(7,2)").IsRequired();
                 entity.Property(e => e.Precio).HasColumnName("precio_producto").HasColumnType("numeric(7,2)").IsRequired();
@@ -41,7 +41,7 @@ namespace entornoPolleria
                 entity.ToTable("proveedor");
                 entity.HasKey(e => e.IdProveedor);
                 entity.Property(e => e.IdProveedor).HasColumnName("id_proveedor").UseIdentityColumn();
-                entity.Property(e => e.Proveedor).HasColumnName("proveedor").HasMaxLength(50).IsRequired();
+                entity.Property(e => e.Proveedor).HasColumnName("proveedor").HasMaxLength(75).IsRequired();
                 entity.Property(e => e.Contacto).HasColumnName("contacto").HasMaxLength(100);
                 entity.Property(e => e.Debo).HasColumnName("debo").HasColumnType("numeric(9,2)").IsRequired();
                 entity.HasMany(p => p.Productos)
@@ -79,7 +79,7 @@ namespace entornoPolleria
                 entity.ToTable("promocion");
                 entity.HasKey(e => e.IdPromocion);
                 entity.Property(e => e.IdPromocion).HasColumnName("id_promocion").UseIdentityColumn();
-                entity.Property(e => e.Promocion).HasColumnName("promocion").HasMaxLength(50).IsRequired();
+                entity.Property(e => e.Promocion).HasColumnName("promocion").HasMaxLength(75).IsRequired();
                 entity.Property(e => e.Precio).HasColumnName("precio_promocion").HasColumnType("numeric(7,2)").IsRequired();
                 entity.Property(e => e.Inicio).HasColumnName("inicio").IsRequired();
                 entity.Property(e => e.Fin).HasColumnName("fin");
@@ -107,16 +107,9 @@ namespace entornoPolleria
                 entity.HasKey(e => e.IdVenta);
                 entity.Property(e => e.IdVenta).HasColumnName("id_venta").UseIdentityColumn();
                 entity.Property(e => e.IdMetodo).HasColumnName("id_metodo").IsRequired();
-                entity.Property(e => e.Costo).HasColumnName("costo_venta").HasColumnType("numeric(8,2)").IsRequired();
-                entity.Property(e => e.Precio).HasColumnName("precio_venta").HasColumnType("numeric(8,2)").IsRequired();
                 entity.Property(e => e.Fecha).HasColumnName("fecha").IsRequired();
                 entity.Property(e => e.Hora).HasColumnName("hora").IsRequired();
                 entity.Property(e => e.Detalle).HasColumnName("detalle").HasMaxLength(100);
-                entity.HasMany(v => v.DetallesVenta)
-                    .WithOne(dv => dv.Venta)
-                    .HasForeignKey(dv => dv.IdVenta)
-                    .IsRequired()
-                    .OnDelete(DeleteBehavior.Cascade);
             });
 
             // DetallesVentas
@@ -129,6 +122,11 @@ namespace entornoPolleria
                 entity.Property(e => e.Cantidad).HasColumnName("cantidad").HasColumnType("numeric(6,3)").IsRequired();
                 entity.Property(e => e.CostoUnitario).HasColumnName("costo_unitario").HasColumnType("numeric(7,2)").IsRequired();
                 entity.Property(e => e.PrecioUnitario).HasColumnName("precio_unitario").HasColumnType("numeric(7,2)").IsRequired();
+                entity.HasOne<Ventas>()
+                    .WithMany(v => v.DetallesVenta)
+                    .HasForeignKey(d => d.IdVenta)
+                    .IsRequired()
+                    .OnDelete(DeleteBehavior.Cascade);
             });
 
             // VentasPromociones
@@ -141,6 +139,11 @@ namespace entornoPolleria
                 entity.Property(e => e.Cantidad).HasColumnName("cantidad").HasColumnType("smallint").IsRequired();
                 entity.Property(e => e.CostoPromo).HasColumnName("costo_promo").HasColumnType("numeric(7,2)").IsRequired();
                 entity.Property(e => e.PrecioPromo).HasColumnName("precio_promo").HasColumnType("numeric(7,2)").IsRequired();
+                entity.HasOne<Ventas>()
+                    .WithMany(v => v.VentaPromociones)
+                    .HasForeignKey(d => d.IdVenta)
+                    .IsRequired()
+                    .OnDelete(DeleteBehavior.Cascade);
             });
 
             // MetodosDePago

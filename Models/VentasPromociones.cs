@@ -1,13 +1,44 @@
+using VentasPromocionesVM;
+
 public class VentasPromociones
 {
-    private long idVenta;
-    private int idPromocion;
-    private short cantidad;
-    private decimal costoPromo;
-    private decimal precioPromo;
-    public long IdVenta { get => idVenta; set => idVenta = value; }
-    public int IdPromocion { get => idPromocion; set => idPromocion = value; }
-    public short Cantidad { get => cantidad;  set => cantidad = value; }
-    public decimal CostoPromo { get => costoPromo;  set => costoPromo = value; }
-    public decimal PrecioPromo { get => precioPromo; set => precioPromo = value; }
+    public long IdVenta { get; set; }
+    public int IdPromocion { get; set; }
+    public short Cantidad { get; set; }
+    public decimal CostoPromo { get; set; }
+    public decimal PrecioPromo { get; set; }
+    public virtual Promociones Promocion { get; set; }
+    private VentasPromociones()
+    {
+        Promocion = null!;
+    }
+
+    private VentasPromociones(int idPromocion, short cantidad, decimal costoPromo, decimal precioPromo)
+    {
+        IdPromocion = idPromocion;
+        Cantidad = cantidad;
+        CostoPromo = costoPromo;
+        PrecioPromo = precioPromo;
+        Promocion = null!;
+    }
+
+    public static VentasPromociones CrearDesdeViewModel(AltaVentaPromocionVM promocionVM)
+    {
+        return new VentasPromociones(promocionVM.IdPromocion, promocionVM.Cantidad, promocionVM.CostoPromo, promocionVM.PrecioPromo);
+    }
+
+    public static VentasPromociones CrearDesdeViewModel(ModificarVentaPromocionVM promocionVM)
+    {
+        return new VentasPromociones(promocionVM.IdPromocion, promocionVM.Cantidad, promocionVM.CostoPromo, promocionVM.PrecioPromo);
+    }
+
+    public decimal CalcularPrecio()
+    {
+        return CostoPromo * Cantidad;
+    }
+
+    public decimal CalcularCosto()
+    {
+        return PrecioPromo * Cantidad;
+    }
 }
