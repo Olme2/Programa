@@ -11,6 +11,7 @@ public class VentasController : Controller
     private readonly IPromocionesRepository _promocionesRepo;
     private readonly IMetodosPagoRepository _metodosPagoRepo;
     private readonly ILogger<VentasController> _logger;
+
     public VentasController(
         IVentaRepository ventaRepo,
         IProductosRepository productosRepo,
@@ -25,11 +26,47 @@ public class VentasController : Controller
         _logger = logger;
     }
     // GET: /Ventas
-    public IActionResult Index()
-    {
-        // Lógica para mostrar el listado de ventas (la completaremos después)
-        return View();
-    }
+    [HttpGet]
+        public IActionResult Index(IndexVentasVM filtro)
+        {
+            try
+            {
+                var viewModel = new IndexVentasVM
+                {
+                    FechaInicio = filtro.FechaInicio == default ? DateTime.Today : filtro.FechaInicio,
+                    FechaFin = filtro.FechaFin == default ? DateTime.Today : filtro.FechaFin,
+                    Busqueda = filtro.Busqueda,
+                    IdMetodoPago = filtro.IdMetodoPago,
+                    OrdenarPor = filtro.OrdenarPor ?? "fecha"
+                };
+
+                viewModel.Ventas = _ventaRepo.ObtenerListadoVentas(viewModel).ToList();
+                viewModel.MetodosPago = _metodosPagoRepo.ObtenerListadoMetodosPago().ToList();
+
+                return View(viewModel);
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "Error al obtener el listado de ventas.");
+                TempData["ErrorMessage"] = "No se pudo cargar el listado de ventas.";
+                return View(new IndexVentasVM());
+            }
+        }
+
+        [HttpGet]
+        public IActionResult _BuscarVentas(IndexVentasVM filtro)
+        {
+            try
+            {
+                var ventas = _ventaRepo.ObtenerListadoVentas(filtro);
+                return PartialView("_VentasTabla", ventas.ToList());
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "Error en la búsqueda dinámica de ventas.");
+                return StatusCode(500);
+            }
+        }
     // GET: /Ventas/Alta
     public IActionResult Alta()
     {

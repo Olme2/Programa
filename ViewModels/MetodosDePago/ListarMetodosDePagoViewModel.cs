@@ -1,20 +1,10 @@
 namespace MetodosVM;
 
-public class ModificarMetodoDePagoVM
+public class ListarMetodosPagoVM
 {
-    private short idMetodo;
-    private string metodo;
+    public short IdMetodo { get ; set; }
+    public string Metodo { get ; set; } = string.Empty;
+    public bool EsEliminable { get; set; }
 
-    public ModificarMetodoDePagoVM()
-    {
-        metodo = string.Empty;
-    }
-    public ModificarMetodoDePagoVM(MetodosDePago Metodo)
-    {
-        idMetodo = Metodo.IdMetodo;
-        metodo = Metodo.Metodo;
-    }
-
-    public short IdMetodo { get => idMetodo; set => idMetodo = value; }
-    public string Metodo { get => metodo; set => metodo = value; }
+    public ListarMetodosPagoVM(){}
 }

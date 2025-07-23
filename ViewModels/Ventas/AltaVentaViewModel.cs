@@ -20,7 +20,7 @@ public class AltaVentaVM : IValidatableObject
     public List<AltaVentaPromocionVM> VentaPromociones { get; set; }
     public List<ListarProductosVM> Productos { get; set; }
     public List<ListarPromocionesVM> Promociones { get; set; }
-    public List<ListarMetodosDePagoVM> Metodos { get; set; }
+    public List<ListarMetodosPagoVM> Metodos { get; set; }
 
     public AltaVentaVM()
     {
@@ -30,9 +30,9 @@ public class AltaVentaVM : IValidatableObject
         VentaPromociones = new List<AltaVentaPromocionVM>();
         Productos = new List<ListarProductosVM>();
         Promociones = new List<ListarPromocionesVM>();
-        Metodos = new List<ListarMetodosDePagoVM>();
+        Metodos = new List<ListarMetodosPagoVM>();
     }
-    public AltaVentaVM(List<ListarProductosVM> productos, List<ListarPromocionesVM> promociones, List<ListarMetodosDePagoVM> metodos) : this()
+    public AltaVentaVM(List<ListarProductosVM> productos, List<ListarPromocionesVM> promociones, List<ListarMetodosPagoVM> metodos) : this()
     {
         Productos = productos;
         Promociones = promociones;

@@ -1,9 +1,10 @@
 using VentasVM;
+
 public interface IVentaRepository
 {
-    IEnumerable<ListarVentasVM> ObtenerVentasPorFechas(DateOnly inicio, DateOnly fin);
+    IEnumerable<ListarVentasVM> ObtenerListadoVentas(IndexVentasVM filtro);
     Ventas? ObtenerVentaPorId(int id);
     void CrearVenta(Ventas nuevaVenta);
     void ActualizarVenta(Ventas ventaModificada);
-    void EliminarVenta(int id);
+    void EliminarVenta(int id);   
 }

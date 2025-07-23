@@ -71,7 +71,8 @@ public class PromocionesController : Controller
             var promocion = _promocionesRepo.ObtenerPorId(id);
             if (promocion == null)
             {
-                return NotFound();
+                TempData["ErrorMessage"] = "No existe promocion con ese id.";
+                return RedirectToAction(nameof(Index));
             }
 
             var viewModel = new ModificarPromocionVM(promocion);

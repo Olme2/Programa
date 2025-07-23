@@ -21,15 +21,15 @@ public class Proveedores
         Productos = null!;
     }
 
-    public static Proveedores CrearDesdeViewModel(AltaProveedorVM vm)
+    public static Proveedores CrearDesdeViewModel(AltaProveedorVM proveedorVM)
     {
-        return new Proveedores(vm.Proveedor, vm.Contacto, vm.Debo);
+        return new Proveedores(proveedorVM.Proveedor, proveedorVM.Contacto, proveedorVM.Debo);
     }
 
-    public void ActualizarDesdeViewModel(ModificarProveedorVM vm)
+    public void ActualizarDesdeViewModel(ModificarProveedorVM proveedorVM)
     {
-        Proveedor = vm.Proveedor;
-        Contacto = vm.Contacto;
-        Debo = vm.Debo;
+        Proveedor = proveedorVM.Proveedor;
+        Contacto = proveedorVM.Contacto;
+        Debo = proveedorVM.Debo;
     }
 }

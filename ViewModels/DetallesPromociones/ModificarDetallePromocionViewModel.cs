@@ -4,12 +4,12 @@ namespace DetallesPromocionesVM;
 
 public class ModificarDetallePromocionVM
 {
-    [Required]
-    [Range(1, int.MaxValue)]
+    [Required(ErrorMessage = "Debe seleccionar un producto.")]
+    [Range(1, int.MaxValue, ErrorMessage = "Debe seleccionar un producto válido.")]
     public int IdProducto { get; set; }
 
-    [Required]
-    [Range(0.001, 99999.999)]
+    [Required(ErrorMessage = "La cantidad es obligatoria.")]
+    [Range(0.001, 999.999, ErrorMessage = "La cantidad debe ser como mínimo 0,001 y maximo 999,999.")]
     public decimal Cantidad { get; set; }
 
     public string? NombreProducto { get; set; }

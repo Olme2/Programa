@@ -1,20 +1,23 @@
+using System.ComponentModel.DataAnnotations;
 namespace MetodosVM;
 
-public class ListarMetodosDePagoVM
+public class ModificarMetodoPago
 {
-    private short idMetodo;
-    private string metodo;
+    [Required]
+    public short IdMetodo { get; set; }
+    [Required(ErrorMessage = "Nombre de Método de pago Obligatorio")]
+    [StringLength(30, ErrorMessage = "El nombre del metodo de pago no puede ser mayor a 30 caracteres")]
+    public string Metodo { get; set; }
 
-    public ListarMetodosDePagoVM()
+    public ModificarMetodoPago()
     {
-        metodo = string.Empty;
+        Metodo = string.Empty;
     }
-    public ListarMetodosDePagoVM(MetodosDePago Metodo)
+    public ModificarMetodoPago(MetodosPago metodoPago)
     {
-        idMetodo = Metodo.IdMetodo;
-        metodo = Metodo.Metodo;
+        IdMetodo = metodoPago.IdMetodo;
+        Metodo = metodoPago.Metodo;
     }
 
-    public short IdMetodo { get => idMetodo; set => idMetodo = value; }
-    public string Metodo { get => metodo; set => metodo = value; }
+    
 }

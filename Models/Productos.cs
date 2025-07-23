@@ -29,19 +29,19 @@ public class Productos
         Proveedor = null!;
     }
 
-    public static Productos CrearDesdeViewModel(AltaProductoVM vm)
+    public static Productos CrearDesdeViewModel(AltaProductoVM productoVM)
     {
-        return new Productos(vm.IdProveedor, vm.Producto, vm.Stock, vm.Costo, vm.Precio);
+        return new Productos(productoVM.IdProveedor, productoVM.Producto, productoVM.Stock, productoVM.Costo, productoVM.Precio);
     }
 
-    public void ActualizarDesdeViewModel(ModificarProductoVM vm)
+    public void ActualizarDesdeViewModel(ModificarProductoVM productoVM)
     {
-        IdProveedor = vm.IdProveedor;
-        Producto = vm.Producto;
-        Stock = vm.Stock;
-        Costo = vm.Costo;
-        Precio = vm.Precio;
-        if (vm.Activo)
+        IdProveedor = productoVM.IdProveedor;
+        Producto = productoVM.Producto;
+        Stock = productoVM.Stock;
+        Costo = productoVM.Costo;
+        Precio = productoVM.Precio;
+        if (productoVM.Activo)
         {
             Activar();
         }

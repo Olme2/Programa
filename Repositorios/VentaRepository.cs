@@ -9,32 +9,59 @@ public class VentaRepository : IVentaRepository
     {
         _context = context;
     }
-    public IEnumerable<ListarVentasVM> ObtenerVentasPorFechas(DateOnly inicio, DateOnly fin)
-    {
-        return _context.Ventas
-            .Where(v => v.Fecha >= inicio && v.Fecha <= fin)
-            .Include(v => v.Metodo)
-            .Include(v => v.DetallesVenta)
-                .ThenInclude(dv => dv.Producto)
-            .Include(v => v.VentaPromociones)
-                .ThenInclude(vp => vp.Promocion)
-            .Select(v => new ListarVentasVM()
+    public IEnumerable<ListarVentasVM> ObtenerListadoVentas(IndexVentasVM filtro)
+        {
+            var fechaInicio = DateOnly.FromDateTime(filtro.FechaInicio);
+            var fechaFin = DateOnly.FromDateTime(filtro.FechaFin);
+
+            var query = _context.Ventas.AsQueryable();
+
+            // Filtrado
+            query = query.Where(v => v.Fecha >= fechaInicio && v.Fecha <= fechaFin);
+
+            if (filtro.IdMetodoPago.HasValue)
             {
-                IdVenta = v.IdVenta,
-                Metodo = v.Metodo.Metodo,
-                ProductosYPromociones = v.VentaPromociones.Any()
-                    ? string.Concat(
-                            string.Join("<br>", v.VentaPromociones.Select(vp => vp.Promocion.Promocion)),
-                            "<br>",
-                            string.Join("<br>", v.DetallesVenta.Select(dv => dv.Producto.Producto)))
-                    : string.Join("<br>", v.DetallesVenta.Select(dv => dv.Producto.Producto)),
-                Precio = v.CalcularPrecioTotal(),
-                Fecha = v.Fecha,
-                Hora = v.Hora
-            })
-            .OrderByDescending(v => v.Fecha).ThenByDescending(v => v.Hora)
-            .ToList();
-    }
+                query = query.Where(v => v.IdMetodo == filtro.IdMetodoPago.Value);
+            }
+
+            if (!string.IsNullOrEmpty(filtro.Busqueda))
+            {
+                string busquedaLower = filtro.Busqueda.ToLower();
+                query = query.Where(v =>
+                    v.DetallesVenta.Any(d => d.Producto.Producto.ToLower().Contains(busquedaLower)) ||
+                    v.VentaPromociones.Any(vp => vp.Promocion.Promocion.ToLower().Contains(busquedaLower))
+                );
+            }
+
+            // Proyección al ViewModel
+            var ventasVM = query
+                .Include(v => v.Metodo)
+                .Include(v => v.DetallesVenta).ThenInclude(dv => dv.Producto)
+                .Include(v => v.VentaPromociones).ThenInclude(vp => vp.Promocion)
+                .Select(v => new ListarVentasVM()
+                {
+                    IdVenta = v.IdVenta,
+                    Metodo = v.Metodo.Metodo,
+                    ProductosYPromociones = v.VentaPromociones.Any()
+                        ? string.Concat(
+                                string.Join("<br>", v.VentaPromociones.Select(vp => vp.Promocion.Promocion)),
+                                "<br>",
+                                string.Join("<br>", v.DetallesVenta.Select(dv => dv.Producto.Producto)))
+                        : string.Join("<br>", v.DetallesVenta.Select(dv => dv.Producto.Producto)),
+                    Precio = v.CalcularPrecioTotal(),
+                    Fecha = v.Fecha,
+                    Hora = v.Hora
+                });
+
+            // Ordenamiento
+            switch (filtro.OrdenarPor)
+            {
+                case "total":
+                    return ventasVM.OrderByDescending(v => v.Precio).ToList();
+                default: // "fecha"
+                    return ventasVM.OrderByDescending(v => v.Fecha).ThenByDescending(v => v.Hora).ToList();
+            }
+        }
     public Ventas? ObtenerVentaPorId(int id)
     {
         return _context.Ventas

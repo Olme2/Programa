@@ -11,7 +11,7 @@ public class Ventas
     public IReadOnlyCollection<DetallesVentas> DetallesVenta => _detallesVenta.AsReadOnly();
     public List<VentasPromociones> _ventaPromociones = new List<VentasPromociones>();
     public IReadOnlyCollection<VentasPromociones> VentaPromociones => _ventaPromociones.AsReadOnly();
-    public virtual MetodosDePago Metodo { get; private set; }
+    public virtual MetodosPago Metodo { get; private set; }
     private Ventas()
     {
         Metodo = null!;

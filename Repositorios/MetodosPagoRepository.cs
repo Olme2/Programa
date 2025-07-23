@@ -1,4 +1,6 @@
 using entornoPolleria;
+using MetodosVM;
+using Microsoft.EntityFrameworkCore;
 
 public class MetodosPagoRepository : IMetodosPagoRepository
 {
@@ -8,43 +10,47 @@ public class MetodosPagoRepository : IMetodosPagoRepository
     {
         _context = context;
     }
-
-    public void CrearMetodoDePago(MetodosDePago metodoDePago)
+    public IEnumerable<ListarMetodosPagoVM> ObtenerListadoMetodosPago()
     {
-        _context.MetodosDePago.Add(metodoDePago);
+        return _context.MetodosPago
+        .Select(m => new ListarMetodosPagoVM
+        {
+            IdMetodo = m.IdMetodo,
+            Metodo = m.Metodo,
+            EsEliminable = !_context.Ventas.Any(v => v.IdMetodo == m.IdMetodo)
+        })
+        .OrderBy(m => m.Metodo)
+        .ToList();
+    }
+
+    public void Crear(MetodosPago metodoPago)
+    {
+        _context.MetodosPago.Add(metodoPago);
         _context.SaveChanges();
     }
-    
-    public List<MetodosDePago> ListarMetodosDePagoRegistrados()
+
+    public MetodosPago? ObtenerPorId(short id)
     {
-        return _context.MetodosDePago.ToList();
+        return _context.MetodosPago.FirstOrDefault(m => m.IdMetodo == id);
     }
 
-    public MetodosDePago ObtenerDetallesDeMetodoDePagoPorId(short id)
+    public void Actualizar(MetodosPago metodoPago)
     {
-        MetodosDePago? metodoDePago = null;
-        metodoDePago = _context.MetodosDePago.Find(id);
-        if (metodoDePago == null)
-        {
-            throw new Exception("Metodo de pago inexistente");
-        }
-        return metodoDePago;
-    }
-
-    public void ModificarMetodoDePago(MetodosDePago metodoDePago)
-    {
-        _context.MetodosDePago.Update(metodoDePago);
+        _context.MetodosPago.Update(metodoPago);
         _context.SaveChanges();
     }
-    
-    public void EliminarMetodoDePagoPorId(short id)
+
+    public void Eliminar(short id)
     {
-        var metodoDePago = _context.MetodosDePago.Find(id);
-        if (metodoDePago != null)
+        var metodoPago = _context.MetodosPago.Find(id);
+        if (metodoPago != null)
         {
-            _context.MetodosDePago.Remove(metodoDePago);
+            _context.MetodosPago.Remove(metodoPago);
             _context.SaveChanges();
         }
     }
 
+    public bool PuedeSerEliminado(short id){
+        return !_context.Ventas.Any(v => v.IdMetodo == id);
+    }
 } 

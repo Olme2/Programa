@@ -168,13 +168,6 @@ public class ProductosController : Controller
     {
         try
         {
-            // Añadimos el "guardián"
-            if (!_productosRepo.PuedeSerEliminado(id))
-            {
-                TempData["ErrorMessage"] = "No se puede eliminar el producto porque está en uso en promociones, ventas o compras.";
-                return RedirectToAction(nameof(Index));
-            }
-            
             _productosRepo.Eliminar(id);
             TempData["SuccessMessage"] = "Producto eliminado correctamente.";
             return RedirectToAction(nameof(Index));

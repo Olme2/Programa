@@ -9,7 +9,7 @@ namespace entornoPolleria
 
         public DbSet<Productos> Productos { get; set; }
         public DbSet<Proveedores> Proveedores { get; set; }
-        public DbSet<MetodosDePago> MetodosDePago { get; set; }
+        public DbSet<MetodosPago> MetodosPago { get; set; }
         public DbSet<Ventas> Ventas { get; set; }
         public DbSet<DetallesVentas> DetallesVentas { get; set; }
         public DbSet<Compras> Compras { get; set; }
@@ -147,12 +147,16 @@ namespace entornoPolleria
             });
 
             // MetodosDePago
-            modelBuilder.Entity<MetodosDePago>(entity =>
+            modelBuilder.Entity<MetodosPago>(entity =>
             {
-                entity.ToTable("metodos_pago");
+                entity.ToTable("metodo_pago");
                 entity.HasKey(e => e.IdMetodo);
                 entity.Property(e => e.IdMetodo).HasColumnName("id_metodo").UseIdentityColumn();
-                entity.Property(e => e.Metodo).HasColumnName("metodo").HasMaxLength(30).IsRequired();
+                entity.Property(e => e.Metodo).HasColumnName("metodo").HasMaxLength(50).IsRequired();
+                entity.HasMany(m => m.Ventas)
+                        .WithOne(v => v.Metodo)
+                        .HasForeignKey(v => v.IdMetodo)
+                        .IsRequired();
             });
 
             modelBuilder.UseSerialColumns();
