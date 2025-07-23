@@ -29,6 +29,8 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 builder.Services.AddScoped<IProveedoresRepository, ProveedoresRepository>();
 builder.Services.AddScoped<IProductosRepository, ProductosRepository>();
 builder.Services.AddScoped<IPromocionesRepository, PromocionesRepository>();
+builder.Services.AddScoped<IVentaRepository, VentaRepository>();
+builder.Services.AddScoped<IMetodosPagoRepository, MetodosPagoRepository>();
 
 var app = builder.Build();
 

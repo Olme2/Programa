@@ -1,6 +1,5 @@
 using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
-using entornoPolleria.Models;
 
 public class HomeController : Controller
 {

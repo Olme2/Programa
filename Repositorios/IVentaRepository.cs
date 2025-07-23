@@ -1,13 +1,9 @@
-using PromocionesVM;
-
-namespace entornoPolleria.Repositorios
+using VentasVM;
+public interface IVentaRepository
 {
-    public interface IVentaRepository
-    {
-        IEnumerable<ListarVentasVM> ObtenerVentasPorFechas(DateOnly inicio, DateOnly fin);
-        Ventas? ObtenerVentaPorId(int id);
-        void CrearVenta(Ventas nuevaVenta);
-        void ActualizarVenta(Ventas ventaModificada);
-        void EliminarVenta(int id);
-    }
+    IEnumerable<ListarVentasVM> ObtenerVentasPorFechas(DateOnly inicio, DateOnly fin);
+    Ventas? ObtenerVentaPorId(int id);
+    void CrearVenta(Ventas nuevaVenta);
+    void ActualizarVenta(Ventas ventaModificada);
+    void EliminarVenta(int id);
 }

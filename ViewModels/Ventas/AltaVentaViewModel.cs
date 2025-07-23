@@ -6,7 +6,7 @@ using PromocionesVM;
 using VentasPromocionesVM;
 namespace VentasVM;
 
-public class AltaVentaVM
+public class AltaVentaVM : IValidatableObject
 {
     [Required(ErrorMessage = "Debe seleccionar un método de pago.")]
     [Display(Name = "Método de Pago")]
@@ -40,13 +40,10 @@ public class AltaVentaVM
     }
     public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
     {
-        // La regla de negocio: si AMBAS listas están vacías, es un error.
-        if (!DetallesVenta.Any() && !VentaPromociones.Any())
+        if (DetallesVenta.Count() == 0 && VentaPromociones.Count() == 0)
         {
-            // Este error no está asociado a una propiedad específica, sino al modelo en general.
-            // Aparecerá en el 'validation-summary'.
             yield return new ValidationResult(
-                "La venta debe contener al menos un producto o una promoción."// Opcional: asociar el error a un campo para resaltarlo
+                "La venta debe contener al menos un producto o una promoción."
             );
         }
     }

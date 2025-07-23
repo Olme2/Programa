@@ -1,4 +1,3 @@
-using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 using ProductosVM;
 
@@ -150,7 +149,7 @@ public class ProductosController : Controller
             }
             if (!_productosRepo.PuedeSerEliminado(id))
             {
-                TempData["ErrorMessage"] = "No se puede eliminar el producto porque está en uso en promociones, ventas o compras.";
+                TempData["ErrorMessage"] = "No se puede eliminar el producto porque está en uso en promociones, ventas o compras. Prueba desactivandolo.";
                 return RedirectToAction(nameof(Index));
             }
             return View(productoVM);
@@ -169,6 +168,13 @@ public class ProductosController : Controller
     {
         try
         {
+            // Añadimos el "guardián"
+            if (!_productosRepo.PuedeSerEliminado(id))
+            {
+                TempData["ErrorMessage"] = "No se puede eliminar el producto porque está en uso en promociones, ventas o compras.";
+                return RedirectToAction(nameof(Index));
+            }
+            
             _productosRepo.Eliminar(id);
             TempData["SuccessMessage"] = "Producto eliminado correctamente.";
             return RedirectToAction(nameof(Index));

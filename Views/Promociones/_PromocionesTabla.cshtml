@@ -37,7 +37,14 @@
         </td>
         <td>
             <a asp-action="Modificar" asp-route-id="@item.IdPromocion" class="btn btn-warning btn-sm">Modificar</a>
-            <a asp-action="Eliminar" asp-route-id="@item.IdPromocion" class="btn btn-danger btn-sm">Eliminar</a>
+            @if (item.EsEliminable)
+            {
+                <a asp-action="Eliminar" asp-route-id="@item.IdPromocion" class="btn btn-danger btn-sm">Eliminar</a>
+            }
+            else
+            {
+                <a class="btn btn-secondary btn-sm disabled" title="No se puede eliminar, está en uso">Eliminar</a>
+            }
         </td>
     </tr>
 }

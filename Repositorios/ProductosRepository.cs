@@ -25,6 +25,9 @@ public class ProductosRepository : IProductosRepository
                 Activo = p.Activo,
                 Ganancia = p.Precio - p.Costo,
                 PorcentajeGanancia = (p.Costo > 0) ? ((p.Precio - p.Costo) / p.Costo) : 0,
+                EsEliminable = !_context.DetallesVentas.Any(dv => dv.IdProducto == p.IdProducto) &&
+                                   !_context.DetallesPromociones.Any(dp => dp.IdProducto == p.IdProducto) &&
+                                   !_context.DetallesCompras.Any(dc => dc.IdProducto == p.IdProducto)
             })
             .ToList();
     }
@@ -56,11 +59,7 @@ public class ProductosRepository : IProductosRepository
         }
     }
     public bool PuedeSerEliminado(int id)
-    {
-        bool enVentas = _context.DetallesVentas.Any(dv => dv.IdProducto == id);
-        bool enPromociones = _context.DetallesPromociones.Any(dp => dp.IdProducto == id);
-        bool enCompras = _context.DetallesCompras.Any(dc => dc.IdProducto == id);
-
-        return !enVentas && !enPromociones && !enCompras;
-    }
+        {
+            return !_context.DetallesPromociones.Any(d => d.IdProducto == id) && !_context.DetallesVentas.Any(d => d.IdProducto == id) && !_context.DetallesCompras.Any(d => d.IdProducto == id);
+        }
 }

@@ -1,12 +1,12 @@
 using System.ComponentModel.DataAnnotations;
-namespace PromocionesVM;
+namespace VentasVM;
 
 public class ListarVentasVM
 {
     public long IdVenta { get; set; }
     [Display(Name = "Método de pago")]
     public string Metodo { get; set; } = string.Empty;
-    [Display(Name = "Productos")]
+    [Display(Name = "Promociones/Productos")]
     public string ProductosYPromociones { get; set; } = string.Empty;
     [DataType(DataType.Currency)]
     public decimal Precio { get; set; }

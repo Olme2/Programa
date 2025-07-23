@@ -23,6 +23,6 @@ public class ListarPromocionesVM
     [DisplayFormat(DataFormatString = "{0:dd/MM}", NullDisplayText = "-")]
     public DateOnly? Fin { get; set; }
     public bool Activa { get; set; }
-    //public bool EsEliminable { get; set; }
+    public bool EsEliminable { get; set; }
     public ListarPromocionesVM() { }
 }

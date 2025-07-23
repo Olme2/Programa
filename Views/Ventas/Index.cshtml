@@ -37,9 +37,6 @@
                 <td>@v.IdVenta</td>
                 <td>@v.Fecha.ToShortDateString()</td>
                 <td>@v.Hora</td> //solucionar
-                <td>@v.Costo.ToString("C")</td>
-                <td>@v.Ganancia.ToString("C")</td>
-                <td>@v.PorcentajeGanancia.ToString("F2")%</td>
                 <td>
                     <a asp-action="VerDetalles" asp-route-id="@v.IdVenta" class="btn btn-info btn-sm">Ver Detalles</a>
                     <a asp-action="ModificarVenta" asp-route-id="@v.IdVenta" class="btn btn-warning btn-sm">Modificar</a>

@@ -14,6 +14,7 @@
                     <h4>Datos Generales</h4>
                 </div>
                 <div class="card-body">
+                    <input asp-for="Productos" type="hidden">
                     <div class="mb-3">
                         <label asp-for="Promocion" class="form-label"></label>
                         <input asp-for="Promocion" class="form-control" placeholder="Ej: Combo Alitas BBQ" />
@@ -52,6 +53,7 @@
                         + Añadir Producto
                     </button>
                 </div>
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             </div>
         </div>
 

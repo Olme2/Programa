@@ -1,14 +1,12 @@
-@model VentasVM.AltaVentaVM
+@model VentasVM.ModificarVentaVM
 @{
-    ViewData["Title"] = "Registrar Venta";
+    ViewData["Title"] = "Modificar Venta";
 }
-<h2>Registrar Nueva Venta</h2>
-<form asp-action="AltaVenta" method="post" class="row g-3">
+<h2>Modificar Venta</h2>
+<form asp-action="ModificarVenta" method="post" class="row g-3">
+    <input type="hidden" asp-for="IdVenta" />
     <div class="col-md-4">
-        <label asp-for="IdMetodoPago" class="form-label">Método de Pago</label>
-        <select asp-for="IdMetodoPago" class="form-select">
-            //agregar
-        </select>
+        <label asp-for="IdMetodo" class="form-label">Método de Pago</label>
     </div>
     <div class="col-md-4">
         <label asp-for="Detalle" class="form-label">Detalle</label>
@@ -23,7 +21,7 @@
         <input asp-for="Hora" type="time" class="form-control" value="@(Model.Hora.ToString("HH:mm"))" />
     </div>
     <div class="col-12">
-        <button type="submit" class="btn btn-primary">Registrar</button>
+        <button type="submit" class="btn btn-primary">Guardar Cambios</button>
         <a asp-action="Index" class="btn btn-secondary">Cancelar</a>
     </div>
 </form> 

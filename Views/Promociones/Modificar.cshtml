@@ -10,9 +10,19 @@
     <h1>Modificar Promoción: @Model.Promocion</h1>
     <hr />
 
+    @if (!Model.EsModificable)
+    {
+        <div class="alert alert-warning" role="alert">
+            <h4 class="alert-heading">Modificación Restringida</h4>
+            <p>Esta promoción ya fue utilizada en ventas, por lo que su "receta" (productos y cantidades) no puede ser alterada para mantener la integridad de los datos históricos.</p>
+            <hr>
+            <p class="mb-0">Aún puedes modificar el nombre, el precio y las fechas de vigencia.</p>
+        </div>
+    }
+
     <div class="row">
         <div class="col-md-7">
-            @* --- DATOS GENERALES --- *@
+            @* --- DATOS GENERALES (Siempre editables) --- *@
             <div class="card shadow-sm mb-4">
                 <div class="card-header"><h4>Datos Generales</h4></div>
                 <div class="card-body">
@@ -36,19 +46,21 @@
                 </div>
             </div>
 
-            @* --- DETALLES DE PRODUCTOS --- *@
-            <div class="card shadow-sm">
-                <div class="card-header"><h4>Productos Incluidos</h4></div>
-                <div class="card-body">
-                    <div id="detalles-container">
-                        @for (var i = 0; i < Model.DetallesPromocion.Count; i++)
-                        {
-                            <partial name="_ModificarDetallePromocionItem" for="DetallesPromocion[i]" />
-                        }
+            @* --- DETALLES DE PRODUCTOS (Condicionalmente deshabilitado) --- *@
+            <fieldset disabled="@(!Model.EsModificable)">
+                <div class="card shadow-sm">
+                    <div class="card-header"><h4>Productos Incluidos</h4></div>
+                    <div class="card-body">
+                        <div id="detalles-container">
+                            @for (var i = 0; i < Model.DetallesPromocion.Count; i++)
+                            {
+                                <partial name="_ModificarDetallePromocionItem" for="DetallesPromocion[i]" />
+                            }
+                        </div>
+                        <button type="button" id="btn-agregar-detalle" class="btn btn-success w-100 mt-2">+ Añadir Producto</button>
                     </div>
-                    <button type="button" id="btn-agregar-detalle" class="btn btn-success w-100 mt-2">+ Añadir Producto</button>
                 </div>
-            </div>
+            </fieldset>
         </div>
 
         @* --- COLUMNA DE RESUMEN --- *@

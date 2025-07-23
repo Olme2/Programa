@@ -6,7 +6,7 @@ using VentasPromocionesVM;
 using PromocionesVM;
 namespace VentasVM;
 
-public class ModificarVentaVM
+public class ModificarVentaVM : IValidatableObject
 {
     [Required]
     public long IdVenta { get; set; }
@@ -18,9 +18,7 @@ public class ModificarVentaVM
     [Required(ErrorMessage = "La hora es obligatoria.")]
     public TimeOnly Hora { get; set; }
     public string? Detalle { get; set; }
-    [MinLength(1, ErrorMessage = "La venta debe tener al menos un ítem.")]
     public List<ModificarDetalleVentaVM> DetallesVenta { get; set; }
-    [MinLength(1, ErrorMessage = "La venta debe tener al menos un ítem.")]
     public List<ModificarVentaPromocionVM> VentaPromociones { get; set; }
     public List<ListarProductosVM> Productos { get; set; }
     public List<ListarPromocionesVM> Promociones { get; set; }
@@ -39,5 +37,14 @@ public class ModificarVentaVM
         Productos = productos;
         Promociones = promociones;
         Metodos = metodos;
+    }
+    public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
+    {
+        if (DetallesVenta.Count() == 0 && VentaPromociones.Count() == 0)
+        {
+            yield return new ValidationResult(
+                "La venta debe contener al menos un producto o una promoción."
+            );
+        }
     }
 }
