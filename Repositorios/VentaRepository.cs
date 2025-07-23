@@ -48,19 +48,12 @@ public class VentaRepository : IVentaRepository
                                 "<br>",
                                 string.Join("<br>", v.DetallesVenta.Select(dv => dv.Producto.Producto)))
                         : string.Join("<br>", v.DetallesVenta.Select(dv => dv.Producto.Producto)),
-                    Precio = v.CalcularPrecioTotal(),
+                    Total = v.CalcularPrecioTotal(),
                     Fecha = v.Fecha,
                     Hora = v.Hora
                 });
 
-            // Ordenamiento
-            switch (filtro.OrdenarPor)
-            {
-                case "total":
-                    return ventasVM.OrderByDescending(v => v.Precio).ToList();
-                default: // "fecha"
-                    return ventasVM.OrderByDescending(v => v.Fecha).ThenByDescending(v => v.Hora).ToList();
-            }
+                return ventasVM.OrderByDescending(v => v.Fecha).ThenByDescending(v => v.Hora).ToList();
         }
     public Ventas? ObtenerVentaPorId(int id)
     {

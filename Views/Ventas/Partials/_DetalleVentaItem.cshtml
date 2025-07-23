@@ -1,0 +1,34 @@
+@model DetallesVentasVM.AltaDetalleVentaVM
+@{
+    var index = ViewData["index"];
+}
+<div class="row detalle-item-producto align-items-center mb-3 p-2 border rounded">
+    @* Campos ocultos para enviar el precio y costo al servidor *@
+    <input type="hidden" name="DetallesVenta[@index].PrecioUnitario" class="precio-unitario-hidden" />
+    <input type="hidden" name="DetallesVenta[@index].CostoUnitario" class="costo-unitario-hidden" />
+
+    <div class="col-md-6">
+        <label class="form-label">Producto</label>
+        <select name="DetallesVenta[@index].IdProducto" class="form-control producto-search">
+            @if(Model.IdProducto > 0)
+            {
+                <option value="@Model.IdProducto" selected>@Model.NombreProducto</option>
+            }
+        </select>
+        @* CORRECCIÓN: Apuntamos directamente a la propiedad del modelo *@
+        <span asp-validation-for="IdProducto" class="text-danger"></span>
+    </div>
+    <div class="col-md-3">
+        <label class="form-label">Cantidad</label>
+        <input name="DetallesVenta[@index].Cantidad" type="number" step="0.001" min="0.001" class="form-control cantidad-producto" value="@Model.Cantidad.ToString(System.Globalization.CultureInfo.InvariantCulture)" />
+        @* CORRECCIÓN: Apuntamos directamente a la propiedad del modelo *@
+        <span asp-validation-for="Cantidad" class="text-danger"></span>
+    </div>
+    <div class="col-md-2">
+        <label class="form-label">Subtotal</label>
+        <p class="form-control-plaintext fw-bold subtotal-display">$0.00</p>
+    </div>
+    <div class="col-md-1 text-end">
+        <button type="button" class="btn btn-danger btn-sm btn-eliminar-detalle">&times;</button>
+    </div>
+</div>

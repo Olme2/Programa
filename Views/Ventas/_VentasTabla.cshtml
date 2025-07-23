@@ -1,0 +1,43 @@
+@model List<VentasVM.ListarVentasVM>
+@using Microsoft.AspNetCore.Html
+
+@{
+    var busqueda = ViewData["BusquedaActual"] as string;
+
+    // Función para resaltar las coincidencias de la búsqueda.
+    Func<string, HtmlString> ResaltarCoincidencia = (texto) => 
+    {
+        if (string.IsNullOrEmpty(busqueda) || string.IsNullOrEmpty(texto) || !texto.Contains(busqueda, StringComparison.CurrentCultureIgnoreCase))
+        {
+            return new HtmlString(texto.Replace("\n", "<br />"));
+        }
+        var regex = new System.Text.RegularExpressions.Regex(busqueda, System.Text.RegularExpressions.RegexOptions.IgnoreCase);
+        string textoResaltado = regex.Replace(texto, $"<span class='highlight'>$&</span>");
+        return new HtmlString(textoResaltado.Replace("\n", "<br />"));
+    };
+}
+
+@if (Model.Any())
+{
+    @foreach (var venta in Model)
+    {
+        <tr>
+            @* Aplicamos la función de resaltado al listado de productos *@
+            <td>@ResaltarCoincidencia(venta.ProductosYPromociones)</td>
+            <td>@venta.Metodo</td>
+            <td>@venta.Total.ToString("C")</td>
+            <td>@venta.Fecha.ToString("dd/MM/yyyy") @venta.Hora.ToString("HH:mm")</td>
+            <td>
+                @* Estructura de botones corregida para que estén uno al lado del otro *@
+                <a asp-action="Modificar" asp-route-id="@venta.IdVenta" class="btn btn-warning btn-sm">Modificar</a>
+                <a asp-action="Eliminar" asp-route-id="@venta.IdVenta" class="btn btn-danger btn-sm">Eliminar</a>
+            </td>
+        </tr>
+    }
+}
+else
+{
+    <tr>
+        <td colspan="5" class="text-center">No se encontraron ventas para los filtros seleccionados.</td>
+    </tr>
+}

@@ -5,34 +5,29 @@
 
 <div class="container-fluid">
     <h1>Listado de Ventas</h1>
-
+    <p></p>
     <form id="filtro-form" class="row g-3 align-items-center p-3 mb-3 bg-light border rounded">
+        <h2>Filtros</h2>
         <div class="col-xl-2 col-md-6">
-            <label asp-for="FechaInicio" class="form-label"></label>
+            <label asp-for="FechaInicio" class="form-label">Fecha de Inicio</label>
             <input asp-for="FechaInicio" type="date" class="form-control filtro-control" />
         </div>
         <div class="col-xl-2 col-md-6">
-            <label asp-for="FechaFin" class="form-label"></label>
+            <label asp-for="FechaFin" class="form-label">Fecha de Fin</label>
             <input asp-for="FechaFin" type="date" class="form-control filtro-control" />
-        </div>
-        <div class="col-xl-3 col-md-6">
-            <label asp-for="Busqueda" class="form-label">Buscar</label>
-            <input asp-for="Busqueda" class="form-control filtro-control" placeholder="Producto o Promoción..." />
         </div>
         <div class="col-xl-2 col-md-6">
             <label asp-for="IdMetodoPago" class="form-label"></label>
             <select asp-for="IdMetodoPago" class="form-select filtro-control">
+                <option value="" selected>Todos</option>
                 @foreach(var metodo in Model.MetodosPago){
                     <option value="@metodo.IdMetodo">@metodo.Metodo</option>
                 }
             </select>
         </div>
-        <div class="col-xl-3 col-md-12">
-            <label asp-for="OrdenarPor" class="form-label"></label>
-            <select asp-for="OrdenarPor" class="form-select filtro-control">
-                <option value="fecha">Fecha y Hora (Más recientes)</option>
-                <option value="total">Total (Mayor a Menor)</option>
-            </select>
+        <div class="col-xl-6 col-md-6">
+            <label asp-for="Busqueda" class="form-label">Buscar</label>
+            <input asp-for="Busqueda" class="form-control filtro-control" placeholder="Producto o Promoción..." />
         </div>
     </form>
 
@@ -44,7 +39,7 @@
                     <th>Método de Pago</th>
                     <th>Total</th>
                     <th>Fecha y Hora</th>
-                    <th style="width: 150px;">Acciones</th>
+                    <th style="width: 220px;">Acciones</th>
                 </tr>
             </thead>
             <tbody id="tabla-ventas-body">
@@ -65,7 +60,6 @@
                     FechaFin: $('#FechaFin').val(),
                     Busqueda: $('#Busqueda').val(),
                     IdMetodoPago: $('#IdMetodoPago').val(),
-                    OrdenarPor: $('#OrdenarPor').val()
                 };
 
                 $.ajax({

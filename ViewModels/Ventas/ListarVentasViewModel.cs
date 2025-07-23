@@ -9,7 +9,7 @@ public class ListarVentasVM
     [Display(Name = "Promociones/Productos")]
     public string ProductosYPromociones { get; set; } = string.Empty;
     [DataType(DataType.Currency)]
-    public decimal Precio { get; set; }
+    public decimal Total { get; set; }
     [Display(Name = "Fecha")]
     [DisplayFormat(DataFormatString = "{0:dd/MM}")]
     public DateOnly Fecha { get; set; }

@@ -13,13 +13,11 @@ public class ModificarDetallePromocionVM
     public decimal Cantidad { get; set; }
 
     public string? NombreProducto { get; set; }
-    
-    // Propiedad clave para que la vista conozca el costo inicial del producto.
+
     public decimal Costo { get; set; }
 
     public ModificarDetallePromocionVM() { }
 
-    // Constructor que facilita el mapeo desde la entidad en el controlador.
     public ModificarDetallePromocionVM(DetallesPromociones detalle)
     {
         IdProducto = detalle.IdProducto;
@@ -29,5 +27,9 @@ public class ModificarDetallePromocionVM
             NombreProducto = detalle.Producto.Producto;
             Costo = detalle.Producto.Costo;
         }
+    }
+    public decimal CalcularCosto()
+    {
+        return Cantidad*Costo;
     }
 }

@@ -22,6 +22,7 @@ public class ListarProductosVM
         [DisplayFormat(DataFormatString = "{0:P2}")]
         public decimal PorcentajeGanancia { get; set; }
         public bool EsEliminable { get; set; }
+        public decimal VentaSemanal { get; set; }
         public ListarProductosVM() { }
 
         public ListarProductosVM(Productos producto)

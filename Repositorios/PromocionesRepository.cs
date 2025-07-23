@@ -13,8 +13,8 @@ public class PromocionesRepository : IPromocionesRepository
 
     public IEnumerable<ListarPromocionesVM> ObtenerListadoPromociones()
     {
+        var unaSemanaAtras = DateOnly.FromDateTime(DateTime.Now.AddDays(-7));
         var hoy = DateOnly.FromDateTime(DateTime.Now);
-
         return _context.Promociones
             .Include(p => p.DetallesPromocion)
             .ThenInclude(d => d.Producto)
@@ -30,7 +30,15 @@ public class PromocionesRepository : IPromocionesRepository
                 Activa = !p.Fin.HasValue || p.Fin.Value > hoy,
                 Ganancia = p.Precio - p.DetallesPromocion.Sum(d => d.Producto.Costo * d.Cantidad),
                 PorcentajeGanancia = (p.DetallesPromocion.Sum(d => d.Producto.Costo * d.Cantidad) > 0) ? (p.Precio - p.DetallesPromocion.Sum(d => d.Producto.Costo * d.Cantidad)) / p.DetallesPromocion.Sum(d => d.Producto.Costo * d.Cantidad) : 0,
-                EsEliminable = !_context.VentasPromociones.Any(vp => vp.IdPromocion == p.IdPromocion)
+                EsEliminable = !_context.VentasPromociones.Any(vp => vp.IdPromocion == p.IdPromocion),
+                Stock = (int)p.DetallesPromocion
+                        .Where(d => d.Cantidad > 0)
+                        .Select(d => Math.Floor(d.Producto.Stock / d.Cantidad))
+                        .Min(),
+                VentaSemanal = _context.VentasPromociones
+                                .Where(vp => vp.IdPromocion == p.IdPromocion &&
+                                _context.Ventas.Any(v => v.IdVenta == vp.IdVenta && v.Fecha >= unaSemanaAtras && v.Fecha <= hoy))
+                                .Sum(dv => (int?)dv.Cantidad) ?? 0
             })
             .ToList();
     }

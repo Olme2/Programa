@@ -57,4 +57,16 @@ public class ModificarPromocionVM : IValidatableObject
             );
         }
     }
+    public decimal CalcularCosto()
+    {
+        return DetallesPromocion.Sum(d => d.CalcularCosto());
+    }
+    public decimal CalcularGanancia()
+    {
+        return Precio - CalcularCosto();
+    }
+    public decimal CalcularPorcentajeGanancia()
+    {
+        return CalcularCosto() > 0 ? 100*CalcularGanancia()/CalcularCosto() : 0;
+    }
 }

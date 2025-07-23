@@ -136,8 +136,16 @@ build_metadata.AdditionalFiles.CssScope =
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcVmVudGFzXE1vZGlmaWNhci5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/Valentino/OneDrive/Desktop/Polleria/Programa/Views/Ventas/_VentaTabla.cshtml]
-build_metadata.AdditionalFiles.TargetPath = Vmlld3NcVmVudGFzXF9WZW50YVRhYmxhLmNzaHRtbA==
+[C:/Users/Valentino/OneDrive/Desktop/Polleria/Programa/Views/Ventas/Partials/_DetalleVentaItem.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcVmVudGFzXFBhcnRpYWxzXF9EZXRhbGxlVmVudGFJdGVtLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Valentino/OneDrive/Desktop/Polleria/Programa/Views/Ventas/Partials/_VentaPromocionItem.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcVmVudGFzXFBhcnRpYWxzXF9WZW50YVByb21vY2lvbkl0ZW0uY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Valentino/OneDrive/Desktop/Polleria/Programa/Views/Ventas/_VentasTabla.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcVmVudGFzXF9WZW50YXNUYWJsYS5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
 [C:/Users/Valentino/OneDrive/Desktop/Polleria/Programa/Views/_ViewImports.cshtml]

@@ -1,25 +1,29 @@
 @model DetallesPromocionesVM.ModificarDetallePromocionVM
 @{
-    // Nos aseguramos de que los valores numéricos usen '.' como separador decimal para el HTML.
     var cantidadValue = Model.Cantidad.ToString(System.Globalization.CultureInfo.InvariantCulture);
     var costoValue = Model.Costo.ToString(System.Globalization.CultureInfo.InvariantCulture);
 }
 <div class="row detalle-item align-items-center mb-3 p-2 border rounded">
+    @* --- LA SOLUCIÓN CLAVE --- *@
+    @*
+      Estos campos ocultos aseguran que los valores de IdProducto y Cantidad
+      SIEMPRE se envíen al servidor, incluso si los campos visibles están deshabilitados.
+    *@
+    <input type="hidden" asp-for="@Model.IdProducto" />
+    <input type="hidden" asp-for="@Model.Cantidad" />
+
     <div class="col-md-6">
         <label class="form-label">Producto</label>
-        @* LA CORRECCIÓN CLAVE: Añadimos 'data-costo' para que JS lo lea al cargar. *@
         <select asp-for="IdProducto" class="form-control producto-search" data-costo="@costoValue">
             @if(Model.IdProducto > 0)
             {
                 <option value="@Model.IdProducto" selected>@Model.NombreProducto</option>
             }
         </select>
-        <span asp-validation-for="IdProducto" class="text-danger"></span>
     </div>
     <div class="col-md-3">
         <label asp-for="Cantidad" class="form-label"></label>
         <input asp-for="Cantidad" type="number" step="0.001" min="0.001" class="form-control cantidad-producto" value="@cantidadValue"/>
-        <span asp-validation-for="Cantidad" class="text-danger"></span>
     </div>
     <div class="col-md-2">
         <label class="form-label">Costo</label>

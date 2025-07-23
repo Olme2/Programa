@@ -3,51 +3,44 @@
     ViewData["Title"] = "Modificar Promoción";
 }
 
-<form asp-action="Modificar" method="post" id="form-promocion">
-    <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
-    <input type="hidden" asp-for="IdPromocion" />
+@if (Model.EsModificable)
+{
+    @* --- CASO 1: LA PROMOCIÓN SÍ SE PUEDE MODIFICAR (Formulario Dinámico Completo) --- *@
 
-    <h1>Modificar Promoción: @Model.Promocion</h1>
-    <hr />
+    <form asp-action="Modificar" method="post" id="form-promocion">
+        <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+        <input type="hidden" asp-for="IdPromocion" />
+        <input type="hidden" asp-for="EsModificable" />
+        <h1>Modificar Promoción: @Model.Promocion</h1>
+        <hr />
 
-    @if (!Model.EsModificable)
-    {
-        <div class="alert alert-warning" role="alert">
-            <h4 class="alert-heading">Modificación Restringida</h4>
-            <p>Esta promoción ya fue utilizada en ventas, por lo que su "receta" (productos y cantidades) no puede ser alterada para mantener la integridad de los datos históricos.</p>
-            <hr>
-            <p class="mb-0">Aún puedes modificar el nombre, el precio y las fechas de vigencia.</p>
-        </div>
-    }
-
-    <div class="row">
-        <div class="col-md-7">
-            @* --- DATOS GENERALES (Siempre editables) --- *@
-            <div class="card shadow-sm mb-4">
-                <div class="card-header"><h4>Datos Generales</h4></div>
-                <div class="card-body">
-                    <div class="mb-3">
-                        <label asp-for="Promocion" class="form-label"></label>
-                        <input asp-for="Promocion" class="form-control" />
-                        <span asp-validation-for="Promocion" class="text-danger"></span>
-                    </div>
-                    <div class="row">
-                        <div class="col-sm-6 mb-3">
-                            <label asp-for="Inicio" class="form-label"></label>
-                            <input asp-for="Inicio" type="date" class="form-control" />
-                            <span asp-validation-for="Inicio" class="text-danger"></span>
+        <div class="row">
+            <div class="col-md-7">
+                @* --- DATOS GENERALES --- *@
+                <div class="card shadow-sm mb-4">
+                    <div class="card-header"><h4>Datos Generales</h4></div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <label asp-for="Promocion" class="form-label"></label>
+                            <input asp-for="Promocion" class="form-control" />
+                            <span asp-validation-for="Promocion" class="text-danger"></span>
                         </div>
-                        <div class="col-sm-6 mb-3">
-                            <label asp-for="Fin" class="form-label">Fecha de Fin (Opcional)</label>
-                            <input asp-for="Fin" type="date" class="form-control" />
-                            <span asp-validation-for="Fin" class="text-danger"></span>
+                        <div class="row">
+                            <div class="col-sm-6 mb-3">
+                                <label asp-for="Inicio" class="form-label"></label>
+                                <input asp-for="Inicio" type="date" class="form-control" />
+                                <span asp-validation-for="Inicio" class="text-danger"></span>
+                            </div>
+                            <div class="col-sm-6 mb-3">
+                                <label asp-for="Fin" class="form-label">Fecha de Fin (Opcional)</label>
+                                <input asp-for="Fin" type="date" class="form-control" />
+                                <span asp-validation-for="Fin" class="text-danger"></span>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
 
-            @* --- DETALLES DE PRODUCTOS (Condicionalmente deshabilitado) --- *@
-            <fieldset disabled="@(!Model.EsModificable)">
+                @* --- DETALLES DE PRODUCTOS (Dinámicos) --- *@
                 <div class="card shadow-sm">
                     <div class="card-header"><h4>Productos Incluidos</h4></div>
                     <div class="card-body">
@@ -60,181 +53,278 @@
                         <button type="button" id="btn-agregar-detalle" class="btn btn-success w-100 mt-2">+ Añadir Producto</button>
                     </div>
                 </div>
-            </fieldset>
-        </div>
+            </div>
 
-        @* --- COLUMNA DE RESUMEN --- *@
-        <div class="col-md-5">
-            <div class="summary-card">
-                <h4>Resumen de la Promoción</h4>
-                <hr>
-                <div class="mb-3">
-                    <label asp-for="Precio" class="form-label fs-5">Precio de Venta Final</label>
-                    <div class="input-group">
-                        <span class="input-group-text">$</span>
-                        <input asp-for="Precio" type="number" step="0.01" class="form-control form-control-lg" />
+            @* --- COLUMNA DE RESUMEN --- *@
+            <div class="col-md-5">
+                <div class="summary-card">
+                    <h4>Resumen de la Promoción</h4>
+                    <hr>
+                    <div class="mb-3">
+                        <label asp-for="Precio" class="form-label fs-5">Precio de Venta Final</label>
+                        <div class="input-group">
+                            <span class="input-group-text">$</span>
+                            <input asp-for="Precio" type="number" step="0.01" class="form-control form-control-lg" />
+                        </div>
+                        <span asp-validation-for="Precio" class="text-danger"></span>
                     </div>
-                    <span asp-validation-for="Precio" class="text-danger"></span>
-                </div>
-                <div class="summary-item">
-                    <span>Costo Total:</span>
-                    <span id="costo-total-display" class="fw-bold text-danger">$0.00</span>
-                </div>
-                <div class="summary-item total">
-                    <span>GANANCIA:</span>
-                    <span id="ganancia-total-display" class="text-success">$0.00</span>
-                </div>
-                <div class="summary-item">
-                    <span>% Ganancia:</span>
-                    <span id="porcentaje-ganancia-display" class="fw-bold">0.00%</span>
+                    <div class="summary-item">
+                        <span>Costo Total:</span>
+                        <span id="costo-total-display" class="fw-bold text-danger">$0.00</span>
+                    </div>
+                    <div class="summary-item total">
+                        <span>GANANCIA:</span>
+                        <span id="ganancia-total-display" class="text-success">$0.00</span>
+                    </div>
+                    <div class="summary-item">
+                        <span>% Ganancia:</span>
+                        <span id="porcentaje-ganancia-display" class="fw-bold">0.00%</span>
+                    </div>
                 </div>
             </div>
         </div>
+
+        <div class="mt-4">
+            <button type="submit" class="btn btn-primary btn-lg">Guardar Cambios</button>
+            <a asp-action="Index" class="btn btn-secondary btn-lg">Cancelar</a>
+        </div>
+    </form>
+
+    @* Plantilla oculta para añadir nuevas filas (usa la parcial de Alta) *@
+    <div id="detalle-template" style="display: none;">
+        <partial name="_DetallePromocionItem" model="new DetallesPromocionesVM.AltaDetallePromocionVM()" view-data='new ViewDataDictionary(ViewData) { { "index", "__INDEX__" } }' />
     </div>
 
-    <div class="mt-4">
-        <button type="submit" class="btn btn-primary btn-lg">Guardar Cambios</button>
-        <a asp-action="Index" class="btn btn-secondary btn-lg">Cancelar</a>
-    </div>
-</form>
-
-
-
-
-@section Scripts {
-    @{ await Html.RenderPartialAsync("_ValidationScriptsPartial"); }
-    
-    <script>
-        $(document).ready(function () {
-            
-            function parseLocalFloat(valor) {
-                if (!valor) return 0;
-                return parseFloat(String(valor).replace(',', '.')) || 0;
-            }
-
-            function recalcularTotales(origenDelCambio) {
-                let costoTotal = 0;
-                let precioPromocion = parseLocalFloat($('#Precio').val());
-
-                $('.detalle-item').each(function () {
-                    const fila = $(this);
-                    const selectProducto = fila.find('.producto-search');
-                    const inputCantidad = fila.find('.cantidad-producto');
-                    const costoUnitario = parseLocalFloat(selectProducto.data('costo'));
-                    const cantidad = parseLocalFloat(inputCantidad.val());
-                    const costoDetalle = costoUnitario * cantidad;
-
-                    fila.find('.costo-detalle-display').text(costoDetalle.toLocaleString('es-AR', { style: 'currency', currency: 'ARS' }));
-                    costoTotal += costoDetalle;
-                });
-                
-                if (origenDelCambio !== 'precio' && precioPromocion <= costoTotal) {
-                    precioPromocion = costoTotal + 1;
-                    $('#Precio').val(precioPromocion.toFixed(2));
-                }
-
-                const ganancia = precioPromocion - costoTotal;
-                const porcentajeGanancia = costoTotal > 0 ? (ganancia / costoTotal) : 0;
-                
-                $('#costo-total-display').text(costoTotal.toLocaleString('es-AR', { style: 'currency', currency: 'ARS' }));
-                $('#ganancia-total-display').text(ganancia.toLocaleString('es-AR', { style: 'currency', currency: 'ARS' }));
-                $('#porcentaje-ganancia-display').text(porcentajeGanancia.toLocaleString('es-AR', { style: 'percent', minimumFractionDigits: 2 }));
-            }
-
-            function inicializarSelect2(selector) {
-                if (selector.hasClass("select2-hidden-accessible")) {
-                    selector.select2('destroy');
-                }
-                selector.select2({
-                    placeholder: "-- Buscar producto --",
-                    ajax: {
-                        url: '@Url.Action("BuscarProductosParaPromocion", "Promociones")',
-                        dataType: 'json',
-                        delay: 250,
-                        data: function (params) {
-                            var idsExcluidos = [];
-                            var currentSelect = $(this);
-                            $('.producto-search').not(currentSelect).each(function() {
-                                var selectedId = $(this).val();
-                                if (selectedId) { idsExcluidos.push(selectedId); }
-                            });
-                            return { term: params.term, excluir: idsExcluidos };
-                        },
-                        processResults: function (data) { return { results: data }; },
-                        cache: true
+    @section Scripts {
+        @{ await Html.RenderPartialAsync("_ValidationScriptsPartial"); }
+        <script>
+            // Script completo para la versión dinámica, idéntico al de Alta.
+            $(document).ready(function () {
+                function parseLocalFloat(valor) { if (!valor) return 0; return parseFloat(String(valor).replace(',', '.')) || 0; }
+                function recalcularTotales(origenDelCambio) {
+                    let costoTotal = 0;
+                    let precioPromocion = parseLocalFloat($('#Precio').val());
+                    $('.detalle-item').each(function () {
+                        const costoUnitario = parseLocalFloat($(this).find('.producto-search').data('costo'));
+                        const cantidad = parseLocalFloat($(this).find('.cantidad-producto').val());
+                        const costoDetalle = costoUnitario * cantidad;
+                        $(this).find('.costo-detalle-display').text(costoDetalle.toLocaleString('es-AR', { style: 'currency', currency: 'ARS' }));
+                        costoTotal += costoDetalle;
+                    });
+                    if (origenDelCambio !== 'precio' && precioPromocion <= costoTotal) {
+                        precioPromocion = costoTotal + 1;
+                        $('#Precio').val(precioPromocion.toFixed(2));
                     }
-                }).on('select2:select', function (e) {
-                    $(this).data('costo', e.params.data.costo);
-                    recalcularTotales('detalle');
-                });
-            }
-
-            $('#btn-agregar-detalle').on('click', function() {
-                const container = $('#detalles-container');
-                const nuevoIndex = container.find('.detalle-item').length;
-            
-                // Usamos la misma llamada AJAX que en Alta.cshtml. Es más robusta.
-                $.get('@Url.Action("ObtenerVistaDetallePromocion", "Promociones")', { index: nuevoIndex }, function(nuevaFilaHtml) {
-                    const nuevaFila = $(nuevaFilaHtml);
+                    const ganancia = precioPromocion - costoTotal;
+                    const porcentajeGanancia = costoTotal > 0 ? (ganancia / costoTotal) : 0;
+                    $('#costo-total-display').text(costoTotal.toLocaleString('es-AR', { style: 'currency', currency: 'ARS' }));
+                    $('#ganancia-total-display').text(ganancia.toLocaleString('es-AR', { style: 'currency', currency: 'ARS' }));
+                    $('#porcentaje-ganancia-display').text(porcentajeGanancia.toLocaleString('es-AR', { style: 'percent', minimumFractionDigits: 2 }));
+                }
+                function inicializarSelect2(selector) {
+                    if (selector.hasClass("select2-hidden-accessible")) { selector.select2('destroy'); }
+                    selector.select2({
+                        placeholder: "-- Buscar producto --",
+                        ajax: {
+                            url: '@Url.Action("BuscarProductosParaPromocion", "Promociones")',
+                            dataType: 'json',
+                            delay: 250,
+                            data: function (params) {
+                                var idsExcluidos = [];
+                                $('.producto-search').not($(this)).each(function () { if ($(this).val()) { idsExcluidos.push($(this).val()); } });
+                                return { term: params.term, excluir: idsExcluidos };
+                            },
+                            processResults: function (data) { return { results: data }; }
+                        }
+                    }).on('select2:select', function (e) {
+                        $(this).data('costo', e.params.data.costo);
+                        recalcularTotales('detalle');
+                    });
+                }
+                $('#btn-agregar-detalle').on('click', function () {
+                    const container = $('#detalles-container');
+                    const nuevoIndex = container.find('.detalle-item').length;
+                    const templateHtml = $('#detalle-template').html().replace(/__INDEX__/g, nuevoIndex);
+                    const nuevaFila = $(templateHtml);
                     container.append(nuevaFila);
                     inicializarSelect2(nuevaFila.find('.producto-search'));
                     actualizarVisibilidadBotonEliminar();
                 });
-            });
-
-            $('#detalles-container').on('click', '.btn-eliminar-detalle', function () {
-                $(this).closest('.detalle-item').remove();
-                reindexarFilas();
+                $('#detalles-container').on('click', '.btn-eliminar-detalle', function () {
+                    $(this).closest('.row').remove();
+                    reindexarFilas();
+                    actualizarVisibilidadBotonEliminar();
+                    recalcularTotales('detalle');
+                });
+                function reindexarFilas() {
+                    $('#detalles-container .detalle-item').each(function (index, item) {
+                        $(item).find('[name^="DetallesPromocion"]').each(function () {
+                            this.name = this.name.replace(/\[\d+\]/, `[${index}]`);
+                        });
+                    });
+                }
+                function actualizarVisibilidadBotonEliminar() {
+                    const filas = $('#detalles-container .detalle-item');
+                    filas.find('.btn-eliminar-detalle').toggle(filas.length > 1);
+                }
+                $('#form-promocion').on('submit', function (e) {
+                    $('#Precio, .cantidad-producto').each(function () {
+                        const input = $(this);
+                        if (input.val()) { input.val(input.val().replace(',', '.')); }
+                    });
+                    $('.detalle-item').each(function () { if (!$(this).find('.producto-search').val()) { $(this).remove(); } });
+                    reindexarFilas();
+                });
+                $('#form-promocion').on('keydown', '.cantidad-producto', function (e) { if (e.key === 'Enter') { e.preventDefault(); $(this).trigger('change'); } });
+                $('#Precio').on('input', () => recalcularTotales('precio'));
+                $('#detalles-container').on('change', '.cantidad-producto', () => recalcularTotales('detalle'));
+                $('.producto-search').each(function () { inicializarSelect2($(this)); });
                 actualizarVisibilidadBotonEliminar();
                 recalcularTotales('detalle');
             });
+        </script>
+    }
+}
+else
+{
+    @* --- CASO 2: LA PROMOCIÓN NO SE PUEDE MODIFICAR (Formulario Semi-Bloqueado) --- *@
 
-            function reindexarFilas() {
-                $('#detalles-container .detalle-item').each(function(index, item) {
-                    $(item).find('[name^="DetallesPromocion"]').each(function() {
-                        const oldName = $(this).attr('name');
-                        const newName = oldName.replace(/\[\d+\]/, `[${index}]`);
-                        $(this).attr('name', newName);
-                    });
-                });
+    <form asp-action="Modificar" method="post" id="form-promocion">
+        <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+        <input type="hidden" asp-for="IdPromocion" />
+        
+        @* Pasamos los detalles originales en campos ocultos para que no se pierdan al guardar *@
+        @for (var i = 0; i < Model.DetallesPromocion.Count; i++)
+        {
+            <input type="hidden" name="DetallesPromocion[@i].IdProducto" value="@Model.DetallesPromocion[i].IdProducto" />
+            <input type="hidden" name="DetallesPromocion[@i].Cantidad" value="@Model.DetallesPromocion[i].Cantidad.ToString(System.Globalization.CultureInfo.InvariantCulture)" />
+        }
+
+        <h1>Modificar Promoción: @Model.Promocion</h1>
+        <hr />
+
+        <div class="alert alert-warning" role="alert">
+            <h4 class="alert-heading">Modificación Restringida</h4>
+            <p>Esta promoción ya fue utilizada en ventas, por lo que su "receta" (productos y cantidades) no puede ser alterada. Solo puedes modificar el nombre, precio y las fechas de vigencia.</p>
+        </div>
+
+        <div class="row">
+            <div class="col-md-7">
+                @* --- DATOS GENERALES (Editables) --- *@
+                <div class="card shadow-sm mb-4">
+                    <div class="card-header"><h4>Datos Generales</h4></div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <label asp-for="Promocion" class="form-label"></label>
+                            <input asp-for="Promocion" class="form-control" />
+                            <span asp-validation-for="Promocion" class="text-danger"></span>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-6 mb-3">
+                                <label asp-for="Inicio" class="form-label"></label>
+                                <input asp-for="Inicio" type="date" class="form-control" />
+                                <span asp-validation-for="Inicio" class="text-danger"></span>
+                            </div>
+                            <div class="col-sm-6 mb-3">
+                                <label asp-for="Fin" class="form-label">Fecha de Fin (Opcional)</label>
+                                <input asp-for="Fin" type="date" class="form-control" />
+                                <span asp-validation-for="Fin" class="text-danger"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                @* --- DETALLES DE PRODUCTOS (Solo Lectura) --- *@
+                <div class="card shadow-sm">
+                    <div class="card-header"><h4>Productos Incluidos (No editable)</h4></div>
+                    <div class="card-body">
+                        <div id="detalles-container">
+                            @foreach (var detalle in Model.DetallesPromocion)
+                            {
+                                <div class="row detalle-item align-items-center mb-3 p-2 border rounded">
+                                    <div class="col-md-6">
+                                        <label class="form-label">Producto</label>
+                                        <input asp-for="@detalle.NombreProducto" class="form-control producto-search" readonly>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <label asp-for="@detalle.Cantidad" class="form-label"></label>
+                                        <input asp-for="@detalle.Cantidad" type="number" step="0.001" min="0.001" class="form-control cantidad-producto" readonly/>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <label class="form-label">Costo</label>
+                                        <p class="form-control-plaintext fw-bold costo-detalle-display">$@detalle.CalcularCosto().ToString("N2")</p>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            @* --- COLUMNA DE RESUMEN --- *@
+            <div class="col-md-5">
+                <div class="summary-card">
+                    <h4>Resumen de la Promoción</h4>
+                    <hr>
+                    <div class="mb-3">
+                        <label asp-for="Precio" class="form-label fs-5">Precio de Venta Final</label>
+                        <div class="input-group">
+                            <span class="input-group-text">$</span>
+                            <input asp-for="Precio" type="number" step="0.01" id="Precio" class="form-control form-control-lg" />
+                        </div>
+                        <span asp-validation-for="Precio" class="text-danger"></span>
+                    </div>
+                    <div class="summary-item">
+                        <span>Costo Total:</span>
+                        <span id="costo-total-display" class="fw-bold text-danger">$0.00</span>
+                    </div>
+                    <div class="summary-item total">
+                        <span>GANANCIA:</span>
+                        <span id="ganancia-total-display" class="text-success">$0.00</span>
+                    </div>
+                    <div class="summary-item">
+                        <span>% Ganancia:</span>
+                        <span id="porcentaje-ganancia-display" class="fw-bold">0.00%</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="mt-4">
+            <button type="submit" class="btn btn-primary btn-lg">Guardar Cambios</button>
+            <a asp-action="Index" class="btn btn-secondary btn-lg">Cancelar</a>
+        </div>
+    </form>
+    @section Scripts{
+    @{ await Html.RenderPartialAsync("_ValidationScriptsPartial"); }
+    <script>
+        $(document).ready(function() {
+            // 1. Obtenemos el costo total (que es fijo) desde el modelo de C# UNA SOLA VEZ.
+            //    Usamos Json.Serialize para asegurar que el número se escriba correctamente.
+            const costoTotalFijo = @Json.Serialize(Model.CalcularCosto());
+
+            // 2. Definimos la función que se ejecutará CADA VEZ que el precio cambie.
+            function recalcularTotales() {
+                // Obtenemos el precio actual del input.
+                let precioPromocion = parseFloat(String($('#Precio').val()).replace(',', '.')) || 0;
+                
+                // Calculamos la ganancia y el porcentaje USANDO JAVASCRIPT.
+                const ganancia = precioPromocion - costoTotalFijo;
+                const porcentajeGanancia = costoTotalFijo > 0 ? (ganancia / costoTotalFijo) : 0;
+                
+                // Actualizamos los campos de texto en la vista.
+                $('#costo-total-display').text(costoTotalFijo.toLocaleString('es-AR', { style: 'currency', currency: 'ARS' }));
+                $('#ganancia-total-display').text(ganancia.toLocaleString('es-AR', { style: 'currency', currency: 'ARS' }));
+                $('#porcentaje-ganancia-display').text(porcentajeGanancia.toLocaleString('es-AR', { style: 'percent', minimumFractionDigits: 2 }));
             }
 
-            function actualizarVisibilidadBotonEliminar() {
-                const filas = $('#detalles-container .detalle-item');
-                filas.find('.btn-eliminar-detalle').toggle(filas.length > 1);
-            }
+            // 3. Vinculamos la función al evento 'input' del campo de precio.
+            $('#Precio').on('input', recalcularTotales);
 
-            $('#form-promocion').on('submit', function(e) {
-                $('#Precio, .cantidad-producto').each(function() {
-                    const input = $(this);
-                    if (input.val()) {
-                        const valorNeutral = input.val().replace(',', '.');
-                        input.val(valorNeutral);
-                    }
-                });
-                $('.detalle-item').each(function() {
-                    const selectProducto = $(this).find('.producto-search');
-                    if (!selectProducto.val() || selectProducto.val() === "0") { $(this).remove(); }
-                });
-                reindexarFilas();
-            });
-
-            $('#form-promocion').on('keydown', '.cantidad-producto', function(e) {
-                if (e.key === 'Enter') { e.preventDefault(); $(this).trigger('change'); }
-            });
-
-            $('#Precio').on('input', () => recalcularTotales('precio'));
-            $('#detalles-container').on('change', '.cantidad-producto', () => recalcularTotales('detalle'));
-            
-            // --- INICIALIZACIÓN UNIFICADA ---
-            // 1. Inicializamos los buscadores para TODAS las filas (viejas y nuevas).
-            $('.producto-search').each(function() {
-                inicializarSelect2($(this));
-            });
-            // 2. Ajustamos la visibilidad de los botones de eliminar.
-            actualizarVisibilidadBotonEliminar();
-            // 3. Lanzamos el primer cálculo para que los totales iniciales aparezcan correctamente.
-            recalcularTotales('detalle');
+            // 4. Ejecutamos la función una vez al cargar la página para mostrar los valores iniciales.
+            recalcularTotales();
         });
     </script>
 }
+}
+

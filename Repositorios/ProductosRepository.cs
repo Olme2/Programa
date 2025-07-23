@@ -12,6 +12,8 @@ public class ProductosRepository : IProductosRepository
 
     public IEnumerable<ListarProductosVM> ObtenerListadoProductos()
     {
+        var unaSemanaAtras = DateOnly.FromDateTime(DateTime.Now.AddDays(-7));
+        var hoy = DateOnly.FromDateTime(DateTime.Now);
         return _context.Productos
             .Include(p => p.Proveedor)
             .Select(p => new ListarProductosVM
@@ -27,9 +29,20 @@ public class ProductosRepository : IProductosRepository
                 PorcentajeGanancia = (p.Costo > 0) ? ((p.Precio - p.Costo) / p.Costo) : 0,
                 EsEliminable = !_context.DetallesVentas.Any(dv => dv.IdProducto == p.IdProducto) &&
                                    !_context.DetallesPromociones.Any(dp => dp.IdProducto == p.IdProducto) &&
-                                   !_context.DetallesCompras.Any(dc => dc.IdProducto == p.IdProducto)
-            })
-            .ToList();
+                                   !_context.DetallesCompras.Any(dc => dc.IdProducto == p.IdProducto),
+                VentaSemanal = _context.DetallesVentas
+                                .Where(dv => dv.IdProducto == p.IdProducto &&
+                                             _context.Ventas.Any(v => v.IdVenta == dv.IdVenta && v.Fecha >= unaSemanaAtras && v.Fecha <= hoy))
+                                .Sum(dv => (decimal?)dv.Cantidad) ?? 0
+                                +
+                                // Parte 2: Suma de ventas del producto a través de promociones en la última semana.
+                                (from vp in _context.VentasPromociones
+                                 join v in _context.Ventas on vp.IdVenta equals v.IdVenta
+                                 join dp in _context.DetallesPromociones on vp.IdPromocion equals dp.IdPromocion
+                                 where dp.IdProducto == p.IdProducto && v.Fecha >= unaSemanaAtras && v.Fecha <= hoy
+                                 select (decimal?)vp.Cantidad * dp.Cantidad)
+                                .Sum() ?? 0,
+            }).ToList();
     }
 
     public Productos? ObtenerPorId(int id)

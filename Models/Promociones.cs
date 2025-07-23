@@ -44,6 +44,15 @@ public class Promociones
         }
     }
 
+    public void ActualizarDatosGenerales(ModificarPromocionVM vm)
+    {
+        Promocion = vm.Promocion;
+        Precio = vm.Precio;
+        Inicio = vm.Inicio;
+        Fin = vm.Fin;
+    }
+
+
     public void LimpiarDetalles()
     {
         _detallesPromocion.Clear();

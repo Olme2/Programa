@@ -26,11 +26,6 @@ public class AltaPromocionVM : IValidatableObject
         Productos = new List<ListarProductosVM>();
     }
 
-    public AltaPromocionVM(List<ListarProductosVM> productos) : this()
-    {
-        Productos = productos;
-    }
-
     public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
     {
         // Lógica para verificar duplicados

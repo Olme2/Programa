@@ -23,7 +23,4 @@ public class IndexVentasVM
 
     [Display(Name = "Método de Pago")]
     public short? IdMetodoPago { get; set; }
-
-    [Display(Name = "Ordenar Por")]
-    public string OrdenarPor { get; set; } = "fecha"; // Valor por defecto
 }

@@ -6,7 +6,7 @@
 <form asp-action="Alta" method="post" id="form-promocion">
     <h1>Crear Nueva Promoción</h1>
     <hr />
-
+    <input asp-for="@Model.Productos" type="hidden">
     <div class="row">
         <div class="col-md-7">
             <div class="card shadow-sm mb-4">
@@ -69,6 +69,9 @@
                         <input asp-for="Precio" type="number" step="0.01" class="form-control form-control-lg" />
                     </div>
                     <span asp-validation-for="Precio" class="text-danger"></span>
+                    @if (TempData["Precio"] != null){
+                        <span class="text-danger">@TempData["Precio"]</span>
+                    }
                 </div>
                 
                 <div class="summary-item">
@@ -240,7 +243,7 @@
                 recalcularTotales('precio');
             });
 
-            $('#detalles-container').on('change', '.cantidad-producto', function() {
+            $('#detalles-container').on('input', '.cantidad-producto', function() {
                  recalcularTotales('detalle');
             });
             

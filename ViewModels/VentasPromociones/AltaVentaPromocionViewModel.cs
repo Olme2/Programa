@@ -5,6 +5,7 @@ public class AltaVentaPromocionVM
     [Required(ErrorMessage = "Debe seleccionar una promocion.")]
     [Range(1, int.MaxValue, ErrorMessage = "Debe seleccionar una promocion válida.")]
     public int IdPromocion { get; set; }
+    public string? NombrePromocion { get; set; }
     [Required(ErrorMessage = "La cantidad es obligatoria.")]
     [Range(1, short.MaxValue, ErrorMessage = "La cantidad debe ser como mínimo 1 y válida.")]
     public short Cantidad { get; set; }
