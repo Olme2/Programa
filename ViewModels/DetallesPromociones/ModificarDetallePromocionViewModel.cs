@@ -22,11 +22,8 @@ public class ModificarDetallePromocionVM
     {
         IdProducto = detalle.IdProducto;
         Cantidad = detalle.Cantidad;
-        if (detalle.Producto != null)
-        {
-            NombreProducto = detalle.Producto.Producto;
-            Costo = detalle.Producto.Costo;
-        }
+        NombreProducto = detalle.Producto.Producto;
+        Costo = detalle.Producto.Costo;
     }
     public decimal CalcularCosto()
     {

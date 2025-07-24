@@ -133,68 +133,56 @@ public class PromocionesController : Controller
     [HttpGet]
     public IActionResult Modificar(int id)
     {
-        try
-        {
-            var promocion = _promocionesRepo.ObtenerPorId(id);
-            if (promocion == null)
+        var promocion = _promocionesRepo.ObtenerPorId(id);
+        if (promocion == null)
             {
-                TempData["ErrorMessage"] = "No existe promocion con ese id.";
+                TempData["ErrorMessage"] = "No existe promocion con este id.";
                 return RedirectToAction(nameof(Index));
             }
 
-            var viewModel = new ModificarPromocionVM(promocion);
+        // --- INICIO DE LA CORRECCIÓN ---
+        // Aquí estaba el error. Mapeamos manualmente la entidad al ViewModel correcto.
+        var viewModel = new ModificarPromocionVM(promocion);
+        // --- FIN DE LA CORRECCIÓN ---
 
-            // Pasamos la regla de negocio a la vista.
-            viewModel.EsModificable = _promocionesRepo.PuedeSerEliminada(id);
+        // Pasamos la variable para saber si el formulario debe ser editable.
+        viewModel.EsModificable = _promocionesRepo.PuedeSerEliminada(id);
 
-            return View(viewModel);
-        }
-        catch (Exception e)
-        {
-            _logger.LogError(e, "Error al cargar el formulario de modificación para la promoción ID {id}", id);
-            TempData["ErrorMessage"] = "Ocurrió un error al cargar la promoción.";
-            return RedirectToAction(nameof(Index));
-        }
+        return View(viewModel);
     }
+
 
 
     [HttpPost]
     [ValidateAntiForgeryToken]
     public IActionResult Modificar(ModificarPromocionVM viewModel)
     {
-        // --- INICIO DE LA CORRECCIÓN (BUG #2) ---
-        // Antes de validar, debemos "rehidratar" el costo en el ViewModel,
-        // ya que este valor no se envía desde el cliente y es crucial para la validación.
+        // Rehidratamos el ViewModel ANTES de validar, igual que en Alta.
         if (viewModel.DetallesPromocion != null)
         {
-            foreach (var detalle in viewModel.DetallesPromocion)
-            {
-                if (detalle.IdProducto > 0)
-                {
-                    var producto = _productosRepo.ObtenerPorId(detalle.IdProducto);
-                    detalle.Costo = producto?.Costo ?? 0; // Asignamos el costo desde la DB
-                }
-            }
+            RepoblarViewModelParaModificar(viewModel); // Necesitarás este método
 
-            // Ahora, una validación personalizada del costo total vs el precio.
-            var costoTotalCalculado = viewModel.CalcularCosto();
-            if (viewModel.Precio < costoTotalCalculado)
+            var costoTotal = viewModel.CalcularCosto();
+            if (viewModel.Precio < costoTotal)
             {
-                ModelState.AddModelError(nameof(viewModel.Precio), $"El precio no puede ser menor que el costo total de la promoción ({costoTotalCalculado:C}).");
+                ModelState.AddModelError(nameof(viewModel.Precio), $"El precio no puede ser menor que el costo total ({costoTotal:C}).");
             }
         }
-        // --- FIN DE LA CORRECCIÓN ---
 
         if (!ModelState.IsValid)
-        {
-            RepoblarViewModelParaModificar(viewModel); // Re-populamos los nombres de productos para Select2
-            return View(viewModel);
-        }
+            {
+                viewModel.EsModificable = _promocionesRepo.PuedeSerEliminada(viewModel.IdPromocion);
+                return View(viewModel);
+            }
 
         try
         {
             var promocion = _promocionesRepo.ObtenerPorId(viewModel.IdPromocion);
-            if (promocion == null) return NotFound();
+            if (promocion == null)
+            {
+                TempData["ErrorMessage"] = "No existe promocion con este id.";
+                return RedirectToAction(nameof(Index));
+            }
 
             // Verificamos si la promoción es modificable (regla de negocio)
             var esModificable = _promocionesRepo.PuedeSerEliminada(promocion.IdPromocion);
@@ -220,6 +208,7 @@ public class PromocionesController : Controller
             _logger.LogError(e, "Error al modificar la promoción con ID {Id}", viewModel.IdPromocion);
             TempData["ErrorMessage"] = "Ocurrió un error inesperado al intentar modificar la promoción.";
             RepoblarViewModelParaModificar(viewModel);
+            viewModel.EsModificable = _promocionesRepo.PuedeSerEliminada(viewModel.IdPromocion);
             return View(viewModel);
         }
     }
@@ -330,30 +319,34 @@ public class PromocionesController : Controller
         }
     }
 
-    // La acción que devuelve la vista parcial para un nuevo detalle también debe usar el ViewModel unificado.
+    [HttpGet]
     public IActionResult ObtenerVistaDetallePromocion(int index)
     {
+        // Usamos el ViewModel de Modificar para mantener la consistencia del HTML.
         var vm = new ModificarDetallePromocionVM();
-        return PartialView("_DetallePromocionItem", vm);
+        // La vista parcial debe ser la misma que usa la vista Modificar.
+        return PartialView("_ModificarDetallePromocionItem", vm);
     }
 
 
+    // --- MÉTODO DE AYUDA (similar al de Alta) ---
     private void RepoblarViewModelParaModificar(ModificarPromocionVM viewModel)
     {
-        // Repoblamos los nombres de los productos para que Select2 los muestre al recargar la página.
-        if (viewModel.DetallesPromocion != null)
+        if (viewModel.DetallesPromocion == null) return;
+
+        foreach (var detalle in viewModel.DetallesPromocion)
         {
-            foreach (var detalle in viewModel.DetallesPromocion.Where(d => d.IdProducto > 0))
+            if (detalle.IdProducto > 0 && string.IsNullOrEmpty(detalle.NombreProducto))
             {
                 var producto = _productosRepo.ObtenerPorId(detalle.IdProducto);
                 if (producto != null)
                 {
-                    detalle.IdProducto = producto.IdProducto;
                     detalle.NombreProducto = producto.Producto;
                     detalle.Costo = producto.Costo;
                 }
             }
         }
     }
+
 
 }

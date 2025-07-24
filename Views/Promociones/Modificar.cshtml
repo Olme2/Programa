@@ -45,9 +45,15 @@
                     <div class="card-header"><h4>Productos Incluidos</h4></div>
                     <div class="card-body">
                         <div id="detalles-container">
-                            @for (var i = 0; i < Model.DetallesPromocion.Count; i++)
+                            @* --- INICIO DE LA CORRECCIÓN ---
+                               Usamos un bucle 'for' y la vista parcial estándar '_ModificarDetallePromocionItem.cshtml'
+                            *@
+                            @if (Model.DetallesPromocion != null)
                             {
-                                <partial name="_ModificarDetallePromocionItem" for="DetallesPromocion[i]" />
+                                for (int i = 0; i < Model.DetallesPromocion.Count; i++)
+                                {
+                                    <partial name="_ModificarDetallePromocionItem" model="Model.DetallesPromocion[i]" />
+                                }
                             }
                         </div>
                         <button type="button" id="btn-agregar-detalle" class="btn btn-success w-100 mt-2">+ Añadir Producto</button>
@@ -92,7 +98,7 @@
 
     @* Plantilla oculta para añadir nuevas filas (usa la parcial de Alta) *@
     <div id="detalle-template" style="display: none;">
-        <partial name="_DetallePromocionItem" model="new DetallesPromocionesVM.AltaDetallePromocionVM()" view-data='new ViewDataDictionary(ViewData) { { "index", "__INDEX__" } }' />
+        <partial name="_DetallePromocionItem" model="new DetallesPromocionesVM.ModificarDetallePromocionVM()" view-data='new ViewDataDictionary(ViewData) { { "index", "__INDEX__" } }' />
     </div>
 
     @section Scripts {
@@ -109,7 +115,7 @@
                         url: '@Url.Action("BuscarProductosParaPromocion", "Promociones")',
                         dataType: 'json',
                         delay: 250,
-                        data: function(params) {
+                        data: function (params) {
                             let idsSeleccionados = [];
                             $('.producto-search').not(element).each(function() {
                                 let val = $(this).val();
@@ -142,47 +148,27 @@
                 $('#porcentaje-ganancia-display').text(porcentajeGanancia.toLocaleString('es-AR', { style: 'percent', minimumFractionDigits: 2 }));
             }
 
-            function actualizarBotonesEliminar() {
+            function actualizarVisibilidadBotonEliminar() {
                 const filas = detallesContainer.find('.detalle-item');
                 filas.find('.btn-eliminar-detalle').prop('disabled', filas.length <= 1);
             }
 
             function reindexarFilas() {
                 detallesContainer.find('.detalle-item').each(function(index) {
-                    $(this).find('[name^="DetallesPromocion"]').each(function() {
+                    $(this).find('input, select').each(function() {
                         const oldName = $(this).attr('name');
                         if (oldName) {
-                            const newName = oldName.replace(/\[\d+\]/, `[${index}]`);
+                            const propertyName = oldName.substring(oldName.lastIndexOf('.') + 1);
+                            const newName = `DetallesPromocion[${index}].${propertyName}`;
                             $(this).attr('name', newName);
                         }
                     });
                 });
-                actualizarBotonesEliminar();
+                actualizarVisibilidadBotonEliminar();
                 recalcularTotales();
             }
 
-            // --- MANEJADORES DE EVENTOS DELEGADOS (LA CLAVE DE LA SOLUCIÓN) ---
-
-            // 1. Cuando se SELECCIONA un producto (para filas nuevas y existentes)
-            detallesContainer.on('select2:select', '.producto-search', function (e) {
-                const data = e.params.data;
-                const costo = data.costo || 0;
-                // Busca el input de costo DENTRO de la fila actual y actualiza su valor.
-                $(this).closest('.detalle-item').find('.costo-producto-unitario').val(costo);
-                recalcularTotales();
-            });
-
-            // 2. Cuando se CAMBIA la cantidad (para filas nuevas y existentes)
-            detallesContainer.on('input', '.cantidad-producto', recalcularTotales);
-
-            // 3. Cuando se ELIMINA una fila
-            detallesContainer.on('click', '.btn-eliminar-detalle', function () {
-                $(this).closest('.detalle-item').remove();
-                reindexarFilas();
-            });
-
-            // --- FIN DE MANEJADORES DE EVENTOS ---
-
+            // --- MANEJADORES DE EVENTOS ---
             $('#btn-agregar-detalle').click(function () {
                 const nuevoIndex = detallesContainer.find('.detalle-item').length;
                 $.get('@Url.Action("ObtenerVistaDetallePromocion", "Promociones")', { index: nuevoIndex }, function (data) {
@@ -193,13 +179,26 @@
                 });
             });
 
+            detallesContainer.on('click', '.btn-eliminar-detalle', function () {
+                $(this).closest('.detalle-item').remove();
+                reindexarFilas();
+            });
+            
+            detallesContainer.on('select2:select', '.producto-search', function (e) {
+                const data = e.params.data;
+                const costo = data.costo || 0;
+                $(this).closest('.detalle-item').find('.costo-producto-unitario').val(costo);
+                recalcularTotales();
+            });
+
+            detallesContainer.on('input', '.cantidad-producto', recalcularTotales);
             $('#Precio').on('input', recalcularTotales);
 
-            // --- INICIALIZACIÓN AL CARGAR LA PÁGINA ---
+            // --- INICIALIZACIÓN ---
             detallesContainer.find('.producto-search').each(function() {
                 inicializarSelect2($(this));
             });
-            reindexarFilas(); // Llama a recalcular y actualizar botones
+            reindexarFilas(); // Es importante llamarla al inicio para calcular todo.
         });
     </script>
 }
