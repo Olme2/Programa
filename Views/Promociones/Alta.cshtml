@@ -119,11 +119,11 @@
             function inicializarSelect2(element) {
                 element.select2({
                     placeholder: 'Buscar producto...',
-                    minimumInputLength: 0,
+                    minimumInputLength: 2,
                     ajax: {
                         url: '@Url.Action("BuscarProductosParaPromocion", "Promociones")',
                         dataType: 'json',
-                        delay: 0,
+                        delay: 250,
                         data: function (params) {
                             let idsSeleccionados = [];
                             $('.producto-search').not(element).each(function() {
@@ -162,16 +162,12 @@
                 filas.find('.btn-eliminar-detalle').prop('disabled', filas.length <= 1);
             }
 
-            // --- INICIO DE LA CORRECCIÓN CLAVE ---
             function reindexarFilas() {
                 detallesContainer.find('.detalle-item').each(function(index) {
-                    // Reconstruimos los nombres de todos los inputs/selects dentro de la fila
                     $(this).find('input, select').each(function() {
                         const oldName = $(this).attr('name');
                         if (oldName) {
-                            // Extraemos el nombre de la propiedad (ej: "IdProducto")
                             const propertyName = oldName.substring(oldName.lastIndexOf('.') + 1);
-                            // Construimos el nuevo nombre con el prefijo y el índice correcto
                             const newName = `DetallesPromocion[${index}].${propertyName}`;
                             $(this).attr('name', newName);
                         }
@@ -180,8 +176,8 @@
                 actualizarVisibilidadBotonEliminar();
                 recalcularTotales();
             }
-            // --- FIN DE LA CORRECCIÓN CLAVE ---
 
+            // --- MANEJADORES DE EVENTOS ---
             $('#btn-agregar-detalle').click(function () {
                 const nuevoIndex = detallesContainer.find('.detalle-item').length;
                 $.get('@Url.Action("ObtenerVistaDetallePromocion", "Promociones")', { index: nuevoIndex }, function (data) {
@@ -207,7 +203,7 @@
             detallesContainer.on('input', '.cantidad-producto', recalcularTotales);
             $('#Precio').on('input', recalcularTotales);
 
-            // Inicialización al cargar la página
+            // --- INICIALIZACIÓN ---
             detallesContainer.find('.producto-search').each(function() {
                 inicializarSelect2($(this));
             });
