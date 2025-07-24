@@ -15,17 +15,24 @@ public class AltaPromocionVM : IValidatableObject
     public DateOnly Inicio { get; set; }
     public DateOnly? Fin { get; set; }
     [MinLength(1, ErrorMessage = "La promoción debe tener al menos un producto.")]
-    public List<AltaDetallePromocionVM> DetallesPromocion { get; set; }
+   // --- INICIO DE LA CORRECCIÓN ---
+    // Cambiamos el tipo de la lista para usar el ViewModel más completo.
+    public List<ModificarDetallePromocionVM> DetallesPromocion { get; set; }
+    // --- FIN DE LA CORRECCIÓN ---
+
     public List<ListarProductosVM> Productos { get; set; }
 
     public AltaPromocionVM()
     {
         Promocion = string.Empty;
         Inicio = DateOnly.FromDateTime(DateTime.Now);
-        DetallesPromocion = new List<AltaDetallePromocionVM>();
+        DetallesPromocion = new List<ModificarDetallePromocionVM>();
         Productos = new List<ListarProductosVM>();
     }
-
+    public decimal CalcularCosto()
+    {
+        return DetallesPromocion?.Sum(d => d.Cantidad * d.Costo) ?? 0;
+    }
     public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
     {
         // Lógica para verificar duplicados

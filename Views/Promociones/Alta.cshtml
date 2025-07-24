@@ -6,7 +6,9 @@
 <form asp-action="Alta" method="post" id="form-promocion">
     <h1>Crear Nueva Promoción</h1>
     <hr />
+    <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
     <input asp-for="@Model.Productos" type="hidden">
+    <span ></span>
     <div class="row">
         <div class="col-md-7">
             <div class="card shadow-sm mb-4">
@@ -42,10 +44,17 @@
                 </div>
                 <div class="card-body">
                     <div id="detalles-container">
-                        @for (var i = 0; i < Model.DetallesPromocion.Count; i++)
+                        @* Usamos un bucle 'for' para asegurar la correcta indexación de los campos. *@
+                        @if (Model.DetallesPromocion != null)
                         {
-                            @* Esto renderiza la primera fila inicial *@
-                            <partial name="_DetallePromocionItem" model="Model.DetallesPromocion[i]" view-data='new ViewDataDictionary(ViewData) { { "index", i } }' />
+                            for (int i = 0; i < Model.DetallesPromocion.Count; i++)
+                            {
+                                @*
+                                    Le pasamos a la vista parcial el objeto del detalle y el índice.
+                                    El prefijo del nombre se generará automáticamente como "DetallesPromocion[i]".
+                                *@
+                                <partial name="_DetallePromocionItem" for="DetallesPromocion[i]" />
+                            }
                         }
                     </div>
                     
@@ -99,157 +108,110 @@
 </form>
 
 
+@* Archivo: Views/Promociones/Alta.cshtml (reemplazar la sección @section Scripts) *@
+
 @section Scripts {
-    @{
-        await Html.RenderPartialAsync("_ValidationScriptsPartial");
-    }
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        $(document).ready(function() {
+            const detallesContainer = $('#detalles-container');
 
-    <script type="text/javascript">
-        $(document).ready(function () {
-
-            // --- FUNCIÓN CENTRAL DE CÁLCULO (Mejorada para leer números con coma) ---
-            function recalcularTotales(origenDelCambio) {
-                let costoTotal = 0;
-                let precioTexto = $('#Precio').val() || '0';
-                let precioPromocion = parseFloat(precioTexto.replace(',', '.')) || 0;
-
-                $('.detalle-item').each(function () {
-                    const fila = $(this);
-                    const selectProducto = fila.find('.producto-search');
-                    const inputCantidad = fila.find('.cantidad-producto');
-                    const costoUnitario = parseFloat(selectProducto.data('costo')) || 0;
-                    
-                    // Leemos la cantidad, reemplazando la coma por un punto para que JS lo entienda siempre.
-                    const cantidadTexto = inputCantidad.val() || '0';
-                    const cantidad = parseFloat(cantidadTexto.replace(',', '.')) || 0;
-                    const costoDetalle = costoUnitario * cantidad;
-
-                    fila.find('.costo-detalle-display').text(costoDetalle.toLocaleString('es-AR', { style: 'currency', currency: 'ARS' }));
-                    costoTotal += costoDetalle;
-                });
-                
-                if (origenDelCambio !== 'precio' && precioPromocion <= costoTotal) {
-                    precioPromocion = costoTotal + 1;
-                    $('#Precio').val(precioPromocion.toFixed(2));
-                }
-
-                const ganancia = precioPromocion - costoTotal;
-                const porcentajeGanancia = costoTotal > 0 ? (ganancia / costoTotal) * 100 : 0;
-                
-                $('#costo-total-display').text(costoTotal.toLocaleString('es-AR', { style: 'currency', currency: 'ARS' }));
-                $('#ganancia-total-display').text(ganancia.toLocaleString('es-AR', { style: 'currency', currency: 'ARS' }));
-                $('#porcentaje-ganancia-display').text(porcentajeGanancia.toFixed(2).replace('.', ',') + '%');
-            }
-
-            // --- MANEJADOR DE ENVÍO DEL FORMULARIO (LA SOLUCIÓN PRINCIPAL) ---
-            $('#form-promocion').on('submit', function(e) {
-                
-                // 1. Limpiamos el campo de precio para asegurar el formato correcto
-                const precioInput = $('#Precio');
-                if (precioInput.val()) {
-                    const valorNeutralPrecio = precioInput.val().replace(',', '.');
-                    precioInput.val(valorNeutralPrecio);
-                }
-
-                // 2. Iteramos por cada fila de detalle para limpiar la CANTIDAD
-                $('.detalle-item').each(function() {
-                    const fila = $(this);
-                    const selectProducto = fila.find('.producto-search');
-                    const cantidadInput = fila.find('.cantidad-producto');
-
-                    // Si la fila no tiene producto, la eliminamos
-                    if (!selectProducto.val() || selectProducto.val() === "0") {
-                        fila.remove();
-                    } else {
-                        // ¡LA SOLUCIÓN! Limpiamos el campo de cantidad de esta fila
-                        if (cantidadInput.val()) {
-                            const valorNeutralCantidad = cantidadInput.val().replace(',', '.');
-                            cantidadInput.val(valorNeutralCantidad);
-                        }
-                    }
-                });
-
-                // 3. Re-indexamos las filas restantes
-                reindexarFilas();
-            });
-
-            // (El resto de funciones como inicializarSelect2, añadir/eliminar, etc., no cambian)
-            function inicializarSelect2(selector) {
-                selector.select2({
-                    placeholder: "-- Buscar producto --",
+            function inicializarSelect2(element) {
+                element.select2({
+                    placeholder: 'Buscar producto...',
+                    minimumInputLength: 0,
                     ajax: {
                         url: '@Url.Action("BuscarProductosParaPromocion", "Promociones")',
                         dataType: 'json',
                         delay: 0,
                         data: function (params) {
-                            var idsExcluidos = [];
-                            var currentSelect = $(this);
-                            $('.producto-search').not(currentSelect).each(function() {
-                                var selectedId = $(this).val();
-                                if (selectedId) { idsExcluidos.push(selectedId); }
+                            let idsSeleccionados = [];
+                            $('.producto-search').not(element).each(function() {
+                                let val = $(this).val();
+                                if (val) { idsSeleccionados.push(val); }
                             });
-                            return { term: params.term, excluir: idsExcluidos };
+                            return { term: params.term, idsExcluidos: idsSeleccionados };
                         },
-                        processResults: function (data) { return { results: data }; },
-                        cache: true
+                        processResults: function (data) { return { results: data }; }
                     }
-                }).on('select2:select', function (e) {
-                    $(this).data('costo', e.params.data.costo);
-                    recalcularTotales('detalle');
                 });
             }
 
-            $('#btn-agregar-detalle').on('click', function() {
-                const container = $('#detalles-container');
-                const nuevoIndex = container.find('.detalle-item').length;
-                $.get('@Url.Action("ObtenerVistaDetallePromocion")', { index: nuevoIndex }, function(nuevaFilaHtml) {
-                    const nuevaFila = $(nuevaFilaHtml);
-                    container.append(nuevaFila);
-                    inicializarSelect2(nuevaFila.find('.producto-search'));
-                    actualizarVisibilidadBotonEliminar();
+            function recalcularTotales() {
+                let costoTotal = 0;
+                detallesContainer.find('.detalle-item').each(function() {
+                    const row = $(this);
+                    const costoUnitario = parseFloat(row.find('.costo-producto-unitario').val()) || 0;
+                    const cantidad = parseFloat(row.find('.cantidad-producto').val()) || 0;
+                    const costoDetalle = costoUnitario * cantidad;
+                    costoTotal += costoDetalle;
+                    row.find('.costo-detalle-display').text(costoDetalle.toLocaleString('es-AR', { style: 'currency', currency: 'ARS' }));
                 });
-            });
 
-            $('#detalles-container').on('click', '.btn-eliminar-detalle', function () {
-                $(this).closest('.detalle-item').remove();
-                reindexarFilas();
-                actualizarVisibilidadBotonEliminar();
-                recalcularTotales('detalle');
-            });
+                const precioPromocion = parseFloat(String($('#Precio').val()).replace(',', '.')) || 0;
+                const ganancia = precioPromocion - costoTotal;
+                const porcentajeGanancia = costoTotal > 0 ? (ganancia / costoTotal) : 0;
 
-            function reindexarFilas() {
-                $('#detalles-container .detalle-item').each(function(index, item) {
-                    $(item).find('[name^="DetallesPromocion"]').each(function() {
-                        const oldName = $(this).attr('name');
-                        const newName = oldName.replace(/\[\d+\]/, `[${index}]`);
-                        $(this).attr('name', newName);
-                    });
-                });
+                $('#costo-total-display').text(costoTotal.toLocaleString('es-AR', { style: 'currency', currency: 'ARS' }));
+                $('#ganancia-total-display').text(ganancia.toLocaleString('es-AR', { style: 'currency', currency: 'ARS' }));
+                $('#porcentaje-ganancia-display').text(porcentajeGanancia.toLocaleString('es-AR', { style: 'percent', minimumFractionDigits: 2 }));
             }
 
             function actualizarVisibilidadBotonEliminar() {
-                const filas = $('#detalles-container .detalle-item');
-                filas.find('.btn-eliminar-detalle').toggle(filas.length > 1);
+                const filas = detallesContainer.find('.detalle-item');
+                filas.find('.btn-eliminar-detalle').prop('disabled', filas.length <= 1);
             }
-            
-            $('#form-promocion').on('keydown', '.cantidad-producto', function(e) {
-                if (e.key === 'Enter') {
-                    e.preventDefault();
-                    $(this).trigger('change');
-                }
+
+            // --- INICIO DE LA CORRECCIÓN CLAVE ---
+            function reindexarFilas() {
+                detallesContainer.find('.detalle-item').each(function(index) {
+                    // Reconstruimos los nombres de todos los inputs/selects dentro de la fila
+                    $(this).find('input, select').each(function() {
+                        const oldName = $(this).attr('name');
+                        if (oldName) {
+                            // Extraemos el nombre de la propiedad (ej: "IdProducto")
+                            const propertyName = oldName.substring(oldName.lastIndexOf('.') + 1);
+                            // Construimos el nuevo nombre con el prefijo y el índice correcto
+                            const newName = `DetallesPromocion[${index}].${propertyName}`;
+                            $(this).attr('name', newName);
+                        }
+                    });
+                });
+                actualizarVisibilidadBotonEliminar();
+                recalcularTotales();
+            }
+            // --- FIN DE LA CORRECCIÓN CLAVE ---
+
+            $('#btn-agregar-detalle').click(function () {
+                const nuevoIndex = detallesContainer.find('.detalle-item').length;
+                $.get('@Url.Action("ObtenerVistaDetallePromocion", "Promociones")', { index: nuevoIndex }, function (data) {
+                    const nuevaFila = $(data);
+                    detallesContainer.append(nuevaFila);
+                    inicializarSelect2(nuevaFila.find('.producto-search'));
+                    reindexarFilas();
+                });
             });
 
-            $('#Precio').on('input', function() {
-                recalcularTotales('precio');
-            });
-
-            $('#detalles-container').on('input', '.cantidad-producto', function() {
-                 recalcularTotales('detalle');
+            detallesContainer.on('click', '.btn-eliminar-detalle', function () {
+                $(this).closest('.detalle-item').remove();
+                reindexarFilas();
             });
             
-            inicializarSelect2($('.producto-search'));
-            actualizarVisibilidadBotonEliminar();
-            recalcularTotales('detalle');
+            detallesContainer.on('select2:select', '.producto-search', function (e) {
+                const data = e.params.data;
+                const costo = data.costo || 0;
+                $(this).closest('.detalle-item').find('.costo-producto-unitario').val(costo);
+                recalcularTotales();
+            });
+
+            detallesContainer.on('input', '.cantidad-producto', recalcularTotales);
+            $('#Precio').on('input', recalcularTotales);
+
+            // Inicialización al cargar la página
+            detallesContainer.find('.producto-search').each(function() {
+                inicializarSelect2($(this));
+            });
+            reindexarFilas();
         });
     </script>
 }

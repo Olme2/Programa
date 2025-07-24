@@ -35,19 +35,30 @@ public class PromocionesController : Controller
     public IActionResult Alta()
     {
         var viewModel = new AltaPromocionVM();
-        viewModel.DetallesPromocion.Add(new AltaDetallePromocionVM());
+        // Agregamos un detalle vacío por defecto para que el usuario pueda empezar a cargar.
+        viewModel.DetallesPromocion.Add(new ModificarDetallePromocionVM());
         return View(viewModel);
     }
+
 
     [HttpPost]
     [ValidateAntiForgeryToken]
     public IActionResult Alta(AltaPromocionVM viewModel)
     {
-            // Esta validación se mantiene para los [Required], [Range], etc.
-        if (!ModelState.IsValid)
+        // --- INICIO DE LA CORRECCIÓN ---
+        // Antes de validar, rehidratamos los datos que no vienen del formulario.
+        if (viewModel.DetallesPromocion != null)
         {
-            return View(viewModel);
+            RepoblarViewModelParaAlta(viewModel);
+    
+            var costoTotal = viewModel.CalcularCosto();
+            if (viewModel.Precio < costoTotal)
+            {
+                ModelState.AddModelError(nameof(viewModel.Precio), $"El precio no puede ser menor que el costo total ({costoTotal:C}).");
+            }
         }
+    // --- FIN DE LA CORRECCIÓN ---
+
 
         // --- VALIDACIÓN MANUAL DE PRECIO vs COSTO (AQUÍ ESTÁ LA SOLUCIÓN) ---
         try
@@ -97,6 +108,25 @@ public class PromocionesController : Controller
             _logger.LogError(e, "Error al crear la promoción.");
             TempData["ErrorMessage"] = "Ocurrió un error al crear la promoción.";
             return View(viewModel);
+        }
+    }
+    // --- NUEVO MÉTODO DE AYUDA ---
+    private void RepoblarViewModelParaAlta(AltaPromocionVM viewModel)
+    {
+        if (viewModel.DetallesPromocion == null) return;
+
+        foreach (var detalle in viewModel.DetallesPromocion)
+        {
+            if (detalle.IdProducto > 0)
+            {
+                var producto = _productosRepo.ObtenerPorId(detalle.IdProducto);
+                if (producto != null)
+                {
+                    // ¡Aquí está la magia! Rellenamos nombre y costo.
+                    detalle.NombreProducto = producto.Producto;
+                    detalle.Costo = producto.Costo;
+                }
+            }
         }
     }
 
@@ -300,12 +330,13 @@ public class PromocionesController : Controller
         }
     }
 
-    [HttpGet]
+    // La acción que devuelve la vista parcial para un nuevo detalle también debe usar el ViewModel unificado.
     public IActionResult ObtenerVistaDetallePromocion(int index)
     {
-        ViewData["index"] = index;
-        return PartialView("Views/Shared/_DetallePromocionItem.cshtml", new AltaDetallePromocionVM());
+        var vm = new ModificarDetallePromocionVM();
+        return PartialView("_DetallePromocionItem", vm);
     }
+
 
     private void RepoblarViewModelParaModificar(ModificarPromocionVM viewModel)
     {
