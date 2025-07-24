@@ -45,14 +45,11 @@
                     <div class="card-header"><h4>Productos Incluidos</h4></div>
                     <div class="card-body">
                         <div id="detalles-container">
-                            @* --- INICIO DE LA CORRECCIÓN ---
-                               Usamos un bucle 'for' y la vista parcial estándar '_ModificarDetallePromocionItem.cshtml'
-                            *@
-                            @if (Model.DetallesPromocion != null)
+                           @if (Model.DetallesPromocion != null)
                             {
                                 for (int i = 0; i < Model.DetallesPromocion.Count; i++)
                                 {
-                                    <partial name="_ModificarDetallePromocionItem" model="Model.DetallesPromocion[i]" />
+                                    <partial name="Partials/_DetallePromocionItem" model="Model.DetallesPromocion[i]" />
                                 }
                             }
                         </div>
@@ -96,9 +93,8 @@
         </div>
     </form>
 
-    @* Plantilla oculta para añadir nuevas filas (usa la parcial de Alta) *@
     <div id="detalle-template" style="display: none;">
-        <partial name="_DetallePromocionItem" model="new DetallesPromocionesVM.ModificarDetallePromocionVM()" view-data='new ViewDataDictionary(ViewData) { { "index", "__INDEX__" } }' />
+        <partial name="Partials/_DetallePromocionItem" model="new DetallesPromocionesVM.DetallePromocionVM()" view-data='new ViewDataDictionary(ViewData) { { "index", "__INDEX__" } }' />
     </div>
 
     @section Scripts {
@@ -346,4 +342,3 @@ else
         </script>
     }
 }
-

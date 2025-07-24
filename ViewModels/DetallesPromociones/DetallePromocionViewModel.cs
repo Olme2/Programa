@@ -2,7 +2,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace DetallesPromocionesVM;
 
-public class ModificarDetallePromocionVM
+public class DetallePromocionVM
 {
     [Required(ErrorMessage = "Debe seleccionar un producto.")]
     [Range(1, int.MaxValue, ErrorMessage = "Debe seleccionar un producto válido.")]
@@ -16,9 +16,9 @@ public class ModificarDetallePromocionVM
 
     public decimal Costo { get; set; }
 
-    public ModificarDetallePromocionVM() { }
+    public DetallePromocionVM() { }
 
-    public ModificarDetallePromocionVM(DetallesPromociones detalle)
+    public DetallePromocionVM(DetallesPromociones detalle)
     {
         IdProducto = detalle.IdProducto;
         Cantidad = detalle.Cantidad;

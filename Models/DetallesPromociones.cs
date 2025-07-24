@@ -16,11 +16,7 @@ public class DetallesPromociones
         Cantidad = cantidad;
         Producto = null!;
     }
-    public static DetallesPromociones CrearDesdeViewModel(AltaDetallePromocionVM detalleVM)
-    {
-        return new DetallesPromociones(detalleVM.IdProducto, detalleVM.Cantidad);
-    }
-    public static DetallesPromociones CrearDesdeViewModel(ModificarDetallePromocionVM detalleVM)
+    public static DetallesPromociones CrearDesdeViewModel(DetallePromocionVM detalleVM)
     {
         return new DetallesPromociones(detalleVM.IdProducto, detalleVM.Cantidad);
     }

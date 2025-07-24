@@ -17,7 +17,7 @@ public class AltaPromocionVM : IValidatableObject
     [MinLength(1, ErrorMessage = "La promoción debe tener al menos un producto.")]
    // --- INICIO DE LA CORRECCIÓN ---
     // Cambiamos el tipo de la lista para usar el ViewModel más completo.
-    public List<ModificarDetallePromocionVM> DetallesPromocion { get; set; }
+    public List<DetallePromocionVM> DetallesPromocion { get; set; }
     // --- FIN DE LA CORRECCIÓN ---
 
     public List<ListarProductosVM> Productos { get; set; }
@@ -26,7 +26,7 @@ public class AltaPromocionVM : IValidatableObject
     {
         Promocion = string.Empty;
         Inicio = DateOnly.FromDateTime(DateTime.Now);
-        DetallesPromocion = new List<ModificarDetallePromocionVM>();
+        DetallesPromocion = new List<DetallePromocionVM>();
         Productos = new List<ListarProductosVM>();
     }
     public decimal CalcularCosto()

@@ -18,7 +18,7 @@ public class ModificarPromocionVM : IValidatableObject
     public DateOnly Inicio { get; set; }
     public DateOnly? Fin { get; set; }
     [MinLength(1, ErrorMessage = "La promoción debe tener al menos un producto.")]
-    public List<ModificarDetallePromocionVM> DetallesPromocion { get; set; }
+    public List<DetallePromocionVM> DetallesPromocion { get; set; }
     // Propiedad para la lista de TODOS los productos disponibles.
     public bool EsEliminable { get; set; }
     public bool EsModificable { get; set; }
@@ -26,7 +26,7 @@ public class ModificarPromocionVM : IValidatableObject
     public ModificarPromocionVM()
     {
         Promocion = string.Empty;
-        DetallesPromocion = new List<ModificarDetallePromocionVM>();
+        DetallesPromocion = new List<DetallePromocionVM>();
         Productos = new List<ListarProductosVM>();
     }
     // Constructor que mapea la entidad al ViewModel.
@@ -37,7 +37,7 @@ public class ModificarPromocionVM : IValidatableObject
         Precio = promocion.Precio;
         Inicio = promocion.Inicio;
         Fin = promocion.Fin;
-        DetallesPromocion = promocion.DetallesPromocion.Select(d => new ModificarDetallePromocionVM(d)).ToList();
+        DetallesPromocion = promocion.DetallesPromocion.Select(d => new DetallePromocionVM(d)).ToList();
     }
     public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
     {

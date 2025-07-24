@@ -36,7 +36,7 @@ public class PromocionesController : Controller
     {
         var viewModel = new AltaPromocionVM();
         // Agregamos un detalle vacío por defecto para que el usuario pueda empezar a cargar.
-        viewModel.DetallesPromocion.Add(new ModificarDetallePromocionVM());
+        viewModel.DetallesPromocion.Add(new DetallePromocionVM());
         return View(viewModel);
     }
 
@@ -323,9 +323,9 @@ public class PromocionesController : Controller
     public IActionResult ObtenerVistaDetallePromocion(int index)
     {
         // Usamos el ViewModel de Modificar para mantener la consistencia del HTML.
-        var vm = new ModificarDetallePromocionVM();
+        var vm = new DetallePromocionVM();
         // La vista parcial debe ser la misma que usa la vista Modificar.
-        return PartialView("_ModificarDetallePromocionItem", vm);
+        return PartialView("Partials/_DetallePromocionItem", vm);
     }
 
 
