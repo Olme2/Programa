@@ -106,11 +106,11 @@
             function inicializarSelect2(element) {
                 element.select2({
                     placeholder: 'Buscar producto...',
-                    minimumInputLength: 2,
+                    minimumInputLength: 0,
                     ajax: {
                         url: '@Url.Action("BuscarProductosParaPromocion", "Promociones")',
                         dataType: 'json',
-                        delay: 250,
+                        delay: 0,
                         data: function (params) {
                             let idsSeleccionados = [];
                             $('.producto-search').not(element).each(function() {
