@@ -96,94 +96,104 @@
     </div>
 
     @section Scripts {
-        @{ await Html.RenderPartialAsync("_ValidationScriptsPartial"); }
+        <partial name="_ValidationScriptsPartial" />
         <script>
-            // Script completo para la versión dinámica, idéntico al de Alta.
-            $(document).ready(function () {
-                function parseLocalFloat(valor) { if (!valor) return 0; return parseFloat(String(valor).replace(',', '.')) || 0; }
-                function recalcularTotales(origenDelCambio) {
-                    let costoTotal = 0;
-                    let precioPromocion = parseLocalFloat($('#Precio').val());
-                    $('.detalle-item').each(function () {
-                        const costoUnitario = parseLocalFloat($(this).find('.producto-search').data('costo'));
-                        const cantidad = parseLocalFloat($(this).find('.cantidad-producto').val());
-                        const costoDetalle = costoUnitario * cantidad;
-                        $(this).find('.costo-detalle-display').text(costoDetalle.toLocaleString('es-AR', { style: 'currency', currency: 'ARS' }));
-                        costoTotal += costoDetalle;
+            $(document).ready(function() {
+                let detalleIndex = $('#detalles-container .detalle-item').length;
+
+                function inicializarSelect2(element) {
+                    element.select2({
+                        placeholder: 'Buscar producto...',
+                        minimumInputLength: 0,
+                        ajax: {
+                            url: '@Url.Action("BuscarProductosParaPromocion", "Promociones")',
+                            dataType: 'json',
+                            delay: 0,
+                            data: function (params) {
+                                // Excluir productos ya seleccionados
+                                let idsSeleccionados = [];
+                                $('.producto-search').each(function() {
+                                    let val = $(this).val();
+                                    if (val) {
+                                        idsSeleccionados.push(val);
+                                    }
+                                });
+                                return {
+                                    term: params.term,
+                                    idsExcluidos: idsSeleccionados
+                                };
+                            },
+                            processResults: function (data) {
+                                return { results: data };
+                            }
+                        }
+                    }).on('select2:select', function (e) {
+                        let data = e.params.data;
+                        let costo = data.costo || 0;
+                        let row = $(this).closest('.detalle-item');
+                        row.find('.costo-producto-unitario').val(costo);
+                        recalcularTotales();
                     });
-                    if (origenDelCambio !== 'precio' && precioPromocion <= costoTotal) {
-                        precioPromocion = costoTotal + 1;
-                        $('#Precio').val(precioPromocion.toFixed(2));
-                    }
-                    const ganancia = precioPromocion - costoTotal;
-                    const porcentajeGanancia = costoTotal > 0 ? (ganancia / costoTotal) : 0;
+                }
+
+                function recalcularTotales() {
+                    let costoTotal = 0;
+                    $('#detalles-container .detalle-item').each(function() {
+                        let row = $(this);
+                        let costoUnitario = parseFloat(row.find('.costo-producto-unitario').val()) || 0;
+                        let cantidad = parseFloat(row.find('.cantidad-producto').val()) || 0;
+                        let costoDetalle = costoUnitario * cantidad;
+                        costoTotal += costoDetalle;
+                        row.find('.costo-detalle-display').text(costoDetalle.toLocaleString('es-AR', { style: 'currency', currency: 'ARS' }));
+                    });
+
+                    let precioPromocion = parseFloat(String($('#Precio').val()).replace(',', '.')) || 0;
+                    let ganancia = precioPromocion - costoTotal;
+                    let porcentajeGanancia = costoTotal > 0 ? (ganancia / costoTotal) : 0;
+
                     $('#costo-total-display').text(costoTotal.toLocaleString('es-AR', { style: 'currency', currency: 'ARS' }));
                     $('#ganancia-total-display').text(ganancia.toLocaleString('es-AR', { style: 'currency', currency: 'ARS' }));
                     $('#porcentaje-ganancia-display').text(porcentajeGanancia.toLocaleString('es-AR', { style: 'percent', minimumFractionDigits: 2 }));
                 }
-                function inicializarSelect2(selector) {
-                    if (selector.hasClass("select2-hidden-accessible")) { selector.select2('destroy'); }
-                    selector.select2({
-                        placeholder: "-- Buscar producto --",
-                        ajax: {
-                            url: '@Url.Action("BuscarProductosParaPromocion", "Promociones")',
-                            dataType: 'json',
-                            delay: 250,
-                            data: function (params) {
-                                var idsExcluidos = [];
-                                $('.producto-search').not($(this)).each(function () { if ($(this).val()) { idsExcluidos.push($(this).val()); } });
-                                return { term: params.term, excluir: idsExcluidos };
-                            },
-                            processResults: function (data) { return { results: data }; }
-                        }
-                    }).on('select2:select', function (e) {
-                        $(this).data('costo', e.params.data.costo);
-                        recalcularTotales('detalle');
+
+                $('#btn-agregar-detalle').click(function () {
+                    $.get('@Url.Action("ObtenerVistaDetallePromocion")', { index: detalleIndex }, function (data) {
+                        $('#detalles-container').append(data);
+                        inicializarSelect2($(`[name="DetallesPromocion[${detalleIndex}].IdProducto"]`));
+                        detalleIndex++;
+                        reindexarFilas();
                     });
-                }
-                $('#btn-agregar-detalle').on('click', function () {
-                    const container = $('#detalles-container');
-                    const nuevoIndex = container.find('.detalle-item').length;
-                    const templateHtml = $('#detalle-template').html().replace(/__INDEX__/g, nuevoIndex);
-                    const nuevaFila = $(templateHtml);
-                    container.append(nuevaFila);
-                    inicializarSelect2(nuevaFila.find('.producto-search'));
-                    actualizarVisibilidadBotonEliminar();
                 });
+
                 $('#detalles-container').on('click', '.btn-eliminar-detalle', function () {
-                    $(this).closest('.row').remove();
+                    $(this).closest('.detalle-item').remove();
                     reindexarFilas();
-                    actualizarVisibilidadBotonEliminar();
-                    recalcularTotales('detalle');
                 });
+
                 function reindexarFilas() {
-                    $('#detalles-container .detalle-item').each(function (index, item) {
-                        $(item).find('[name^="DetallesPromocion"]').each(function () {
-                            this.name = this.name.replace(/\[\d+\]/, `[${index}]`);
+                    $('#detalles-container .detalle-item').each(function(index, item) {
+                        $(item).find('[name^="DetallesPromocion"]').each(function() {
+                            const oldName = $(this).attr('name');
+                            if (oldName) {
+                                const newName = oldName.replace(/\[\d+\]/, `[${index}]`);
+                                $(this).attr('name', newName);
+                            }
                         });
                     });
+                    detalleIndex = $('#detalles-container .detalle-item').length;
+                    recalcularTotales();
                 }
-                function actualizarVisibilidadBotonEliminar() {
-                    const filas = $('#detalles-container .detalle-item');
-                    filas.find('.btn-eliminar-detalle').toggle(filas.length > 1);
-                }
-                $('#form-promocion').on('submit', function (e) {
-                    $('#Precio, .cantidad-producto').each(function () {
-                        const input = $(this);
-                        if (input.val()) { input.val(input.val().replace(',', '.')); }
-                    });
-                    $('.detalle-item').each(function () { if (!$(this).find('.producto-search').val()) { $(this).remove(); } });
-                    reindexarFilas();
-                });
-                $('#form-promocion').on('keydown', '.cantidad-producto', function (e) { if (e.key === 'Enter') { e.preventDefault(); $(this).trigger('change'); } });
-                $('#Precio').on('input', () => recalcularTotales('precio'));
-                $('#detalles-container').on('change', '.cantidad-producto', () => recalcularTotales('detalle'));
-                $('.producto-search').each(function () { inicializarSelect2($(this)); });
-                actualizarVisibilidadBotonEliminar();
-                recalcularTotales('detalle');
+
+                $('#Precio').on('input', recalcularTotales);
+                $('#detalles-container').on('input', '.cantidad-producto', recalcularTotales);
+        
+                // Inicialización al cargar la página
+                inicializarSelect2($('.producto-search'));
+                recalcularTotales();
             });
         </script>
     }
+
 }
 else
 {
@@ -296,35 +306,35 @@ else
         </div>
     </form>
     @section Scripts{
-    @{ await Html.RenderPartialAsync("_ValidationScriptsPartial"); }
-    <script>
-        $(document).ready(function() {
-            // 1. Obtenemos el costo total (que es fijo) desde el modelo de C# UNA SOLA VEZ.
-            //    Usamos Json.Serialize para asegurar que el número se escriba correctamente.
-            const costoTotalFijo = @Json.Serialize(Model.CalcularCosto());
+        @{ await Html.RenderPartialAsync("_ValidationScriptsPartial"); }
+        <script>
+            $(document).ready(function() {
+                // 1. Obtenemos el costo total (que es fijo) desde el modelo de C# UNA SOLA VEZ.
+                //    Usamos Json.Serialize para asegurar que el número se escriba correctamente.
+                const costoTotalFijo = @Json.Serialize(Model.CalcularCosto());
 
-            // 2. Definimos la función que se ejecutará CADA VEZ que el precio cambie.
-            function recalcularTotales() {
-                // Obtenemos el precio actual del input.
-                let precioPromocion = parseFloat(String($('#Precio').val()).replace(',', '.')) || 0;
-                
-                // Calculamos la ganancia y el porcentaje USANDO JAVASCRIPT.
-                const ganancia = precioPromocion - costoTotalFijo;
-                const porcentajeGanancia = costoTotalFijo > 0 ? (ganancia / costoTotalFijo) : 0;
-                
-                // Actualizamos los campos de texto en la vista.
-                $('#costo-total-display').text(costoTotalFijo.toLocaleString('es-AR', { style: 'currency', currency: 'ARS' }));
-                $('#ganancia-total-display').text(ganancia.toLocaleString('es-AR', { style: 'currency', currency: 'ARS' }));
-                $('#porcentaje-ganancia-display').text(porcentajeGanancia.toLocaleString('es-AR', { style: 'percent', minimumFractionDigits: 2 }));
-            }
+                // 2. Definimos la función que se ejecutará CADA VEZ que el precio cambie.
+                function recalcularTotales() {
+                    // Obtenemos el precio actual del input.
+                    let precioPromocion = parseFloat(String($('#Precio').val()).replace(',', '.')) || 0;
 
-            // 3. Vinculamos la función al evento 'input' del campo de precio.
-            $('#Precio').on('input', recalcularTotales);
+                    // Calculamos la ganancia y el porcentaje USANDO JAVASCRIPT.
+                    const ganancia = precioPromocion - costoTotalFijo;
+                    const porcentajeGanancia = costoTotalFijo > 0 ? (ganancia / costoTotalFijo) : 0;
 
-            // 4. Ejecutamos la función una vez al cargar la página para mostrar los valores iniciales.
-            recalcularTotales();
-        });
-    </script>
-}
+                    // Actualizamos los campos de texto en la vista.
+                    $('#costo-total-display').text(costoTotalFijo.toLocaleString('es-AR', { style: 'currency', currency: 'ARS' }));
+                    $('#ganancia-total-display').text(ganancia.toLocaleString('es-AR', { style: 'currency', currency: 'ARS' }));
+                    $('#porcentaje-ganancia-display').text(porcentajeGanancia.toLocaleString('es-AR', { style: 'percent', minimumFractionDigits: 2 }));
+                }
+
+                // 3. Vinculamos la función al evento 'input' del campo de precio.
+                $('#Precio').on('input', recalcularTotales);
+
+                // 4. Ejecutamos la función una vez al cargar la página para mostrar los valores iniciales.
+                recalcularTotales();
+            });
+        </script>
+    }
 }
 

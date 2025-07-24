@@ -132,82 +132,63 @@ public class PromocionesController : Controller
     [ValidateAntiForgeryToken]
     public IActionResult Modificar(ModificarPromocionVM viewModel)
     {
-        // Validación de atributos del ViewModel ([Required], etc.)
+        // --- INICIO DE LA CORRECCIÓN (BUG #2) ---
+        // Antes de validar, debemos "rehidratar" el costo en el ViewModel,
+        // ya que este valor no se envía desde el cliente y es crucial para la validación.
+        if (viewModel.DetallesPromocion != null)
+        {
+            foreach (var detalle in viewModel.DetallesPromocion)
+            {
+                if (detalle.IdProducto > 0)
+                {
+                    var producto = _productosRepo.ObtenerPorId(detalle.IdProducto);
+                    detalle.Costo = producto?.Costo ?? 0; // Asignamos el costo desde la DB
+                }
+            }
+
+            // Ahora, una validación personalizada del costo total vs el precio.
+            var costoTotalCalculado = viewModel.CalcularCosto();
+            if (viewModel.Precio < costoTotalCalculado)
+            {
+                ModelState.AddModelError(nameof(viewModel.Precio), $"El precio no puede ser menor que el costo total de la promoción ({costoTotalCalculado:C}).");
+            }
+        }
+        // --- FIN DE LA CORRECCIÓN ---
+
         if (!ModelState.IsValid)
         {
-            TempData["ErrorMessage"] = "Por favor, corrige los errores e intenta de nuevo.";
-            // Repoblamos el VM para que la vista se muestre correctamente
-            RepoblarViewModelParaModificar(viewModel);
+            RepoblarViewModelParaModificar(viewModel); // Re-populamos los nombres de productos para Select2
             return View(viewModel);
         }
 
         try
         {
             var promocion = _promocionesRepo.ObtenerPorId(viewModel.IdPromocion);
-            if (promocion == null)
-            {
-                TempData["ErrorMessage"] = "No existe promocion con ese id.";
-                return RedirectToAction(nameof(Index));
-            }
+            if (promocion == null) return NotFound();
 
-            // --- VALIDACIÓN MANUAL DE PRECIO vs COSTO ---
-            decimal costoTotalReal = 0;
-            bool esModificable = _promocionesRepo.PuedeSerEliminada(viewModel.IdPromocion);
+            // Verificamos si la promoción es modificable (regla de negocio)
+            var esModificable = _promocionesRepo.PuedeSerEliminada(promocion.IdPromocion);
 
             if (esModificable)
             {
-                // Si es modificable, calculamos el costo con los nuevos datos del ViewModel
-                if (viewModel.DetallesPromocion != null)
-                {
-                    foreach (var detalleVM in viewModel.DetallesPromocion)
-                    {
-                        var producto = _productosRepo.ObtenerPorId(detalleVM.IdProducto);
-                        if (producto != null)
-                        {
-                            costoTotalReal += producto.Costo * detalleVM.Cantidad;
-                        }
-                    }
-                }
-            }
-            else
-            {
-                // Si no es modificable, el costo es el que ya tiene la entidad en la BD
-                costoTotalReal = promocion.CalcularCostoTotal();
-            }
-
-            // Comparamos y agregamos el error si es necesario
-            if (viewModel.Precio < costoTotalReal)
-            {
-                ModelState.AddModelError("Precio", $"El precio no puede ser menor que el costo total (${costoTotalReal:N2}).");
-            }
-
-            // Si agregamos nuestro error personalizado, volvemos a la vista
-            if (!ModelState.IsValid)
-            {
-                RepoblarViewModelParaModificar(viewModel);
-                return View(viewModel);
-            }
-            // --- FIN DE LA VALIDACIÓN MANUAL ---
-
-            // El resto de la lógica de actualización no cambia
-            if (esModificable)
-            {
+                // Si es totalmente modificable, actualizamos todo el objeto.
                 promocion.ActualizarDesdeViewModel(viewModel);
             }
             else
             {
+                // Si no, solo actualizamos los datos generales para no alterar el histórico de ventas.
                 promocion.ActualizarDatosGenerales(viewModel);
             }
 
             _promocionesRepo.Actualizar(promocion);
 
-            TempData["SuccessMessage"] = "Promoción modificada exitosamente.";
+            TempData["SuccessMessage"] = "Promoción modificada con éxito.";
             return RedirectToAction(nameof(Index));
         }
         catch (Exception e)
         {
-            _logger.LogError(e, "Error al modificar la promoción con ID {PromocionId}", viewModel.IdPromocion);
-            TempData["ErrorMessage"] = "Ocurrió un error al modificar la promoción.";
+            _logger.LogError(e, "Error al modificar la promoción con ID {Id}", viewModel.IdPromocion);
+            TempData["ErrorMessage"] = "Ocurrió un error inesperado al intentar modificar la promoción.";
             RepoblarViewModelParaModificar(viewModel);
             return View(viewModel);
         }

@@ -1,16 +1,16 @@
+@* Archivo: Views/Shared/_ModificarDetallePromocionItem.cshtml *@
 @model DetallesPromocionesVM.ModificarDetallePromocionVM
 @{
+    // Usamos CultureInfo.InvariantCulture para asegurar que el punto sea el separador decimal,
+    // lo cual es estándar para los atributos de datos y JavaScript.
     var cantidadValue = Model.Cantidad.ToString(System.Globalization.CultureInfo.InvariantCulture);
     var costoValue = Model.Costo.ToString(System.Globalization.CultureInfo.InvariantCulture);
 }
 <div class="row detalle-item align-items-center mb-3 p-2 border rounded">
-    @* --- LA SOLUCIÓN CLAVE --- *@
-    @*
-      Estos campos ocultos aseguran que los valores de IdProducto y Cantidad
-      SIEMPRE se envíen al servidor, incluso si los campos visibles están deshabilitados.
+    @* --- CORRECCIÓN ---
+       Se eliminaron los campos <input type="hidden" /> para IdProducto y Cantidad.
+       Eran redundantes y causaban que el model binder recibiera los valores antiguos en lugar de los nuevos.
     *@
-    <input type="hidden" asp-for="@Model.IdProducto" />
-    <input type="hidden" asp-for="@Model.Cantidad" />
 
     <div class="col-md-6">
         <label class="form-label">Producto</label>
@@ -27,6 +27,8 @@
     </div>
     <div class="col-md-2">
         <label class="form-label">Costo</label>
+        @* Este input oculto SÍ es necesario para almacenar el costo unitario del producto y usarlo en JS *@
+        <input type="hidden" class="costo-producto-unitario" value="@costoValue" />
         <p class="form-control-plaintext fw-bold costo-detalle-display">$0.00</p>
     </div>
     <div class="col-md-1 text-end">
