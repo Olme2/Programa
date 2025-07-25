@@ -10,7 +10,7 @@
         <div class="row">
             <h2 class="col-md-3">Filtros</h2>
             <div class="col-md-6"></div>
-            <h2 class="col-md-3">Total: </h2>
+            <h2 class="col-md-3">Total: <span id="total-general-display" class="fw-bold text-success"></span></h2>
         </div>
         <div class="col-xl-2 col-md-6">
             <label asp-for="FechaInicio" class="form-label">Fecha de Inicio</label>
@@ -72,13 +72,32 @@
                     data: data,
                     success: function (result) {
                         $('#tabla-ventas-body').html(result);
+                        calcularYMostrarTotalGeneral();
                     },
                     error: function () {
                         alert("Error al cargar los datos. Intente nuevamente.");
                     }
                 });
             }
-
+            function calcularYMostrarTotalGeneral() {
+                let totalGeneral = 0;
+            
+                // 1. Buscamos todas las celdas que contienen el total de cada venta.
+                $('#tabla-ventas-body .totalProducto').each(function() {
+                    
+                    // 2. Limpiamos el texto para convertirlo en un número que JavaScript entienda.
+                    // Ej: "$1.500,75" -> "1500.75"
+                    const textoCelda = $(this).text();
+                    const valorNumerico = parseFloat(textoCelda.replace('$', '').replace(/\./g, '').replace(',', '.')) || 0;
+                    
+                    // 3. Lo sumamos al total general.
+                    totalGeneral += valorNumerico;
+                });
+            
+                // 4. Formateamos el resultado y lo mostramos en el span que creamos.
+                const totalFormateado = totalGeneral.toLocaleString('es-AR', { style: 'currency', currency: 'ARS' });
+                $('#total-general-display').text(totalFormateado);
+            }
             // Actualizar tabla al cambiar cualquier filtro
             $('.filtro-control').on('change', function() {
                 actualizarTablaVentas();
@@ -87,6 +106,7 @@
              $('#Busqueda').on('keyup', function() {
                 actualizarTablaVentas();
             });
+            calcularYMostrarTotalGeneral();
         });
     </script>
 }
