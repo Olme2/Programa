@@ -252,21 +252,124 @@ public class VentasController : Controller
         return Json(promociones);
     }
 
-    // GET: /Ventas/Modificar/5
-    public IActionResult Modificar(int id)
+    [HttpGet]
+    public IActionResult Modificar(long id)
     {
-        // Lógica para mostrar el formulario de modificación (la completaremos después)
-        return View();
+        var venta = _ventaRepo.ObtenerVentaPorId(id);
+        if (venta == null)
+        {
+            TempData["ErrorMessage"] = "No existe venta con ese id.";
+            return RedirectToAction(nameof(Index));
+        }
+        var metodos = ObtenerListaMetodosDePago();
+        var viewModel = new ModificarVentaVM(venta, metodos);
+
+        return View(viewModel);
     }
 
-    // POST: /Ventas/Modificar/5
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public IActionResult Modificar(int id, ModificarVentaVM viewModel)
+    public IActionResult Modificar(ModificarVentaVM viewModel)
     {
-        // Lógica para guardar los cambios de la venta (la completaremos después)
-        return RedirectToAction(nameof(Index));
+        // Rehidratamos por si la validación falla
+        RepoblarViewModelParaModificarVenta(viewModel);
+        if (!ModelState.IsValid)
+        {
+            RepoblarViewModelParaModificarVenta(viewModel);
+            return View(viewModel);
+        }
+
+        try
+        {
+            var venta = _ventaRepo.ObtenerVentaPorId(viewModel.IdVenta);
+            if (venta == null)
+            {
+                TempData["ErrorMessage"] = "No existe venta con ese id.";
+                return RedirectToAction(nameof(Index));
+            }
+            venta.ActualizarDesdeViewModel(viewModel);
+            _ventaRepo.ActualizarVenta(venta);
+            TempData["SuccessMessage"] = "Venta modificada con éxito.";
+            return RedirectToAction(nameof(Index));
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, "Error al modificar la venta.");
+            TempData["ErrorMessage"] = "Ocurrió un error al modificar la venta.";
+            return View(viewModel);
+        }
     }
+
+
+
+    // Método de ayuda para rehidratar el VM de Modificar
+    private void RepoblarViewModelParaModificarVenta(ModificarVentaVM viewModel)
+    {
+        viewModel.Metodos = ObtenerListaMetodosDePago();
+
+        // Repoblar nombres de productos/promociones para filas que ya existían
+        foreach (var detalle in viewModel.DetallesVenta.Where(d => d.IdProducto > 0 && string.IsNullOrEmpty(d.NombreProducto)))
+        {
+            var producto = _productosRepo.ObtenerPorId(detalle.IdProducto);
+            if (producto != null)
+            {
+                detalle.IdProducto = producto.IdProducto;
+                detalle.NombreProducto = $"{producto.Producto} (${producto.Precio.ToString("N2", ConfiguracionGlobal.CulturaES)}) - S: {producto.Stock.ToString("N2", ConfiguracionGlobal.CulturaES)}";
+                detalle.PrecioUnitario = producto.Precio;
+                detalle.CostoUnitario = producto.Costo;
+            }
+        }
+        foreach (var promocion in viewModel.VentaPromociones.Where(d => d.IdPromocion > 0 && string.IsNullOrEmpty(d.NombrePromocion)))
+        {
+            var promo = _promocionesRepo.ObtenerPorId(promocion.IdPromocion);
+            if (promo != null)
+            {
+                promocion.IdPromocion = promo.IdPromocion;
+                promocion.NombrePromocion = $"{promo.Promocion} (${promo.Precio.ToString("N2", ConfiguracionGlobal.CulturaES)}) - S: {promo.CalcularStock()}";
+                promocion.PrecioPromo = promo.Precio;
+                promocion.CostoPromo = promo.CalcularCostoTotal();
+            }
+        }
+        // (Hacer lo mismo para VentaPromociones)
+        viewModel.Metodos = ObtenerListaMetodosDePago();
+        if (viewModel.DetallesVenta != null)
+        {
+            foreach (var detalle in viewModel.DetallesVenta)
+            {
+                if (detalle.IdProducto > 0)
+                {
+                    var producto = _productosRepo.ObtenerPorId(detalle.IdProducto);
+                    if (producto != null)
+                    {
+                        detalle.IdProducto = producto.IdProducto;
+                        detalle.NombreProducto = $"{producto.Producto} (${producto.Precio.ToString("N2", ConfiguracionGlobal.CulturaES)}) - S: {producto.Stock.ToString("N2", ConfiguracionGlobal.CulturaES)}";
+                        detalle.PrecioUnitario = producto.Precio;
+                        detalle.CostoUnitario = producto.Costo;
+                    }
+                }
+            }
+        }
+
+        // Repoblamos los detalles de promociones
+        if (viewModel.VentaPromociones != null)
+        {
+            foreach (var detallePromo in viewModel.VentaPromociones)
+            {
+                if (detallePromo.IdPromocion > 0)
+                {
+                    var promocion = _promocionesRepo.ObtenerListadoPromociones().FirstOrDefault(p => p.IdPromocion == detallePromo.IdPromocion);
+                    if (promocion != null)
+                    {
+                        detallePromo.IdPromocion = promocion.IdPromocion;
+                        detallePromo.NombrePromocion = $"{promocion.Promocion} (${promocion.Precio.ToString("N2", ConfiguracionGlobal.CulturaES)}) - S: {promocion.Stock.ToString("N2", ConfiguracionGlobal.CulturaES)}";
+                        detallePromo.PrecioPromo = promocion.Precio;
+                        detallePromo.CostoPromo = promocion.Costo;
+                    }
+                }
+            }
+        }
+    }
+
 
     // GET: /Ventas/Eliminar/5
     public IActionResult Eliminar(int id)

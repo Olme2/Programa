@@ -1,0 +1,25 @@
+@model VentasPromocionesVM.VentaPromocionVM
+
+<div class="row detalle-item-promocion align-items-center mb-3 p-2 border rounded">
+    <input type="hidden" asp-for="IdPromocion" />
+    <input type="hidden" asp-for="PrecioPromo" class="precio-promo-hidden" />
+    <input type="hidden" asp-for="CostoPromo" class="costo-promo-hidden" />
+
+    <div class="col-md-6">
+        <label class="form-label">Promocion</label>
+        <p class="form-control-plaintext"><strong>@Model.NombrePromocion</strong></p>
+    </div>
+    <div class="col-md-3">
+        <label asp-for="Cantidad" class="form-label"></label>
+        <input asp-for="Cantidad" type="number" step="0.001" min="0.001" class="form-control cantidad-promocion" />
+        <span asp-validation-for="Cantidad" class="text-danger"></span>
+    </div>
+    <div class="col-md-2">
+        <label class="form-label">Subtotal</label>
+        <p class="form-control-plaintext fw-bold subtotal-promocion-display">$0.00</p>
+    </div>
+    <div class="col-md-1 text-end">
+        <button type="button" class="btn btn-danger btn-sm btn-eliminar-promocion">&times;</button>
+    </div>
+</div>
+

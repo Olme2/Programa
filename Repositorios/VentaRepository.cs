@@ -50,12 +50,13 @@ public class VentaRepository : IVentaRepository
                         : string.Join("<br>", v.DetallesVenta.Select(dv => dv.Producto.Producto)),
                     Total = v.CalcularPrecioTotal(),
                     Fecha = v.Fecha,
-                    Hora = v.Hora
+                    Hora = v.Hora,
+                    Detalle = v.Detalle
                 });
 
-                return ventasVM.OrderByDescending(v => v.Fecha).ThenByDescending(v => v.Hora).ToList();
+        return ventasVM.OrderByDescending(v => v.Fecha).ThenByDescending(v => v.Hora).ToList();
         }
-    public Ventas? ObtenerVentaPorId(int id)
+    public Ventas? ObtenerVentaPorId(long id)
     {
         return _context.Ventas
             .Include(v => v.DetallesVenta)

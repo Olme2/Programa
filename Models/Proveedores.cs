@@ -2,10 +2,10 @@ using ProveedoresVM;
 
 public class Proveedores
 {
-    public int IdProveedor { get; private set; }
-    public string Proveedor { get; private set; }
-    public string? Contacto { get; private set; }
-    public decimal Debo { get; private set; }
+    public int IdProveedor { get; set; }
+    public string Proveedor { get; set; }
+    public string? Contacto { get; set; }
+    public decimal Debo { get; set; }
     public virtual ICollection<Productos> Productos { get; private set; }
     private Proveedores()
     {

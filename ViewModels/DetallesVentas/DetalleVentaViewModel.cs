@@ -23,7 +23,7 @@ public class DetalleVentaVM
     {
         IdProducto = detalle.IdProducto;
         Cantidad = detalle.Cantidad;
-        NombreProducto = detalle.Producto.Producto;
+        NombreProducto = $"{detalle.Producto.Producto} (${detalle.Producto.Precio.ToString("N2", ConfiguracionGlobal.CulturaES)}) - S: {detalle.Producto.Stock.ToString("N2", ConfiguracionGlobal.CulturaES)}";
         CostoUnitario = detalle.Producto.Costo;
         PrecioUnitario = detalle.Producto.Precio;
     }

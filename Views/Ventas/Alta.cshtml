@@ -6,7 +6,6 @@
 <form asp-action="Alta" method="post" id="form-venta">
     <h1>Registrar Nueva Venta</h1>
     <hr />
-    <span id="spanPrueba"></span>
     <div class="row">
         <div class="col-lg-8">
             <div class="card shadow-sm mb-4">
@@ -74,7 +73,7 @@
                         @* Renderiza las promociones existentes si la validación falló *@
                         @for (var i = 0; i < Model.VentaPromociones.Count; i++)
                         {
-                            <partial name="Partials/_VentaPromocionItem" for="VentaPromociones[i]" view-data='new ViewDataDictionary(ViewData) { { "index", i } }' />
+                            <partial name="Partials/_VentaPromocionItem" for="VentaPromociones[i]"/>
                         }
                     </div>
                     <span id="advertenciaAgregarPromo" class="text-danger"></span>

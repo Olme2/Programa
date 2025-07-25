@@ -36,7 +36,10 @@ public class VentasPromociones
     {
         return CostoPromo * Cantidad;
     }
-
+    public int CalcularStock()
+    {
+        return (int)Promocion.DetallesPromocion.Where(d => d.Cantidad > 0).Select(d => Math.Floor(d.Producto.Stock / d.Cantidad)).Min();
+    }
     public decimal CalcularPrecio()
     {
         return PrecioPromo * Cantidad;

@@ -2,9 +2,9 @@ using MetodosVM;
 
 public class MetodosPago
 {
-    public short IdMetodo { get ; private set; }
-    public string Metodo { get ; private set; }
-    public virtual ICollection<Ventas> Ventas { get; private set; }
+    public short IdMetodo { get ; set; }
+    public string Metodo { get ; set; }
+    public virtual ICollection<Ventas> Ventas { get; set; }
     private MetodosPago()
     {
         Metodo = string.Empty;

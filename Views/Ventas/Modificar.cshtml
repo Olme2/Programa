@@ -2,26 +2,317 @@
 @{
     ViewData["Title"] = "Modificar Venta";
 }
-<h2>Modificar Venta</h2>
-<form asp-action="ModificarVenta" method="post" class="row g-3">
+
+<form asp-action="Modificar" method="post" id="form-venta">
     <input type="hidden" asp-for="IdVenta" />
-    <div class="col-md-4">
-        <label asp-for="IdMetodo" class="form-label">Método de Pago</label>
+    <h1>Modificar Venta</h1>
+    <hr />
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card shadow-sm mb-4">
+                <div class="card-header">
+                    <h4>Datos Generales</h4>
+                </div>
+
+                <div class="card-body row">
+                    <div class="col-md-4 mb-3">
+                        <label asp-for="IdMetodo" class="form-label"></label>
+                        <select asp-for="IdMetodo" asp-items="Model.Metodos" class="form-select"></select>
+                        <span asp-validation-for="IdMetodo" class="text-danger"></span>
+                    </div>
+
+                    <div class="col-md-3 mb-3">
+                        <label asp-for="Fecha" class="form-label"></label>
+                        <input asp-for="Fecha" type="date" class="form-control" />
+                        <span asp-validation-for="Fecha" class="text-danger"></span>
+                    </div>
+
+                    <div class="col-md-2 mb-3">
+                        <label asp-for="Hora" class="form-label"></label>
+                        <input asp-for="Hora" type="time" class="form-control" />
+                        <span asp-validation-for="Hora" class="text-danger"></span>
+                    </div>
+
+                    <div class="col-md-3 mb-3">
+                        <label asp-for="Recargo" class="form-label"></label>
+                        <div class="input-group">
+                            <input asp-for="Recargo" type="number" step="0.1" min="0" class="form-control" />
+                            <span class="input-group-text">%</span>
+                            <span asp-validation-for="Recargo" class="text-danger"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card shadow-sm mb-4">
+                <div class="card-header">
+                    <h5>Productos Individuales</h5>
+                </div>
+
+                <div class="card-body">
+                    <div id="detalles-productos-container">
+                        @for (var i = 0; i < Model.DetallesVenta.Count; i++)
+                        {
+                            <partial name="Partials/_ModificarDetalleVentaItem" for="DetallesVenta[i]"/>
+                        }
+                    </div>
+
+                    <span id="advertenciaAgregarProducto" class="text-danger"></span>
+                    <button type="button" id="btn-agregar-producto" class="btn btn-outline-primary w-100 mt-2">
+                        + Añadir Producto
+                    </button>
+                </div>
+            </div>
+
+            <div class="card shadow-sm">
+                <div class="card-header">
+                    <h5>Promociones</h5>
+                </div>
+
+                <div class="card-body">
+                    <div id="detalles-promociones-container">
+                        @for (var i = 0; i < Model.VentaPromociones.Count; i++)
+                        {
+                            <partial name="Partials/_ModificarVentaPromocionItem" for="VentaPromociones[i]"/>
+                        }
+                    </div>
+                    <span id="advertenciaAgregarPromo" class="text-danger"></span>
+                    <button type="button" id="btn-agregar-promocion" class="btn btn-outline-primary w-100 mt-2">+ Añadir Promoción</button>
+                </div>
+
+            </div>
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="summary-card" style="position: sticky; top: 20px;">
+                <h4>Resumen de la Venta</h4>
+                <hr>
+
+                <div class="summary-item">
+                    <span>Subtotal:</span>
+                    <span id="subtotal-display">$0.00</span>
+                </div>
+
+                <div class="summary-item">
+                    <span>Recargo:</span>
+                    <span id="recargo-display">$0.00</span>
+                </div>
+
+                <div class="summary-item total fs-4">
+                    <span>TOTAL:</span>
+                    <span id="total-display" class="text-success">$0.00</span>
+                </div>
+
+                <div class="mt-3">
+                    <label asp-for="Detalle" class="form-label">Detalle (Opcional)</label>
+                    <textarea asp-for="Detalle" class="form-control" rows="3"></textarea>
+                </div>
+
+                <div class="mt-4">
+                    <button type="submit" id="envio" class="btn btn-primary btn-lg w-100">Registrar Venta</button>
+                    <a asp-action="Index" class="btn btn-secondary w-100 mt-2">Cancelar</a>
+                </div>
+            </div>
+        </div>
     </div>
-    <div class="col-md-4">
-        <label asp-for="Detalle" class="form-label">Detalle</label>
-        <input asp-for="Detalle" class="form-control" />
-    </div>
-    <div class="col-md-2">
-        <label asp-for="Fecha" class="form-label">Fecha</label>
-        <input asp-for="Fecha" type="date" class="form-control" value="@(Model.Fecha.ToString("yyyy-MM-dd"))" />
-    </div>
-    <div class="col-md-2">
-        <label asp-for="Hora" class="form-label">Hora</label>
-        <input asp-for="Hora" type="time" class="form-control" value="@(Model.Hora.ToString("HH:mm"))" />
-    </div>
-    <div class="col-12">
-        <button type="submit" class="btn btn-primary">Guardar Cambios</button>
-        <a asp-action="Index" class="btn btn-secondary">Cancelar</a>
-    </div>
-</form> 
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        $(document).ready(function() {
+            const productosContainer = $('#detalles-productos-container');
+            const promocionesContainer = $('#detalles-promociones-container');
+
+            function inicializarSelect2Producto(element) {
+                element.select2({
+                    placeholder: 'Buscar producto...',
+                    minimumInputLength: 0,
+                    ajax: {
+                        url: '@Url.Action("BuscarProductosParaVenta", "Ventas")',
+                        dataType: 'json',
+                        delay: 0,
+                        data: function (params) {
+                            let idsExcluidos = [];
+                            $('.producto-search').not(element).each(function() {
+                                if ($(this).val()) idsExcluidos.push($(this).val());
+                            });
+                            return { term: params.term, excluir: idsExcluidos };
+                        },
+                        processResults: function (data) { return { results: data }; }
+                    },
+                    templateResult: function (data) {
+                        if (!data.id) { return data.text; } // Para el texto "Buscando..."
+                        
+                        // Si el producto está deshabilitado (sin stock), le añadimos la clase CSS.
+                        if (data.disabled) {
+                            return $('<div class="producto-sin-stock table-danger">' + data.text + '</div>');
+                        }
+                        
+                        return data.text;
+                    }
+                });
+            }
+            function inicializarSelect2Promocion(element) {
+                element.select2({
+                    placeholder: 'Buscar promoción...',
+                    minimumInputLength: 0,
+                    ajax: {
+                        url: '@Url.Action("BuscarPromocionesParaVenta", "Ventas")',
+                        dataType: 'json',
+                        delay: 0,
+                        data: function (params) {
+                            let idsExcluidos = [];
+                            $('.promocion-search').not(element).each(function() {
+                                if ($(this).val()) idsExcluidos.push($(this).val());
+                            });
+                            return { term: params.term, excluir: idsExcluidos };
+                        },
+                        processResults: function (data) { return { results: data }; }
+                    },
+                    templateResult: function (data) {
+                        if (!data.id) { return data.text; } // Para el texto "Buscando..."
+                        
+                        // Si el producto está deshabilitado (sin stock), le añadimos la clase CSS.
+                        if (data.disabled) {
+                            return $('<div class="producto-sin-stock table-danger">' + data.text + '</div>');
+                        }
+                        
+                        return data.text;
+                    }
+                });
+            }
+            function reindexarFilas() {
+                // Reindexar productos
+                productosContainer.find('.detalle-item-producto').each(function(index) {
+                    $(this).find('input, select').each(function() {
+                        const oldName = $(this).attr('name');
+                        if (oldName) {
+                            const propertyName = oldName.substring(oldName.lastIndexOf('.') + 1).replace(']', '');
+                            const newName = `DetallesVenta[${index}].${propertyName}`;
+                            $(this).attr('name', newName);
+                        }
+                    });
+                });
+                
+                promocionesContainer.find('.detalle-item-promocion').each(function(index) {
+                    $(this).find('input, select').each(function() {
+                        const oldName = $(this).attr('name');
+                        if (oldName) {
+                            const propertyName = oldName.substring(oldName.lastIndexOf('.') + 1).replace(']', '');
+                            const newName = `VentaPromociones[${index}].${propertyName}`;
+                            $(this).attr('name', newName);
+                        }
+                    });
+                });
+
+                recalcularTotalVenta();
+            }
+
+            function recalcularTotalVenta() {
+                let subtotal = 0;
+                productosContainer.find('.detalle-item-producto').each(function() {
+                    const row = $(this);
+                    const precio = parseFloat(row.find('.precio-unitario-hidden').val()) || 0;
+                    const cantidad = parseFloat(row.find('.cantidad-producto').val()) || 0;
+                    const subtotalProducto = (precio * cantidad);
+                    row.find('.subtotal-producto-display').text(subtotalProducto.toLocaleString('es-AR', { style: 'currency', currency: 'ARS' }));
+                    subtotal += subtotalProducto;
+                });
+
+                promocionesContainer.find('.detalle-item-promocion').each(function() {
+                    const row = $(this);
+                    const precio = parseFloat(row.find('.precio-promo-hidden').val()) || 0;
+                    const cantidad = parseFloat(row.find('.cantidad-promocion').val()) || 0;
+                    const subtotalItem = (precio * cantidad);
+                    row.find('.subtotal-promocion-display').text(subtotalItem.toLocaleString('es-AR', { style: 'currency', currency: 'ARS' }));
+                    subtotal += subtotalItem;
+                });
+                
+                const recargo = parseFloat($('#Recargo').val() || 0);
+                const total = (subtotal)*(1+recargo/100);
+                $('#recargo-display').text((subtotal*(recargo/100)).toLocaleString('es-AR', { style: 'currency', currency: 'ARS' }));
+                $('#subtotal-display').text(subtotal.toLocaleString('es-AR', { style: 'currency', currency: 'ARS' }));
+                $('#total-display').text(total.toLocaleString('es-AR', { style: 'currency', currency: 'ARS' }));
+            }
+            
+            // --- MANEJADORES DE EVENTOS ---
+
+            $('#btn-agregar-producto').click(function () {
+                const ultimaFila = productosContainer.find('.detalle-item-producto').last();
+                
+                if (ultimaFila.length > 0 && !ultimaFila.find('.producto-search').val()) {
+                    $('#advertenciaAgregarProducto').text("Por favor seleccione un producto antes de agregar otro");
+                    return;
+                }
+
+                const nuevoIndex = productosContainer.find('.detalle-item-producto').length;
+                $.get('@Url.Action("ObtenerVistaDetalleVenta", "Ventas")', { index: nuevoIndex }, function (data) {
+                    const nuevaFila = $(data);
+                    productosContainer.append(nuevaFila);
+                    inicializarSelect2Producto(nuevaFila.find('.producto-search'));
+                    reindexarFilas();
+                });
+            });
+            $('#btn-agregar-promocion').click(function () {
+                const ultimaFila = promocionesContainer.find('.detalle-item-promocion').last();
+
+                if (ultimaFila.length > 0 && !ultimaFila.find('.promocion-search').val()) {
+                    $('#advertenciaAgregarPromo').text("Por favor seleccione una promocion antes de agregar otra");
+                    return;
+                }
+
+                const nuevoIndex = promocionesContainer.find('.detalle-item-promocion').length;
+                $.get('@Url.Action("ObtenerVistaVentaPromocion", "Ventas")', function (data) {
+                    const nuevaFila = $(data);
+                    promocionesContainer.append(nuevaFila);
+                    inicializarSelect2Promocion(nuevaFila.find('.promocion-search'));
+                    reindexarFilas();
+                });
+
+            });
+
+            productosContainer.on('click', '.btn-eliminar-detalle', function () {
+                $(this).closest('.detalle-item-producto').remove();
+                $('#advertenciaAgregarProducto').text('');
+                reindexarFilas();
+            });
+            promocionesContainer.on('click', '.btn-eliminar-promocion', function () {
+                $(this).closest('.detalle-item-promocion').remove();
+                $('#advertenciaAgregarPromo').text('')
+                reindexarFilas();
+            });
+
+            productosContainer.on('select2:select', '.producto-search', function (e) {
+                const data = e.params.data;
+                const row = $(this).closest('.detalle-item-producto');
+                $('#advertenciaAgregarProducto').text('');
+
+                row.find('.precio-unitario-hidden').val(data.precio || 0);
+                row.find('.costo-unitario-hidden').val(data.costo || 0);
+                recalcularTotalVenta();
+            });
+            promocionesContainer.on('select2:select', '.promocion-search', function (e) {
+                const data = e.params.data;
+                const row = $(this).closest('.detalle-item-promocion');
+                $('#advertenciaAgregarPromo').text('');
+
+                row.find('.precio-promo-hidden').val(data.precio || 0);
+                row.find('.costo-promo-hidden').val(data.costo || 0);
+                recalcularTotalVenta();
+            });
+
+            productosContainer.on('input', '.cantidad-producto', recalcularTotalVenta);
+            promocionesContainer.on('input', '.cantidad-promocion', recalcularTotalVenta);
+            $('#Recargo').on('input', recalcularTotalVenta);
+            
+            // --- INICIALIZACIÓN ---
+            productosContainer.find('.producto-search').each(function() {
+                inicializarSelect2Producto($(this));
+            });
+            promocionesContainer.find('.promocion-search').each(function() { inicializarSelect2Promocion($(this)); });
+            reindexarFilas();
+        });
+    </script>
+}

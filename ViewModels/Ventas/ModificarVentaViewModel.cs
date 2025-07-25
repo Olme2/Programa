@@ -1,4 +1,5 @@
 using DetallesVentasVM;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using MetodosVM;
 using System.ComponentModel.DataAnnotations;
 using ProductosVM;
@@ -17,26 +18,29 @@ public class ModificarVentaVM : IValidatableObject
     public DateOnly Fecha { get; set; }
     [Required(ErrorMessage = "La hora es obligatoria.")]
     public TimeOnly Hora { get; set; }
+    [StringLength(100, ErrorMessage = "El detalle no puede tener mas de 100 caracteres")]
     public string? Detalle { get; set; }
+    public decimal Recargo { get; set; } = 0;
     public List<DetalleVentaVM> DetallesVenta { get; set; }
-    public List<ModificarVentaPromocionVM> VentaPromociones { get; set; }
-    public List<ListarProductosVM> Productos { get; set; }
-    public List<ListarPromocionesVM> Promociones { get; set; }
-    public List<ListarMetodosPagoVM> Metodos { get; set; }
+    public List<VentaPromocionVM> VentaPromociones { get; set; }
+    public List<SelectListItem> Metodos { get; set; }
 
     public ModificarVentaVM()
     {
         DetallesVenta = new List<DetalleVentaVM>();
-        VentaPromociones = new List<ModificarVentaPromocionVM>();
-        Productos = new List<ListarProductosVM>();
-        Promociones = new List<ListarPromocionesVM>();
-        Metodos = new List<ListarMetodosPagoVM>();
+        VentaPromociones = new List<VentaPromocionVM>();
+        Metodos = new List<SelectListItem>();
     }
-    public ModificarVentaVM(List<ListarProductosVM> productos, List<ListarPromocionesVM> promociones, List<ListarMetodosPagoVM> metodos) : this()
+    public ModificarVentaVM(Ventas venta, List<SelectListItem> metodos)
     {
-        Productos = productos;
-        Promociones = promociones;
+        IdVenta = venta.IdVenta;
+        IdMetodo = venta.IdMetodo;
+        Fecha = venta.Fecha;
+        Hora = venta.Hora;
+        Detalle = venta.Detalle;
         Metodos = metodos;
+        DetallesVenta = venta.DetallesVenta.Select(d => new DetalleVentaVM(d)).ToList();
+        VentaPromociones = venta.VentaPromociones.Select(p => new VentaPromocionVM(p)).ToList();
     }
     public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
     {

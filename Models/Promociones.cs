@@ -2,11 +2,11 @@ using PromocionesVM;
 
 public class Promociones
 {
-    public int IdPromocion { get; private set; }
-    public string Promocion { get; private set; }
-    public decimal Precio { get; private set; }
-    public DateOnly Inicio { get; private set; }
-    public DateOnly? Fin { get; private set; }
+    public int IdPromocion { get;  set; }
+    public string Promocion { get;  set; }
+    public decimal Precio { get;  set; }
+    public DateOnly Inicio { get;  set; }
+    public DateOnly? Fin { get;  set; }
     private List<DetallesPromociones> _detallesPromocion = new List<DetallesPromociones>();
     public IReadOnlyCollection<DetallesPromociones> DetallesPromocion => _detallesPromocion.AsReadOnly();
 
@@ -68,6 +68,10 @@ public class Promociones
         return _detallesPromocion.Sum(detalle => detalle.CalcularCosto());
     }
 
+    public int CalcularStock()
+    {
+        return (int)_detallesPromocion.Where(d => d.Cantidad > 0).Select(d => Math.Floor(d.Producto.Stock / d.Cantidad)).Min();
+    }
     public void Desactivar()
     {
         Fin = DateOnly.FromDateTime(DateTime.Now);

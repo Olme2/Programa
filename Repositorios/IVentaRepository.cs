@@ -3,7 +3,7 @@ using VentasVM;
 public interface IVentaRepository
 {
     IEnumerable<ListarVentasVM> ObtenerListadoVentas(IndexVentasVM filtro);
-    Ventas? ObtenerVentaPorId(int id);
+    Ventas? ObtenerVentaPorId(long id);
     void CrearVenta(Ventas nuevaVenta);
     void ActualizarVenta(Ventas ventaModificada);
     void EliminarVenta(int id);   

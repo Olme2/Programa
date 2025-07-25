@@ -2,15 +2,15 @@ using ProductosVM;
 
 public class Productos
 {
-    public int IdProducto { get; private set; }
-    public int IdProveedor { get; private set; }
-    public string Producto { get; private set; }
-    public decimal Stock { get; private set; }
-    public decimal Costo { get; private set; }
-    public decimal Precio { get; private set; }
-    public bool Activo { get; private set; }
+    public int IdProducto { get; set; }
+    public int IdProveedor { get; set; }
+    public string Producto { get; set; }
+    public decimal Stock { get; set; }
+    public decimal Costo { get; set; }
+    public decimal Precio { get; set; }
+    public bool Activo { get; set; }
     
-    public virtual Proveedores Proveedor { get; private set; }
+    public virtual Proveedores Proveedor { get; set; }
 
     // --- CONSTRUCTORES ---
     private Productos()

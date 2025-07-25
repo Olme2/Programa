@@ -17,5 +17,6 @@ public class ListarVentasVM
     [DisplayFormat(DataFormatString = "{0:mm:HH}")]
     public TimeOnly Hora { get; set; }
     public short IdMetodo { get; set; }
+    public string? Detalle { get; set; }
     public ListarVentasVM() { }
 }

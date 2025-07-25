@@ -1,12 +1,13 @@
+using VentasPromocionesVM;
+using DetallesVentasVM;
 using VentasVM;
-
 public class Ventas
 {
-    public long IdVenta { get; private set; }
-    public short IdMetodo { get; private set; }
-    public DateOnly Fecha { get; private set; }
-    public TimeOnly Hora { get; private set; }
-    public string? Detalle { get; private set; }
+    public long IdVenta { get; set; }
+    public short IdMetodo { get; set; }
+    public DateOnly Fecha { get; set; }
+    public TimeOnly Hora { get; set; }
+    public string? Detalle { get; set; }
     public List<DetallesVentas> _detallesVenta = new List<DetallesVentas>();
     public IReadOnlyCollection<DetallesVentas> DetallesVenta => _detallesVenta.AsReadOnly();
     public List<VentasPromociones> _ventaPromociones = new List<VentasPromociones>();
@@ -52,6 +53,51 @@ public class Ventas
             AgregarPromocion(promocion);
         }
     }
+
+    public void ActualizarDetalles(List<DetalleVentaVM> detallesVM, List<VentaPromocionVM> promocionesVM)
+    {
+        var idsProductosEnViewModel = detallesVM.Select(d => d.IdProducto).ToList();
+        var detallesAEliminar = _detallesVenta.Where(d => !idsProductosEnViewModel.Contains(d.IdProducto)).ToList();
+        foreach (var detalle in detallesAEliminar)
+        {
+            _detallesVenta.Remove(detalle);
+        }
+
+        foreach (var detalleVM in detallesVM)
+        {
+            var detalleExistente = _detallesVenta.FirstOrDefault(d => d.IdProducto == detalleVM.IdProducto);
+            if (detalleExistente != null)
+            {
+                detalleExistente.Cantidad = detalleVM.Cantidad;
+            }
+            else
+            {
+                _detallesVenta.Add(DetallesVentas.CrearDesdeViewModel(detalleVM));
+            }
+        }
+
+        var idsPromocionesEnViewModel = promocionesVM.Select(p => p.IdPromocion).ToList();
+        var promocionesAEliminar = _ventaPromociones.Where(p => !idsPromocionesEnViewModel.Contains(p.IdPromocion)).ToList();
+        foreach (var promocion in promocionesAEliminar)
+        {
+            _ventaPromociones.Remove(promocion);
+        }
+
+        foreach (var promocionVM in promocionesVM)
+        {
+            var promocionExistente = _ventaPromociones.FirstOrDefault(p => p.IdPromocion == promocionVM.IdPromocion);
+            if (promocionExistente != null)
+            {
+                promocionExistente.Cantidad = promocionVM.Cantidad;
+            }
+            else
+            {
+                _ventaPromociones.Add(VentasPromociones.CrearDesdeViewModel(promocionVM));
+            }
+        }
+
+    }
+
 
     public void LimpiarDetalles()
     {

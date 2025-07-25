@@ -1,8 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using System.Linq;
 using DetallesVentasVM;
-using MetodosVM;
 using ProductosVM;
 using PromocionesVM;
 using VentasPromocionesVM;

@@ -1,20 +1,22 @@
-@model DetallesVentasVM.DetalleVentaVM 
+@model DetallesVentasVM.DetalleVentaVM
 
 <div class="row detalle-item-producto align-items-center mb-3 p-2 border rounded">
+    @* --- Campos ocultos para enviar todos los datos al servidor --- *@
+    <input type="hidden" asp-for="IdProducto" />
+    <input type="hidden" asp-for="PrecioUnitario" class="precio-unitario-hidden" />
+    <input type="hidden" asp-for="CostoUnitario" class="costo-unitario-hidden" />
+
     <div class="col-md-6">
         <label class="form-label">Producto</label>
-        <select asp-for="IdProducto" class="form-control producto-search"></select>
-        <span asp-validation-for="IdProducto" class="text-danger"></span>
+        @* --- El producto es texto plano, no se puede cambiar --- *@
+        <p class="form-control-plaintext"><strong>@Model.NombreProducto</strong></p>
     </div>
     <div class="col-md-3">
         <label asp-for="Cantidad" class="form-label"></label>
+        @* --- La cantidad sí es editable --- *@
         <input asp-for="Cantidad" type="number" step="0.001" min="0.001" class="form-control cantidad-producto" />
         <span asp-validation-for="Cantidad" class="text-danger"></span>
     </div>
-
-    <input type="hidden" asp-for="CostoUnitario" class="costo-unitario-hidden">
-    <input type="hidden" asp-for="PrecioUnitario" class="precio-unitario-hidden">
-
     <div class="col-md-2">
         <label class="form-label">Subtotal</label>
         <p class="form-control-plaintext fw-bold subtotal-producto-display">$0.00</p>
