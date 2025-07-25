@@ -11,7 +11,7 @@ public class AltaVentaVM : IValidatableObject
 {
     [Required(ErrorMessage = "Debe seleccionar un método de pago.")]
     [Display(Name = "Método de Pago")]
-    public short IdMetodo { get; set; }
+    public short IdMetodo { get; set; } = 1;
 
     [Required(ErrorMessage = "Debe seleccionar una fecha.")]
     public DateOnly Fecha { get; set; }

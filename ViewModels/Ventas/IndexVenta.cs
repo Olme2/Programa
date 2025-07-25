@@ -23,4 +23,12 @@ public class IndexVentasVM
 
     [Display(Name = "Método de Pago")]
     public short? IdMetodoPago { get; set; }
+    public IndexVentasVM() { }
+    public IndexVentasVM(IndexVentasVM filtro)
+    {
+        FechaInicio = filtro.FechaInicio == default ? DateTime.Today : filtro.FechaInicio;
+        FechaFin = filtro.FechaFin == default ? DateTime.Today : filtro.FechaFin;
+        Busqueda = filtro.Busqueda;
+        IdMetodoPago = filtro.IdMetodoPago;
+    }
 }

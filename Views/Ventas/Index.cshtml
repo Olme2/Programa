@@ -57,25 +57,54 @@
 
 @section Scripts {
     <script>
-        $(document).ready(function () {
-            function actualizarTablaVentas() {
-                var data = {
-                    FechaInicio: $('#FechaInicio').val(),
-                    FechaFin: $('#FechaFin').val(),
-                    Busqueda: $('#Busqueda').val(),
-                    IdMetodoPago: $('#IdMetodoPago').val(),
+        $(document).ready(function() {
+            let debounceTimer;
+
+            function actualizarEnlaces(queryString) {
+                // Actualiza el botón "Registrar Venta"
+                const btnAlta = $('#btn-registrar-venta'); // Asegúrate de que tu botón tenga este ID
+                if (btnAlta.length) {
+                    const baseUrl = btnAlta.attr('href').split('?')[0];
+                    btnAlta.attr('href', baseUrl + queryString);
+                }
+
+                // Actualiza los botones de la tabla
+                $('#tabla-ventas-container a').each(function() {
+                    const link = $(this);
+                    const baseUrl = link.attr('href').split('?')[0];
+                    link.attr('href', baseUrl + queryString);
+                });
+            }
+
+            function filtrarVentas() {
+                const fechaDesde = $('#FechaDesde').val();
+                const fechaHasta = $('#FechaHasta').val();
+                const idMetodo = $('#IdMetodo').val();
+                const busqueda = $('#Busqueda').val();
+
+                const filtroData = {
+                    fechaDesde: fechaDesde,
+                    fechaHasta: fechaHasta,
+                    idMetodo: idMetodo,
+                    busqueda: busqueda
                 };
 
                 $.ajax({
-                    url: '@Url.Action("_BuscarVentas", "Ventas")',
+                    url: '@Url.Action("FiltrarVentas", "Ventas")',
                     type: 'GET',
-                    data: data,
-                    success: function (result) {
-                        $('#tabla-ventas-body').html(result);
-                        calcularYMostrarTotalGeneral();
+                    data: filtroData,
+                    success: function(response) {
+                        $('#tabla-ventas-container').html(response.tablaHtml);
+                        $('#total-ventas-filtradas').text(response.totalVentas);
+                        
+                        // --- INICIO DE LA CORRECCIÓN #2 ---
+                        // Después de cada filtro exitoso, actualizamos los enlaces
+                        const queryString = '?' + new URLSearchParams(filtroData).toString();
+                        actualizarEnlaces(queryString);
+                        // --- FIN DE LA CORRECCIÓN #2 ---
                     },
-                    error: function () {
-                        alert("Error al cargar los datos. Intente nuevamente.");
+                    error: function() {
+                        alert('Ocurrió un error al filtrar las ventas.');
                     }
                 });
             }

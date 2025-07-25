@@ -50,5 +50,23 @@ public class ModificarVentaVM : IValidatableObject
                 "La venta debe contener al menos un producto o una promoción."
             );
         }
+        var productosDuplicados = DetallesVenta
+        .GroupBy(d => d.IdProducto)
+        .Any(g => g.Count() > 1);
+
+        if (productosDuplicados)
+        {
+            yield return new ValidationResult("No se puede agregar el mismo producto más de una vez a la venta.");
+        }
+
+        // Regla 3: No puede haber promociones duplicadas.
+        var promocionesDuplicadas = VentaPromociones
+            .GroupBy(vp => vp.IdPromocion)
+            .Any(g => g.Count() > 1);
+
+        if (promocionesDuplicadas)
+        {
+            yield return new ValidationResult("No se puede agregar la misma promoción más de una vez a la venta.");
+        }
     }
 }

@@ -40,7 +40,7 @@ public class VentasController : Controller
                 Busqueda = filtro.Busqueda,
                 IdMetodoPago = filtro.IdMetodoPago,
             };
-
+        
             viewModel.Ventas = _ventaRepo.ObtenerListadoVentas(viewModel).ToList();
             viewModel.MetodosPago = _metodosPagoRepo.ObtenerListadoMetodosPago().ToList();
 
@@ -77,6 +77,7 @@ public class VentasController : Controller
         {
             var viewModel = new AltaVentaVM();
             viewModel.MetodosPago = ObtenerListaMetodosDePago();
+            ViewBag.FiltrosAnteriores = Request.Query;
             return View(viewModel);
         }
         catch (Exception e)
@@ -263,7 +264,7 @@ public class VentasController : Controller
         }
         var metodos = ObtenerListaMetodosDePago();
         var viewModel = new ModificarVentaVM(venta, metodos);
-
+        ViewBag.FiltrosAnteriores = Request.Query;
         return View(viewModel);
     }
 
@@ -305,32 +306,6 @@ public class VentasController : Controller
     // Método de ayuda para rehidratar el VM de Modificar
     private void RepoblarViewModelParaModificarVenta(ModificarVentaVM viewModel)
     {
-        viewModel.Metodos = ObtenerListaMetodosDePago();
-
-        // Repoblar nombres de productos/promociones para filas que ya existían
-        foreach (var detalle in viewModel.DetallesVenta.Where(d => d.IdProducto > 0 && string.IsNullOrEmpty(d.NombreProducto)))
-        {
-            var producto = _productosRepo.ObtenerPorId(detalle.IdProducto);
-            if (producto != null)
-            {
-                detalle.IdProducto = producto.IdProducto;
-                detalle.NombreProducto = $"{producto.Producto} (${producto.Precio.ToString("N2", ConfiguracionGlobal.CulturaES)}) - S: {producto.Stock.ToString("N2", ConfiguracionGlobal.CulturaES)}";
-                detalle.PrecioUnitario = producto.Precio;
-                detalle.CostoUnitario = producto.Costo;
-            }
-        }
-        foreach (var promocion in viewModel.VentaPromociones.Where(d => d.IdPromocion > 0 && string.IsNullOrEmpty(d.NombrePromocion)))
-        {
-            var promo = _promocionesRepo.ObtenerPorId(promocion.IdPromocion);
-            if (promo != null)
-            {
-                promocion.IdPromocion = promo.IdPromocion;
-                promocion.NombrePromocion = $"{promo.Promocion} (${promo.Precio.ToString("N2", ConfiguracionGlobal.CulturaES)}) - S: {promo.CalcularStock()}";
-                promocion.PrecioPromo = promo.Precio;
-                promocion.CostoPromo = promo.CalcularCostoTotal();
-            }
-        }
-        // (Hacer lo mismo para VentaPromociones)
         viewModel.Metodos = ObtenerListaMetodosDePago();
         if (viewModel.DetallesVenta != null)
         {

@@ -63,6 +63,7 @@
                     </button>
                 </div>
             </div>
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
             <div class="card shadow-sm">
                 <div class="card-header">
@@ -81,7 +82,6 @@
                 </div>
 
             </div>
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
         </div>
 
         <div class="col-lg-4">
@@ -242,10 +242,21 @@
             $('#btn-agregar-producto').click(function () {
                 const ultimaFila = productosContainer.find('.detalle-item-producto').last();
                 
-                if (ultimaFila.length > 0 && !ultimaFila.find('.producto-search').val()) {
-                    $('#advertenciaAgregarProducto').text("Por favor seleccione un producto antes de agregar otro");
-                    return;
+                // Si no hay filas, podemos agregar una.
+                if (ultimaFila.length === 0) {
+                    // Lógica para agregar la primera fila (ya la tienes)
+                } else {
+                    // Verificamos si la última fila es una fila "nueva" (tiene un select)
+                    const esFilaNueva = ultimaFila.find('.producto-search').length > 0;
+                    
+                    // Si es una fila nueva Y su valor está vacío, mostramos error.
+                    if (esFilaNueva && !ultimaFila.find('.producto-search').val()) {
+                        $('#advertenciaAgregarProducto').text("Por favor seleccione un producto antes de agregar otro");
+                        return; // Detenemos la ejecución
+                    }
                 }
+
+                // Si pasamos la validación, procedemos a agregar la nueva fila
 
                 const nuevoIndex = productosContainer.find('.detalle-item-producto').length;
                 $.get('@Url.Action("ObtenerVistaDetalleVenta", "Ventas")', { index: nuevoIndex }, function (data) {
@@ -258,9 +269,17 @@
             $('#btn-agregar-promocion').click(function () {
                 const ultimaFila = promocionesContainer.find('.detalle-item-promocion').last();
 
-                if (ultimaFila.length > 0 && !ultimaFila.find('.promocion-search').val()) {
-                    $('#advertenciaAgregarPromo').text("Por favor seleccione una promocion antes de agregar otra");
-                    return;
+                if (ultimaFila.length === 0) {
+                    // Lógica para agregar la primera fila (ya la tienes)
+                } else {
+                    // Verificamos si la última fila es una fila "nueva" (tiene un select)
+                    const esFilaNueva = ultimaFila.find('.promocion-search').length > 0;
+                    
+                    // Si es una fila nueva Y su valor está vacío, mostramos error.
+                    if (esFilaNueva && !ultimaFila.find('.promocion-search').val()) {
+                        $('#advertenciaAgregarPromo').text("Por favor seleccione una promocion antes de agregar otra");
+                        return; // Detenemos la ejecución
+                    }
                 }
 
                 const nuevoIndex = promocionesContainer.find('.detalle-item-promocion').length;

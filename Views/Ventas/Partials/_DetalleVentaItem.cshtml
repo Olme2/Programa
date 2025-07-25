@@ -1,14 +1,20 @@
 @model DetallesVentasVM.DetalleVentaVM 
-
+@{
+    var cantidadValue = Model.Cantidad.ToString(System.Globalization.CultureInfo.InvariantCulture);
+}
 <div class="row detalle-item-producto align-items-center mb-3 p-2 border rounded">
     <div class="col-md-6">
         <label class="form-label">Producto</label>
-        <select asp-for="IdProducto" class="form-control producto-search"></select>
+        <select asp-for="IdProducto" class="form-control producto-search">
+             @if (Model.IdProducto > 0){
+                <option value="@Model.IdProducto" selected>@Model.NombreProducto</option>
+            }
+        </select>
         <span asp-validation-for="IdProducto" class="text-danger"></span>
     </div>
     <div class="col-md-3">
         <label asp-for="Cantidad" class="form-label"></label>
-        <input asp-for="Cantidad" type="number" step="0.001" min="0.001" class="form-control cantidad-producto" />
+        <input asp-for="Cantidad" type="number" step="0.001" min="0.001" class="form-control cantidad-producto" value="@(cantidadValue!=0.ToString() ? cantidadValue : " ")"/>
         <span asp-validation-for="Cantidad" class="text-danger"></span>
     </div>
 
