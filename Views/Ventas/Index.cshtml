@@ -7,7 +7,11 @@
     <h1>Listado de Ventas</h1>
     <p></p>
     <form id="filtro-form" class="row g-3 align-items-center p-3 mb-3 bg-light border rounded">
-        <h2>Filtros</h2>
+        <div class="row">
+            <h2 class="col-md-3">Filtros</h2>
+            <div class="col-md-6"></div>
+            <h2 class="col-md-3">Total: </h2>
+        </div>
         <div class="col-xl-2 col-md-6">
             <label asp-for="FechaInicio" class="form-label">Fecha de Inicio</label>
             <input asp-for="FechaInicio" type="date" class="form-control filtro-control" />

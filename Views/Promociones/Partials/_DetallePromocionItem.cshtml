@@ -1,16 +1,10 @@
 @* Archivo: Views/Shared/_ModificarDetallePromocionItem.cshtml *@
 @model DetallesPromocionesVM.DetallePromocionVM
 @{
-    // Usamos CultureInfo.InvariantCulture para asegurar que el punto sea el separador decimal,
-    // lo cual es estándar para los atributos de datos y JavaScript.
     var cantidadValue = Model.Cantidad.ToString(System.Globalization.CultureInfo.InvariantCulture);
     var costoValue = Model.Costo.ToString(System.Globalization.CultureInfo.InvariantCulture);
 }
 <div class="row detalle-item align-items-center mb-3 p-2 border rounded">
-    @* --- CORRECCIÓN ---
-       Se eliminaron los campos <input type="hidden" /> para IdProducto y Cantidad.
-       Eran redundantes y causaban que el model binder recibiera los valores antiguos en lugar de los nuevos.
-    *@
 
     <div class="col-md-6">
         <label class="form-label">Producto</label>
@@ -24,6 +18,7 @@
     <div class="col-md-3">
         <label asp-for="Cantidad" class="form-label"></label>
         <input asp-for="Cantidad" type="number" step="0.001" min="0.001" class="form-control cantidad-producto" value="@cantidadValue"/>
+        <span asp-validation-for="Cantidad" class="text-danger"></span>
     </div>
     <div class="col-md-2">
         <label class="form-label">Costo</label>

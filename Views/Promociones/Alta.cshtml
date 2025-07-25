@@ -4,19 +4,20 @@
 }
 
 <form asp-action="Alta" method="post" id="form-promocion">
+
     <h1>Crear Nueva Promoción</h1>
     <hr />
-    <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
-    <input asp-for="@Model.Productos" type="hidden">
+    <input asp-for="Productos" type="hidden">
     <span ></span>
+
     <div class="row">
         <div class="col-md-7">
             <div class="card shadow-sm mb-4">
                 <div class="card-header">
                     <h4>Datos Generales</h4>
                 </div>
+
                 <div class="card-body">
-                    <input asp-for="Productos" type="hidden">
                     <div class="mb-3">
                         <label asp-for="Promocion" class="form-label"></label>
                         <input asp-for="Promocion" class="form-control" placeholder="Ej: Combo Alitas BBQ" />
@@ -29,9 +30,10 @@
                             <input asp-for="Inicio" type="date" class="form-control" />
                             <span asp-validation-for="Inicio" class="text-danger"></span>
                         </div>
+
                         <div class="col-sm-6 mb-3">
-                        <label asp-for="Fin" class="form-label"></label>
-                        <input asp-for="Fin" type="date" class="form-control" />
+                            <label asp-for="Fin" class="form-label"></label>
+                            <input asp-for="Fin" type="date" class="form-control" />
                             <span asp-validation-for="Fin" class="text-danger"></span>
                         </div>
                     </div>
@@ -39,38 +41,33 @@
             </div>
 
             <div class="card shadow-sm">
+
                 <div class="card-header">
                     <h4>Productos Incluidos</h4>
                 </div>
+
                 <div class="card-body">
                     <div id="detalles-container">
-                        @* Usamos un bucle 'for' para asegurar la correcta indexación de los campos. *@
-                        @if (Model.DetallesPromocion != null)
+                        @for (int i = 0; i < Model.DetallesPromocion.Count; i++)
                         {
-                            for (int i = 0; i < Model.DetallesPromocion.Count; i++)
-                            {
-                                @*
-                                    Le pasamos a la vista parcial el objeto del detalle y el índice.
-                                    El prefijo del nombre se generará automáticamente como "DetallesPromocion[i]".
-                                *@
-                                <partial name="Partials/_DetallePromocionItem" for="DetallesPromocion[i]" />
-                            }
+                            <partial name="Partials/_DetallePromocionItem" for="DetallesPromocion[i]"/>
                         }
                     </div>
-                    
+                    <span id="advertenciaAgregarProducto" class="text-danger"></span>
                     <button type="button" id="btn-agregar-detalle" class="btn btn-success w-100 mt-2">
                         + Añadir Producto
                     </button>
                 </div>
+
                 <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             </div>
         </div>
 
         <div class="col-md-5">
             <div class="summary-card">
-                @* ... (El contenido del summary-card es el mismo) ... *@
                 <h4>Resumen de la Promoción</h4>
                 <hr>
+
                 <div class="mb-3">
                     <label asp-for="Precio" class="form-label fs-5">Precio de Venta Final</label>
                     <div class="input-group">
@@ -179,6 +176,13 @@
 
             // --- MANEJADORES DE EVENTOS ---
             $('#btn-agregar-detalle').click(function () {
+                const ultimaFila = detallesContainer.find('.detalle-item').last();
+
+                if (ultimaFila.length > 0 && !ultimaFila.find('.producto-search').val()) {
+                    $('#advertenciaAgregarDetalle').text("Por favor seleccione un producto antes de agregar otro");
+                    return;
+                }
+
                 const nuevoIndex = detallesContainer.find('.detalle-item').length;
                 $.get('@Url.Action("ObtenerVistaDetallePromocion", "Promociones")', { index: nuevoIndex }, function (data) {
                     const nuevaFila = $(data);
@@ -190,6 +194,7 @@
 
             detallesContainer.on('click', '.btn-eliminar-detalle', function () {
                 $(this).closest('.detalle-item').remove();
+                $('#advertenciaAgregarProducto').text('');
                 reindexarFilas();
             });
             
@@ -197,6 +202,7 @@
                 const data = e.params.data;
                 const costo = data.costo || 0;
                 $(this).closest('.detalle-item').find('.costo-producto-unitario').val(costo);
+                $('#advertenciaAgregarProducto').text('');
                 recalcularTotales();
             });
 

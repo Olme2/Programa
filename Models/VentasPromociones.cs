@@ -22,7 +22,7 @@ public class VentasPromociones
         Promocion = null!;
     }
 
-    public static VentasPromociones CrearDesdeViewModel(AltaVentaPromocionVM promocionVM)
+    public static VentasPromociones CrearDesdeViewModel(VentaPromocionVM promocionVM)
     {
         return new VentasPromociones(promocionVM.IdPromocion, promocionVM.Cantidad, promocionVM.CostoPromo, promocionVM.PrecioPromo);
     }
@@ -32,12 +32,12 @@ public class VentasPromociones
         return new VentasPromociones(promocionVM.IdPromocion, promocionVM.Cantidad, promocionVM.CostoPromo, promocionVM.PrecioPromo);
     }
 
-    public decimal CalcularPrecio()
+    public decimal CalcularCosto()
     {
         return CostoPromo * Cantidad;
     }
 
-    public decimal CalcularCosto()
+    public decimal CalcularPrecio()
     {
         return PrecioPromo * Cantidad;
     }

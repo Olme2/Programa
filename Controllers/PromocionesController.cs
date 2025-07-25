@@ -273,7 +273,7 @@ public class PromocionesController : Controller
             {
                 promocionesVM = promocionesVM.Where(p =>
                     p.Promocion.Contains(busqueda, StringComparison.CurrentCultureIgnoreCase) ||
-                    p.ProductosConcatenados.Contains(busqueda, StringComparison.CurrentCultureIgnoreCase)
+                    p.ProductosConcatenados.ToString().Contains(busqueda, StringComparison.CurrentCultureIgnoreCase)
                 );
             }
             var promocionesOrdenadas = promocionesVM.OrderByDescending(p => p.Activa).ThenByDescending(p => p.Inicio);
@@ -306,7 +306,7 @@ public class PromocionesController : Controller
                 {
                     id = p.IdProducto,
                     text = p.Producto,
-                    costo = p.Costo
+                    costo = p.Costo,
                 })
                 .Take(10)
                 .ToList();
@@ -320,12 +320,9 @@ public class PromocionesController : Controller
     }
 
     [HttpGet]
-    public IActionResult ObtenerVistaDetallePromocion(int index)
+    public IActionResult ObtenerVistaDetallePromocion()
     {
-        // Usamos el ViewModel de Modificar para mantener la consistencia del HTML.
-        var vm = new DetallePromocionVM();
-        // La vista parcial debe ser la misma que usa la vista Modificar.
-        return PartialView("Partials/_DetallePromocionItem", vm);
+        return PartialView("Partials/_DetallePromocionItem", new DetallePromocionVM());
     }
 
 
@@ -343,6 +340,7 @@ public class PromocionesController : Controller
                 {
                     detalle.NombreProducto = producto.Producto;
                     detalle.Costo = producto.Costo;
+                    detalle.Activo = producto.Activo;
                 }
             }
         }

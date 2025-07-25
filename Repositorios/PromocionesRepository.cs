@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Html;
 using PromocionesVM;
 using entornoPolleria;
 // Asegúrate de que los 'using' apunten a tus carpetas correctas de Modelos y Repositorios
@@ -26,7 +27,7 @@ public class PromocionesRepository : IPromocionesRepository
                 Inicio = p.Inicio,
                 Fin = p.Fin,
                 Costo = p.DetallesPromocion.Sum(d => d.Producto.Costo * d.Cantidad),
-                ProductosConcatenados = string.Join("<br>", p.DetallesPromocion.Select(d => d.Producto.Producto + " x" + d.Cantidad.ToString("N0"))),
+                ProductosConcatenados = new HtmlString(string.Join("<br>", p.DetallesPromocion.Select(d => d.Producto.Producto + " x" + d.Cantidad.ToString("N0")))),
                 Activa = !p.Fin.HasValue || p.Fin.Value > hoy,
                 Ganancia = p.Precio - p.DetallesPromocion.Sum(d => d.Producto.Costo * d.Cantidad),
                 PorcentajeGanancia = (p.DetallesPromocion.Sum(d => d.Producto.Costo * d.Cantidad) > 0) ? (p.Precio - p.DetallesPromocion.Sum(d => d.Producto.Costo * d.Cantidad)) / p.DetallesPromocion.Sum(d => d.Producto.Costo * d.Cantidad) : 0,
@@ -38,7 +39,7 @@ public class PromocionesRepository : IPromocionesRepository
                 VentaSemanal = _context.VentasPromociones
                                 .Where(vp => vp.IdPromocion == p.IdPromocion &&
                                 _context.Ventas.Any(v => v.IdVenta == vp.IdVenta && v.Fecha >= unaSemanaAtras && v.Fecha <= hoy))
-                                .Sum(dv => (int?)dv.Cantidad) ?? 0
+                                .Sum(dv => (int?)dv.Cantidad) ?? 0,
             })
             .ToList();
     }

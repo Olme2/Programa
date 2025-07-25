@@ -69,3 +69,16 @@ body {
       padding-top: 1rem;
       margin-top: 1rem;
 }
+
+.producto-sin-stock{
+        background-color: #dc3545;
+        
+        /* --- INICIO DE LA CORRECCIÓN --- */
+        /* Estos estilos aseguran que el fondo del div cubra todo el espacio del item <li> padre */
+        padding: 6px 12px;      /* Asumimos un padding estándar de Select2 */
+        margin: -6px -12px;     /* El margen negativo contrarresta el padding del padre */
+        /* --- FIN DE LA CORRECCIÓN --- */
+        
+        pointer-events: none;
+        opacity: 0.7;
+    }

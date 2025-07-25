@@ -22,11 +22,12 @@
     <tr class="@filaInactivaClass">
         <td>@ResaltarCoincidencia(producto.Producto)</td>
         <td>@ResaltarCoincidencia(producto.Proveedor)</td>
-        <td>@producto.Stock</td>
-        <td>@producto.Costo.ToString("C")</td>
-        <td>@producto.Precio.ToString("C")</td>
-        <td>@producto.Ganancia.ToString("C")</td>
-        <td>@producto.PorcentajeGanancia.ToString("P2")</td>
+        <td>@producto.Stock.ToString("N3", ConfiguracionGlobal.CulturaES)</td>
+        <td>$@producto.Costo.ToString("N2", ConfiguracionGlobal.CulturaES)</td>
+        <td>$@producto.Precio.ToString("N2", ConfiguracionGlobal.CulturaES)</td>
+        <td>$@producto.Ganancia.ToString("N2", ConfiguracionGlobal.CulturaES)</td>
+        <td>@producto.PorcentajeGanancia.ToString("N2", ConfiguracionGlobal.CulturaES)%</td>
+        <td>@producto.VentaSemanal.ToString("N3", ConfiguracionGlobal.CulturaES)</td>
         <td>
             <a asp-action="Modificar" asp-route-id="@producto.IdProducto" class="btn btn-warning btn-sm">Modificar</a>
             @if (producto.EsEliminable)

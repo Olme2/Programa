@@ -26,7 +26,7 @@ public class ProductosRepository : IProductosRepository
                 Precio = p.Precio,
                 Activo = p.Activo,
                 Ganancia = p.Precio - p.Costo,
-                PorcentajeGanancia = (p.Costo > 0) ? ((p.Precio - p.Costo) / p.Costo) : 0,
+                PorcentajeGanancia = (p.Costo > 0) ? (100*(p.Precio - p.Costo) / p.Costo) : 0,
                 EsEliminable = !_context.DetallesVentas.Any(dv => dv.IdProducto == p.IdProducto) &&
                                    !_context.DetallesPromociones.Any(dp => dp.IdProducto == p.IdProducto) &&
                                    !_context.DetallesCompras.Any(dc => dc.IdProducto == p.IdProducto),

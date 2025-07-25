@@ -22,15 +22,11 @@ public class DetallesVentas
         Producto = null!;
     }
 
-    public static DetallesVentas CrearDesdeViewModel(AltaDetalleVentaVM detalleVM)
+    public static DetallesVentas CrearDesdeViewModel(DetalleVentaVM detalleVM)
     {
         return new DetallesVentas(detalleVM.IdProducto, detalleVM.Cantidad, detalleVM.CostoUnitario, detalleVM.PrecioUnitario);
     }
 
-    public static DetallesVentas CrearDesdeViewModel(ModificarDetalleVentaVM detalleVM)
-    {
-        return new DetallesVentas(detalleVM.IdProducto, detalleVM.Cantidad, detalleVM.CostoUnitario, detalleVM.PrecioUnitario);
-    }
 
     public decimal CalcularCosto()
     {

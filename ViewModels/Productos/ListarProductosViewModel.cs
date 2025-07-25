@@ -7,11 +7,7 @@ public class ListarProductosVM
         public string Producto { get; set; } = string.Empty;
         public string Proveedor { get; set; } = string.Empty;
         public decimal Stock { get; set; }
-
-        [DataType(DataType.Currency)]
-        public decimal Costo { get; set; }
-        
-        [DataType(DataType.Currency)]
+        public decimal Costo { get; set; }        
         public decimal Precio { get; set; }
 
         public bool Activo { get; set; }
@@ -19,7 +15,6 @@ public class ListarProductosVM
         public decimal Ganancia { get; set; }
 
         [Display(Name = "% Ganancia")]
-        [DisplayFormat(DataFormatString = "{0:P2}")]
         public decimal PorcentajeGanancia { get; set; }
         public bool EsEliminable { get; set; }
         public decimal VentaSemanal { get; set; }

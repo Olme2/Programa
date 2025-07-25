@@ -18,7 +18,7 @@ public class ModificarVentaVM : IValidatableObject
     [Required(ErrorMessage = "La hora es obligatoria.")]
     public TimeOnly Hora { get; set; }
     public string? Detalle { get; set; }
-    public List<ModificarDetalleVentaVM> DetallesVenta { get; set; }
+    public List<DetalleVentaVM> DetallesVenta { get; set; }
     public List<ModificarVentaPromocionVM> VentaPromociones { get; set; }
     public List<ListarProductosVM> Productos { get; set; }
     public List<ListarPromocionesVM> Promociones { get; set; }
@@ -26,7 +26,7 @@ public class ModificarVentaVM : IValidatableObject
 
     public ModificarVentaVM()
     {
-        DetallesVenta = new List<ModificarDetalleVentaVM>();
+        DetallesVenta = new List<DetalleVentaVM>();
         VentaPromociones = new List<ModificarVentaPromocionVM>();
         Productos = new List<ListarProductosVM>();
         Promociones = new List<ListarPromocionesVM>();

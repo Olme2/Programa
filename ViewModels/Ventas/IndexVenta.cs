@@ -18,7 +18,7 @@ public class IndexVentasVM
 
     [DataType(DataType.Date)]
     public DateTime FechaFin { get; set; } = DateTime.Today;
-
+    public decimal Total { get; set; } = 0;
     public string? Busqueda { get; set; }
 
     [Display(Name = "Método de Pago")]

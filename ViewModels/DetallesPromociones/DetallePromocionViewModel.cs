@@ -15,6 +15,7 @@ public class DetallePromocionVM
     public string? NombreProducto { get; set; }
 
     public decimal Costo { get; set; }
+    public bool Activo { get; set; }
 
     public DetallePromocionVM() { }
 
@@ -24,6 +25,7 @@ public class DetallePromocionVM
         Cantidad = detalle.Cantidad;
         NombreProducto = detalle.Producto.Producto;
         Costo = detalle.Producto.Costo;
+        Activo = detalle.Producto.Activo;
     }
     public decimal CalcularCosto()
     {

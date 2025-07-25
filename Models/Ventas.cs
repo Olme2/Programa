@@ -40,9 +40,9 @@ public class Ventas
         Fecha = ventaVM.Fecha;
         Hora = ventaVM.Hora;
         Detalle = ventaVM.Detalle;
-        LimpiarDetalles();
         var detallesActualizados = ventaVM.DetallesVenta.Select(DetallesVentas.CrearDesdeViewModel).ToList();
         var promocionesActualizadas = ventaVM.VentaPromociones.Select(VentasPromociones.CrearDesdeViewModel).ToList();
+        LimpiarDetalles();
         foreach (var detalle in detallesActualizados)
         {
             AgregarDetalle(detalle);

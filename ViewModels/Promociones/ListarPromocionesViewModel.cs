@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using Microsoft.AspNetCore.Html;
 namespace PromocionesVM;
 
 public class ListarPromocionesVM
@@ -6,7 +7,7 @@ public class ListarPromocionesVM
     public int IdPromocion { get; set; }
     public string Promocion { get; set; } = string.Empty;
     [Display(Name = "Productos")]
-    public string ProductosConcatenados { get; set; } = string.Empty;
+    public HtmlString ProductosConcatenados { get; set; } = new HtmlString("");
     [DataType(DataType.Currency)]
     public decimal Costo { get; set; }
     [DataType(DataType.Currency)]
