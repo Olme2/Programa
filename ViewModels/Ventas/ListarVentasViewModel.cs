@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Html;
 using System.ComponentModel.DataAnnotations;
 namespace VentasVM;
 
@@ -14,9 +15,18 @@ public class ListarVentasVM
     [DisplayFormat(DataFormatString = "{0:dd/MM}")]
     public DateOnly Fecha { get; set; }
     [Display(Name = "Hora")]
-    [DisplayFormat(DataFormatString = "{0:mm:HH}")]
+    [DisplayFormat(DataFormatString = "{0:HH:mm}")]
     public TimeOnly Hora { get; set; }
     public short IdMetodo { get; set; }
     public string? Detalle { get; set; }
     public ListarVentasVM() { }
+    public ListarVentasVM(Ventas venta)
+    {
+        IdVenta = venta.IdVenta;
+        Metodo = venta.Metodo.Metodo;
+        ProductosYPromociones =string.Concat("Promociones: ", string.Join(", ", venta.VentaPromociones.Select(vp => vp.Promocion.Promocion)), "<br>Productos: ", string.Join(",", venta.DetallesVenta.Select(dv => dv.Producto.Producto)));
+        Total = venta.CalcularPrecioTotal();
+        Fecha = venta.Fecha;
+        Hora = venta.Hora;
+    }
 }

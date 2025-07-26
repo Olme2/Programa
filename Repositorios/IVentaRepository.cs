@@ -6,5 +6,5 @@ public interface IVentaRepository
     Ventas? ObtenerVentaPorId(long id);
     void CrearVenta(Ventas nuevaVenta);
     void ActualizarVenta(Ventas ventaModificada);
-    void EliminarVenta(int id);   
+    void EliminarVenta(long id);   
 }

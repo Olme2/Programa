@@ -143,7 +143,7 @@ public class VentasController : Controller
                     if (producto != null)
                     {
                         detalle.IdProducto = producto.IdProducto;
-                        detalle.NombreProducto = $"{producto.Producto} (${producto.Precio.ToString("N2", ConfiguracionGlobal.CulturaES)}) - S: {producto.Stock.ToString("N2", ConfiguracionGlobal.CulturaES)}";
+                        detalle.NombreProducto = $"{producto.Producto} (${producto.Precio.ToString("N2", CG.CulturaES)}) - S: {producto.Stock.ToString("N2", CG.CulturaES)}";
                         detalle.PrecioUnitario = producto.Precio;
                         detalle.CostoUnitario = producto.Costo;
                     }
@@ -162,7 +162,7 @@ public class VentasController : Controller
                 if (promocion != null)
                 {
                     detallePromo.IdPromocion = promocion.IdPromocion;
-                    detallePromo.NombrePromocion = $"{promocion.Promocion} (${promocion.Precio.ToString("N2", ConfiguracionGlobal.CulturaES)}) - S: {promocion.Stock.ToString("N2", ConfiguracionGlobal.CulturaES)}";
+                    detallePromo.NombrePromocion = $"{promocion.Promocion} (${promocion.Precio.ToString("N2", CG.CulturaES)}) - S: {promocion.Stock.ToString("N2", CG.CulturaES)}";
                     detallePromo.PrecioPromo = promocion.Precio;
                     detallePromo.CostoPromo = promocion.Costo;
                 }
@@ -214,7 +214,7 @@ public class VentasController : Controller
             .Select(p => new
             {
                 id = p.IdProducto,
-                text = $"{p.Producto} (${p.Precio.ToString("N2", ConfiguracionGlobal.CulturaES)}) - S: {(p.Stock == 0 ? "Sin Stock" : p.Stock.ToString("N2", ConfiguracionGlobal.CulturaES))}",
+                text = $"{p.Producto} (${p.Precio.ToString("N2", CG.CulturaES)}) - S: {(p.Stock == 0 ? "Sin Stock" : p.Stock.ToString("N2", CG.CulturaES))}",
                 precio = p.Precio,
                 costo = p.Costo,
                 disabled = p.Stock <= 0
@@ -243,7 +243,7 @@ public class VentasController : Controller
             .Select(p => new
             {
                 id = p.IdPromocion,
-                text = $"{p.Promocion} (${p.Precio.ToString("N2", ConfiguracionGlobal.CulturaES)}) - S: {(p.Stock == 0 ? "Sin Stock" : p.Stock.ToString("N2", ConfiguracionGlobal.CulturaES))}",
+                text = $"{p.Promocion} (${p.Precio.ToString("N2", CG.CulturaES)}) - S: {(p.Stock == 0 ? "Sin Stock" : p.Stock.ToString("N2", CG.CulturaES))}",
                 precio = p.Precio,
                 costo = p.Costo,
                 disabled = p.Stock <= 0
@@ -317,7 +317,7 @@ public class VentasController : Controller
                     if (producto != null)
                     {
                         detalle.IdProducto = producto.IdProducto;
-                        detalle.NombreProducto = $"{producto.Producto} (${producto.Precio.ToString("N2", ConfiguracionGlobal.CulturaES)}) - S: {producto.Stock.ToString("N2", ConfiguracionGlobal.CulturaES)}";
+                        detalle.NombreProducto = $"{producto.Producto} (${producto.Precio.ToString("N2", CG.CulturaES)}) - S: {producto.Stock.ToString("N2", CG.CulturaES)}";
                         detalle.PrecioUnitario = producto.Precio;
                         detalle.CostoUnitario = producto.Costo;
                     }
@@ -336,7 +336,7 @@ public class VentasController : Controller
                     if (promocion != null)
                     {
                         detallePromo.IdPromocion = promocion.IdPromocion;
-                        detallePromo.NombrePromocion = $"{promocion.Promocion} (${promocion.Precio.ToString("N2", ConfiguracionGlobal.CulturaES)}) - S: {promocion.Stock.ToString("N2", ConfiguracionGlobal.CulturaES)}";
+                        detallePromo.NombrePromocion = $"{promocion.Promocion} (${promocion.Precio.ToString("N2", CG.CulturaES)}) - S: {promocion.Stock.ToString("N2", CG.CulturaES)}";
                         detallePromo.PrecioPromo = promocion.Precio;
                         detallePromo.CostoPromo = promocion.Costo;
                     }
@@ -346,20 +346,50 @@ public class VentasController : Controller
     }
 
 
-    // GET: /Ventas/Eliminar/5
-    public IActionResult Eliminar(int id)
+    [HttpGet]
+    public IActionResult Eliminar(long id)
     {
-        // Lógica para mostrar la página de confirmación de eliminación (la completaremos después)
-        return View();
+        try
+        {
+            // Usamos el mismo método del Index, filtrando por el ID específico.
+            // Esto nos da el ViewModel que la vista necesita sin escribir lógica de mapeo nueva.
+            var venta = _ventaRepo.ObtenerVentaPorId(id);
+            if (venta == null)
+            {
+                TempData["ErrorMessage"] = "La venta que intenta eliminar no fue encontrada.";
+                return RedirectToAction(nameof(Index));
+            }
+            var ventaVM = new ListarVentasVM(venta);
+            return View(ventaVM);
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, "Error al obtener la venta con ID {Id} para eliminar.", id);
+            TempData["ErrorMessage"] = "Ocurrió un error al cargar los datos de la venta.";
+            return RedirectToAction(nameof(Index));
+        }
     }
 
-    // POST: /Ventas/Eliminar/5
+
+
+    // POST: Ventas/Eliminar/5
     [HttpPost, ActionName("Eliminar")]
     [ValidateAntiForgeryToken]
-    public IActionResult EliminarConfirmado(int id)
+    public IActionResult EliminarConfirmado(long IdVenta)
     {
-        // Lógica para eliminar la venta (la completaremos después)
+        try
+        {
+            _ventaRepo.EliminarVenta(IdVenta);
+            TempData["SuccessMessage"] = "Venta eliminada con éxito.";
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, "Error al eliminar la venta con ID {Id}", IdVenta);
+            TempData["ErrorMessage"] = "Ocurrió un error al intentar eliminar la venta.";
+        }
+
         return RedirectToAction(nameof(Index));
     }
+
     
 }

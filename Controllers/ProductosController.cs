@@ -34,9 +34,6 @@ public class ProductosController : Controller
     [HttpGet]
     public IActionResult Alta()
     {
-        // Para el formulario de Alta, preparamos el ViewModel.
-        // El dropdown de proveedores se carga dinámicamente con Select2,
-        // por lo que no es necesario pasar la lista aquí.
         return View(new AltaProductoVM());
     }
 
@@ -46,6 +43,9 @@ public class ProductosController : Controller
     {
         if (!ModelState.IsValid)
         {
+            var proveedor = _proveedoresRepo.ObtenerPorId(viewModel.IdProveedor);
+            if(proveedor != null)
+            viewModel.Proveedor = proveedor.Proveedor;
             return View(viewModel);
         }
 
@@ -164,17 +164,17 @@ public class ProductosController : Controller
 
     [HttpPost, ActionName("Eliminar")]
     [ValidateAntiForgeryToken]
-    public IActionResult EliminarConfirmado(int id)
+    public IActionResult EliminarConfirmado(ListarProductosVM viewModel)
     {
         try
         {
-            _productosRepo.Eliminar(id);
+            _productosRepo.Eliminar(viewModel.IdProducto);
             TempData["SuccessMessage"] = "Producto eliminado correctamente.";
             return RedirectToAction(nameof(Index));
         }
         catch (Exception e)
         {
-            _logger.LogError(e, "Error al eliminar el producto con ID {ProductoId}", id);
+            _logger.LogError(e, "Error al eliminar el producto con ID {ProductoId}", viewModel.IdProducto);
             TempData["ErrorMessage"] = "Ocurrió un error al eliminar el producto.";
             return RedirectToAction(nameof(Index));
         }

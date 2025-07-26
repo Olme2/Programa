@@ -242,17 +242,17 @@ public class PromocionesController : Controller
 
     [HttpPost, ActionName("Eliminar")]
     [ValidateAntiForgeryToken]
-    public IActionResult EliminarConfirmado(int id)
+    public IActionResult EliminarConfirmado(ListarPromocionesVM viewModel)
     {
         try
         {
-            _promocionesRepo.Eliminar(id);
+            _promocionesRepo.Eliminar(viewModel.IdPromocion);
             TempData["SuccessMessage"] = "Promoción eliminada correctamente.";
             return RedirectToAction(nameof(Index));
         }
         catch (Exception e)
         {
-            _logger.LogError(e, "Error al eliminar la promoción con ID {PromocionId}", id);
+            _logger.LogError(e, "Error al eliminar la promoción con ID {PromocionId}", viewModel.IdPromocion);
             TempData["ErrorMessage"] = "Ocurrió un error al eliminar la promoción.";
             return RedirectToAction(nameof(Index));
         }

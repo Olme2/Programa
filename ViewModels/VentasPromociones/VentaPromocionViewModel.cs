@@ -21,7 +21,7 @@ public class VentaPromocionVM
     public VentaPromocionVM(VentasPromociones p)
     {
         IdPromocion = p.IdPromocion;
-        NombrePromocion = $"{p.Promocion} (${p.PrecioPromo.ToString("N2", ConfiguracionGlobal.CulturaES)}) - S: {p.CalcularStock().ToString("N2", ConfiguracionGlobal.CulturaES)}";
+        NombrePromocion = $"{p.Promocion} (${p.PrecioPromo.ToString("N2", CG.CulturaES)}) - S: {p.CalcularStock().ToString("N2", CG.CulturaES)}";
         Cantidad = p.Cantidad;
         PrecioPromo = p.PrecioPromo;
         CostoPromo = p.CostoPromo;

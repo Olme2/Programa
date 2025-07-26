@@ -21,7 +21,7 @@
     <tr class="@filaConDeudaClass">
         <td>@ResaltarCoincidencia(proveedor.Proveedor)</td>
         <td>@(proveedor.Contacto ?? "Sin datos")</td>
-        <td>@proveedor.Debo.ToString("C")</td>
+        <td>@proveedor.DeboFormateado</td>
         <td>
             <a asp-action="Modificar" asp-route-id="@proveedor.IdProveedor" class="btn btn-warning btn-sm">Modificar</a>
             @if (!proveedor.EsEliminable || proveedor.Debo>0)

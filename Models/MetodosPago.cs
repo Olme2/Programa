@@ -3,11 +3,10 @@ using MetodosVM;
 public class MetodosPago
 {
     public short IdMetodo { get ; set; }
-    public string Metodo { get ; set; }
+    public string Metodo { get ; set; } = string.Empty;
     public virtual ICollection<Ventas> Ventas { get; set; }
     private MetodosPago()
     {
-        Metodo = string.Empty;
         Ventas = new List<Ventas>();
     }
 

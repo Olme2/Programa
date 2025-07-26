@@ -1,6 +1,6 @@
 using System.Globalization;
 
-public static class ConfiguracionGlobal
+public static class CG
 {
     /// <summary>
     /// Define una cultura estándar para español de Argentina, disponible en todo el sistema.

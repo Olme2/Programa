@@ -144,17 +144,17 @@ public class ProveedoresController : Controller
 
     [HttpPost, ActionName("Eliminar")]
     [ValidateAntiForgeryToken]
-    public IActionResult EliminarConfirmado(int id)
+    public IActionResult EliminarConfirmado(ListarProveedoresVM viewModel)
     {
         try
         {
-            _proveedoresRepo.Eliminar(id);
+            _proveedoresRepo.Eliminar(viewModel.IdProveedor);
             TempData["SuccessMessage"] = "Proveedor eliminado correctamente.";
             return RedirectToAction(nameof(Index));
         }
         catch (Exception e)
         {
-            _logger.LogError(e, "Error al eliminar el proveedor con ID {ProveedorId}", id);
+            _logger.LogError(e, "Error al eliminar el proveedor con ID {ProveedorId}", viewModel.IdProveedor);
             TempData["ErrorMessage"] = "Ocurrió un error al eliminar el proveedor. Es posible que esté en uso.";
             return RedirectToAction(nameof(Index));
         }

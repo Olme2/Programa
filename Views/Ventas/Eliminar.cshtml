@@ -2,23 +2,44 @@
 @{
     ViewData["Title"] = "Eliminar Venta";
 }
-<h2>Eliminar Venta</h2>
-<div class="alert alert-danger">
-    <strong>¿Estás seguro que deseas eliminar esta venta?</strong>
+
+<h1>Confirmar Eliminación</h1>
+
+<h3 class="text-danger">¿Está seguro que desea eliminar esta venta?</h3>
+<p class="text-muted">Esta acción es permanente y no se puede deshacer. Se restaurará el stock de los productos involucrados.</p>
+
+<hr />
+
+<div class="card bg-light col-md-8 shadow-sm">
+    <div class="card-body">
+        <h4 class="card-title">Venta a Eliminar:</h4>
+        <dl class="row mt-3">
+            <dt class="col-sm-3">ID Venta</dt>
+            <dd class="col-sm-9">@Model.IdVenta</dd>
+
+            <dt class="col-sm-3">Fecha y Hora</dt>
+            <dd class="col-sm-9">@Model.Fecha.ToString("dd/MM") a las @Model.Hora.ToString("HH:mm") hs</dd>
+            
+            <dt class="col-sm-3">Método de Pago</dt>
+            <dd class="col-sm-9">@Model.Metodo</dd>
+
+            <dt class="col-sm-3">Items Vendidos</dt>
+            <dd class="col-sm-9">@Html.Raw(Model.ProductosYPromociones)</dd>
+
+            <dt class="col-sm-3">Detalle Escrito</dt>
+            <dd class="col-sm-9">@(string.IsNullOrEmpty(Model.Detalle) ? "-" : Model.Detalle)</dd>
+
+            <dt class="col-sm-3 fs-5">Total</dt>
+            <dd class="col-sm-9 fs-5 fw-bold">@Model.Total.ToString("C")</dd>
+        </dl>
+    </div>
 </div>
-<dl class="row">
-    <dt class="col-sm-3">ID</dt>
-    <dd class="col-sm-9">@Model.IdVenta</dd>
-    <dt class="col-sm-3">Total</dt>
-    <dt class="col-sm-3">Fecha</dt>
-    <dd class="col-sm-9">@Model.Fecha.ToShortDateString()</dd>
-    <dt class="col-sm-3">Hora</dt>
-    <dd class="col-sm-9">@Model.Hora</dd>
-    <dt class="col-sm-3">Método de Pago</dt>
-    <dt class="col-sm-3">Detalle</dt>
-</dl>
-<form asp-action="EliminarVentaConfirmado" method="post">
-    <input type="hidden" asp-for="IdVenta" />
-    <button type="submit" class="btn btn-danger">Confirmar Eliminación</button>
-    <a asp-action="Index" class="btn btn-secondary">Cancelar</a>
-</form> 
+
+<div class="mt-4">
+    <form asp-action="Eliminar" method="post">
+        @* Pasamos el ID de la venta para que la acción POST sepa cuál eliminar *@
+        <input type="hidden" asp-for="IdVenta" />
+        <button type="submit" class="btn btn-danger">Confirmar Eliminación</button>
+        <a asp-action="Index" class="btn btn-secondary">Cancelar</a>
+    </form>
+</div>

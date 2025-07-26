@@ -14,7 +14,7 @@ public class AltaProductoVM : IValidatableObject
 
     [Required(ErrorMessage = "El stock inicial es obligatorio.")]
     [Range(0, 99999.999, ErrorMessage = "El stock no puede ser negativo ni mayor a 99.999,999.")]
-    public decimal Stock { get; set; }
+    public decimal Stock { get; set; } = -1;
 
     [Required(ErrorMessage = "El costo es obligatorio.")]
     [Range(0.01, 99999.99, ErrorMessage = "El costo debe ser un valor positivo y no mayor a $99.999,99.")]
@@ -23,6 +23,7 @@ public class AltaProductoVM : IValidatableObject
     [Required(ErrorMessage = "El precio es obligatorio.")]
     [Range(0.01, 99999.99, ErrorMessage = "El precio debe ser un valor positivo y no mayor a $99.999,99.")]
     public decimal Precio { get; set; }
+    public string? Proveedor {get; set;}
     public List<ListarProveedoresVM> Proveedores { get; set; }
 
     public AltaProductoVM()

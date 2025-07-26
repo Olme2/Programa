@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Html;
 using entornoPolleria;
 using VentasVM;
 
@@ -58,14 +59,22 @@ public class VentaRepository : IVentaRepository
         }
     public Ventas? ObtenerVentaPorId(long id)
     {
-        return _context.Ventas
-            .Include(v => v.DetallesVenta)
-                .ThenInclude(dv => dv.Producto)
-            .Include(v => v.VentaPromociones)
-                .ThenInclude(vp => vp.Promocion)
-                    .ThenInclude(p => p.DetallesPromocion)
-                        .ThenInclude(dp => dp.Producto)
-            .FirstOrDefault(v => v.IdVenta == id);
+        try
+        {
+            return _context.Ventas
+                .Include(v => v.Metodo)
+                .Include(v => v.DetallesVenta)
+                    .ThenInclude(dv => dv.Producto)
+                .Include(v => v.VentaPromociones)
+                    .ThenInclude(vp => vp.Promocion)
+                        .ThenInclude(p => p.DetallesPromocion)
+                            .ThenInclude(dp => dp.Producto)
+                .FirstOrDefault(v => v.IdVenta == id);
+        }
+        catch (Exception)
+        {
+            throw;
+        }
     }
     public void CrearVenta(Ventas nuevaVenta)
     {
@@ -97,7 +106,7 @@ public class VentaRepository : IVentaRepository
         _context.Ventas.Update(ventaModificada);
         _context.SaveChanges();
     }
-    public void EliminarVenta(int id)
+    public void EliminarVenta(long id)
     {
         var venta = _context.Ventas.Find(id);
         if (venta != null)

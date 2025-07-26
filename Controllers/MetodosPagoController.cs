@@ -103,13 +103,14 @@ public class MetodosPagoController : Controller
         }
     }
 
+    //Probado Eliminar (GET & POST)
     [HttpGet]
     public IActionResult Eliminar(short id)
     {
         try
         {
-            var metodoPagoVM = _metodosPagoRepo.ObtenerListadoMetodosPago().FirstOrDefault(m => m.IdMetodo == id);
-            if (metodoPagoVM == null)
+            var metodoPago = _metodosPagoRepo.ObtenerPorId(id);
+            if (metodoPago == null)
             {
                 TempData["ErrorMessage"] = "No existe método de pago con ese id.";
                 return RedirectToAction(nameof(Index));
@@ -119,11 +120,12 @@ public class MetodosPagoController : Controller
                 TempData["ErrorMessage"] = "No se puede eliminar el metodo porque está en uso en ventas.";
                 return RedirectToAction(nameof(Index));
             }
+            var metodoPagoVM = new ListarMetodosPagoVM(metodoPago);
             return View(metodoPagoVM);
         }
         catch (Exception e)
         {
-             _logger.LogError(e, "Error al obtener el método con ID {IdMetodo} para eliminar.", id);
+            _logger.LogError(e, "Error al obtener el método con ID {IdMetodo} para eliminar.", id);
             TempData["ErrorMessage"] = "No se pudo cargar el producto para eliminar.";
             return RedirectToAction(nameof(Index));
         }
@@ -131,17 +133,17 @@ public class MetodosPagoController : Controller
 
     [HttpPost, ActionName("Eliminar")]
     [ValidateAntiForgeryToken]
-    public IActionResult EliminarConfirmado(short id)
+    public IActionResult EliminarConfirmado(ListarMetodosPagoVM viewModel)
     {
         try
         {
-            _metodosPagoRepo.Eliminar(id);
+            _metodosPagoRepo.Eliminar(viewModel.IdMetodo);
             TempData["SuccessMessage"] = "Método de pago eliminado correctamente.";
             return RedirectToAction("Index");
         }
         catch (Exception e)
         {
-           _logger.LogError(e, "Error al eliminar el método de pago con ID {Id}", id);
+            _logger.LogError(e, "Error al eliminar el método de pago con ID {Id}", viewModel.IdMetodo);
             TempData["ErrorMessage"] = "Ocurrió un error al eliminar el método de pago.";
             return RedirectToAction(nameof(Index));
         }

@@ -25,8 +25,20 @@
             @* Aplicamos la función de resaltado al listado de productos *@
             <td>@ResaltarCoincidencia(venta.ProductosYPromociones)</td>
             <td>@venta.Metodo</td>
-            <td class="totalProducto">$@venta.Total.ToString("N2", ConfiguracionGlobal.CulturaES)</td>
-            <td>@venta.Fecha.ToString("dd/MM/yyyy") | @venta.Hora.ToString("HH:mm")</td>
+            <td class="totalProducto">$@venta.Total.ToString("N2", CG.CulturaES)</td>
+            <td>@venta.Fecha.ToString("dd/MM") | @venta.Hora.ToString("HH:mm")</td>
+            <td>
+                @{
+                    string detalleCorto = venta.Detalle ?? "";
+                    if (detalleCorto.Length > 15)
+                    {
+                        detalleCorto = detalleCorto.Substring(0, 15) + "...";
+                    }else{
+                        detalleCorto = "-";
+                    }
+                }
+                <span title="@venta.Detalle">@detalleCorto</span>
+            </td>
             <td>
                 @* Estructura de botones corregida para que estén uno al lado del otro *@
                 <a asp-action="Modificar" asp-route-id="@venta.IdVenta" class="btn btn-warning btn-sm">Modificar</a>
