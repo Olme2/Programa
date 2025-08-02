@@ -34,7 +34,6 @@ namespace entornoPolleria
                 entity.Property(e => e.Precio).HasColumnName("precio_producto").HasColumnType("numeric(7,2)").IsRequired();
                 entity.Property(e => e.Activo).HasColumnName("activo").HasColumnType("boolean").HasDefaultValue(true);
             });
-
             // Proveedores
             modelBuilder.Entity<Proveedores>(entity =>
             {
@@ -110,6 +109,7 @@ namespace entornoPolleria
                 entity.Property(e => e.Fecha).HasColumnName("fecha").IsRequired();
                 entity.Property(e => e.Hora).HasColumnName("hora").IsRequired();
                 entity.Property(e => e.Detalle).HasColumnName("detalle").HasMaxLength(100);
+                entity.Property(e => e.Redondeo).HasColumnName("redondeo");
             });
 
             // DetallesVentas

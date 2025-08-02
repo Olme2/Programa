@@ -20,7 +20,13 @@ public class ModificarVentaVM : IValidatableObject
     public TimeOnly Hora { get; set; }
     [StringLength(100, ErrorMessage = "El detalle no puede tener mas de 100 caracteres")]
     public string? Detalle { get; set; }
+    [Display(Name = "Recargo (%)")]
+    [Range(0.00, 100.00, ErrorMessage = "El recargo no puede ser negativo ni mayor al 100%.")]
     public decimal Recargo { get; set; } = 0;
+    [Required(ErrorMessage = "El campo redondeo no puede estar vacio")]
+    [Display(Name = "Redondeo")]
+    [Range(-999999.99, 999999.99, ErrorMessage = "El redondeo debe estar entre -999.999,99 y 999.999,99.")]
+    public decimal Redondeo { get; set; }
     public List<DetalleVentaVM> DetallesVenta { get; set; }
     public List<VentaPromocionVM> VentaPromociones { get; set; }
     public List<SelectListItem> Metodos { get; set; }
@@ -38,6 +44,7 @@ public class ModificarVentaVM : IValidatableObject
         Fecha = venta.Fecha;
         Hora = venta.Hora;
         Detalle = venta.Detalle;
+        Redondeo = venta.Redondeo;
         Metodos = metodos;
         DetallesVenta = venta.DetallesVenta.Select(d => new DetalleVentaVM(d)).ToList();
         VentaPromociones = venta.VentaPromociones.Select(p => new VentaPromocionVM(p)).ToList();

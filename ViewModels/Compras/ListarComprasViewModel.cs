@@ -3,7 +3,7 @@ namespace ComprasVM;
 public class ListarComprasVM
 {
     private int idCompra;
-    private string proveedor;
+    private string proveedor = string.Empty;
     private decimal total;
     private DateOnly fecha;
     private string? detalle;

@@ -52,7 +52,8 @@ public class VentaRepository : IVentaRepository
                     Total = v.CalcularPrecioTotal(),
                     Fecha = v.Fecha,
                     Hora = v.Hora,
-                    Detalle = v.Detalle
+                    Detalle = v.Detalle,
+                    Redondeo = v.Redondeo
                 });
 
         return ventasVM.OrderByDescending(v => v.Fecha).ThenByDescending(v => v.Hora).ToList();

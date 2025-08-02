@@ -1,0 +1,5 @@
+C:\Users\Valentino\OneDrive\Desktop\Polleria\Programa\bin\Release\net9.0\win-x64\publish\appsettings.Development.json
+C:\Users\Valentino\OneDrive\Desktop\Polleria\Programa\bin\Release\net9.0\win-x64\publish\appsettings.json
+C:\Users\Valentino\OneDrive\Desktop\Polleria\Programa\bin\Release\net9.0\win-x64\publish\entornoPolleria.pdb
+C:\Users\Valentino\OneDrive\Desktop\Polleria\Programa\bin\Release\net9.0\win-x64\publish\aspnetcorev2_inprocess.dll
+C:\Users\Valentino\OneDrive\Desktop\Polleria\Programa\bin\Release\net9.0\win-x64\publish\entornoPolleria.exe

@@ -56,5 +56,13 @@ app.UseAuthorization();
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Ventas}/{action=Alta}");
-
+try
+{
+    System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo("http://localhost:5000") { UseShellExecute = true });
+}
+catch (Exception ex)
+{
+    // Opcional: Manejar el caso en que no se pueda abrir el navegador.
+    Console.WriteLine("No se pudo abrir el navegador automáticamente: " + ex.Message);
+}
 app.Run();

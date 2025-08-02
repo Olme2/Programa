@@ -14,7 +14,7 @@
                 </div>
 
                 <div class="card-body row">
-                    <div class="col-md-4 mb-3">
+                    <div class="col-md-3 mb-3">
                         <label asp-for="IdMetodo" class="form-label"></label>
                         <select asp-for="IdMetodo" asp-items="Model.MetodosPago" class="form-select"></select>
                         <span asp-validation-for="IdMetodo" class="text-danger"></span>
@@ -31,13 +31,20 @@
                         <input asp-for="Hora" type="time" class="form-control" />
                         <span asp-validation-for="Hora" class="text-danger"></span>
                     </div>
-
-                    <div class="col-md-3 mb-3">
+                    <div class="col-md-2 mb-3">
                         <label asp-for="Recargo" class="form-label"></label>
                         <div class="input-group">
-                            <input asp-for="Recargo" type="number" step="0.1" min="0" class="form-control" />
+                            <input asp-for="Recargo" type="number" step="0.01" min="0" class="form-control" />
                             <span class="input-group-text">%</span>
                             <span asp-validation-for="Recargo" class="text-danger"></span>
+                        </div>
+                    </div>
+                    <div class="col-md-2 mb-3">
+                        <label asp-for="Redondeo" class="form-label"></label>
+                        <div class="input-group">
+                            <span class="input-group-text">$</span>
+                            <input asp-for="Redondeo" type="number" step="0.01" class="form-control">
+                            <span asp-validation-for="Redondeo" class="text-danger"></span>
                         </div>
                     </div>
                 </div>
@@ -230,9 +237,9 @@
                     row.find('.subtotal-promocion-display').text(subtotalItem.toLocaleString('es-AR', { style: 'currency', currency: 'ARS' }));
                     subtotal += subtotalItem;
                 });
-                
+                const redondeo = parseFloat($('#Redondeo').val()) || 0;
                 const recargo = parseFloat($('#Recargo').val() || 0);
-                const total = (subtotal)*(1+recargo/100);
+                const total = (subtotal+redondeo)*(1+recargo/100);
                 $('#recargo-display').text((subtotal*(recargo/100)).toLocaleString('es-AR', { style: 'currency', currency: 'ARS' }));
                 $('#subtotal-display').text(subtotal.toLocaleString('es-AR', { style: 'currency', currency: 'ARS' }));
                 $('#total-display').text(total.toLocaleString('es-AR', { style: 'currency', currency: 'ARS' }));
@@ -303,7 +310,7 @@
                 row.find('.costo-promo-hidden').val(data.costo || 0);
                 recalcularTotalVenta();
             });
-
+            $('#Redondeo').on('input', recalcularTotalVenta);
             productosContainer.on('input', '.cantidad-producto', recalcularTotalVenta);
             promocionesContainer.on('input', '.cantidad-promocion', recalcularTotalVenta);
             $('#Recargo').on('input', recalcularTotalVenta);

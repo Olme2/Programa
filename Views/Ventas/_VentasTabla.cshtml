@@ -29,12 +29,10 @@
             <td>@venta.Fecha.ToString("dd/MM") | @venta.Hora.ToString("HH:mm")</td>
             <td>
                 @{
-                    string detalleCorto = venta.Detalle ?? "";
+                    string detalleCorto = venta.Detalle ?? "-";
                     if (detalleCorto.Length > 15)
                     {
                         detalleCorto = detalleCorto.Substring(0, 15) + "...";
-                    }else{
-                        detalleCorto = "-";
                     }
                 }
                 <span title="@venta.Detalle">@detalleCorto</span>

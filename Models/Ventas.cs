@@ -8,6 +8,7 @@ public class Ventas
     public DateOnly Fecha { get; set; }
     public TimeOnly Hora { get; set; }
     public string? Detalle { get; set; }
+    public decimal Redondeo { get; set; }
     public List<DetallesVentas> _detallesVenta = new List<DetallesVentas>();
     public IReadOnlyCollection<DetallesVentas> DetallesVenta => _detallesVenta.AsReadOnly();
     public List<VentasPromociones> _ventaPromociones = new List<VentasPromociones>();
@@ -18,12 +19,13 @@ public class Ventas
         Metodo = null!;
     }
 
-    private Ventas(short idMetodo, DateOnly fecha, TimeOnly hora, string? detalle, List<DetallesVentas> detalles, List<VentasPromociones> promociones)
+    private Ventas(short idMetodo, DateOnly fecha, TimeOnly hora, string? detalle, decimal redondeo, List<DetallesVentas> detalles, List<VentasPromociones> promociones)
     {
         IdMetodo = idMetodo;
         Fecha = fecha;
         Hora = hora;
         Detalle = detalle;
+        Redondeo = redondeo;
         _detallesVenta = detalles;
         _ventaPromociones = promociones;
         Metodo = null!;
@@ -33,7 +35,7 @@ public class Ventas
     {
         var detalles = ventaVM.DetallesVenta.Select(DetallesVentas.CrearDesdeViewModel).ToList();
         var promociones = ventaVM.VentaPromociones.Select(VentasPromociones.CrearDesdeViewModel).ToList();
-        return new Ventas(ventaVM.IdMetodo, ventaVM.Fecha, ventaVM.Hora, ventaVM.Detalle, detalles, promociones);
+        return new Ventas(ventaVM.IdMetodo, ventaVM.Fecha, ventaVM.Hora, ventaVM.Detalle, ventaVM.Redondeo, detalles, promociones);
     }
     public void ActualizarDesdeViewModel(ModificarVentaVM ventaVM)
     {
@@ -41,6 +43,7 @@ public class Ventas
         Fecha = ventaVM.Fecha;
         Hora = ventaVM.Hora;
         Detalle = ventaVM.Detalle;
+        Redondeo = ventaVM.Redondeo;
         var detallesActualizados = ventaVM.DetallesVenta.Select(DetallesVentas.CrearDesdeViewModel).ToList();
         var promocionesActualizadas = ventaVM.VentaPromociones.Select(VentasPromociones.CrearDesdeViewModel).ToList();
         LimpiarDetalles();
@@ -122,6 +125,6 @@ public class Ventas
 
     public decimal CalcularPrecioTotal()
     {
-        return _detallesVenta.Sum(detalle => detalle.CalcularPrecio()) + _ventaPromociones.Sum(promocion => promocion.CalcularPrecio());
+        return _detallesVenta.Sum(detalle => detalle.CalcularPrecio()) + _ventaPromociones.Sum(promocion => promocion.CalcularPrecio()) + Redondeo;
     }
 }
