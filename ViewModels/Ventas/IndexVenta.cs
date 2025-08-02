@@ -20,16 +20,18 @@ public class IndexVentasVM
     public DateTime FechaFin { get; set; } = DateTime.Today;
     public decimal Total { get; set; } = 0;
     public string? Busqueda { get; set; }
+    public Turnos Turno { get; set; }
 
     [Display(Name = "Método de Pago")]
     public short? IdMetodoPago { get; set; }
     public IndexVentasVM() { }
-    public IndexVentasVM(DateTime inicio, DateTime fin, string? busqueda, short? idMetodoPago)
+    public IndexVentasVM(DateTime inicio, DateTime fin, string? busqueda, short? idMetodoPago, Turnos turno)
     {
         FechaInicio = inicio;
         FechaFin = fin;
         Busqueda = busqueda;
         IdMetodoPago = idMetodoPago;
+        Turno = turno;
     }
     public IndexVentasVM(IndexVentasVM filtro)
     {
@@ -37,5 +39,12 @@ public class IndexVentasVM
         FechaFin = filtro.FechaFin == default ? DateTime.Today : filtro.FechaFin;
         Busqueda = filtro.Busqueda;
         IdMetodoPago = filtro.IdMetodoPago;
+        Turno = filtro.Turno;
+    }
+    public enum Turnos
+    {
+        Todos,
+        Mañana,
+        Tarde
     }
 }

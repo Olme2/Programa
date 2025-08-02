@@ -33,6 +33,8 @@ public class VentasController : Controller
     {
         try
         {
+            var horaActual = TimeOnly.FromDateTime(DateTime.Now);
+            var nueveAM = TimeOnly.FromDateTime(DateTime.Parse("9:00"));
             var viewModel = new IndexVentasVM()
             {
                 FechaInicio = filtro.FechaInicio == default ? DateTime.Today : filtro.FechaInicio,
@@ -40,7 +42,12 @@ public class VentasController : Controller
                 Busqueda = filtro.Busqueda,
                 IdMetodoPago = filtro.IdMetodoPago,
             };
-        
+            viewModel.Turno = horaActual switch
+            {
+                var h when h >= new TimeOnly(9, 0) && h <= new TimeOnly(14, 0) => IndexVentasVM.Turnos.Mañana,
+                var h when h >= new TimeOnly(17, 30) && h <= new TimeOnly(21, 30) => IndexVentasVM.Turnos.Tarde,
+                _ => IndexVentasVM.Turnos.Todos
+            };
             viewModel.Ventas = _ventaRepo.ObtenerListadoVentas(viewModel).ToList();
             viewModel.MetodosPago = _metodosPagoRepo.ObtenerListadoMetodosPago().ToList();
 
