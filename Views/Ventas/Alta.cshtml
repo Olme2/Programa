@@ -160,7 +160,17 @@
                         
                         return data.text;
                     }
+                })
+                // --- INICIO DE LA CORRECCIÓN ---
+                // Enganchamos nuestra lógica al evento 'select2:open'
+                .on('select2:open', function () {
+                    // Usamos un pequeño delay para asegurar que el campo de búsqueda ya fue creado por Select2.
+                    setTimeout(function() {
+                        // Buscamos el único campo de búsqueda visible y le ponemos el foco.
+                        $('.select2-container--open .select2-search__field').focus();
+                    }, 0); // 10 milisegundos es suficiente.
                 });
+                // --- FIN DE LA CORRECCIÓN ---
             }
             function inicializarSelect2Promocion(element) {
                 element.select2({
@@ -322,5 +332,20 @@
             promocionesContainer.find('.promocion-search').each(function() { inicializarSelect2Promocion($(this)); });
             reindexarFilas();
         });
+        // --- INICIO DE LA CORRECCIÓN DEFINITIVA ---
+        // Pega este bloque de código AFUERA del $(document).ready(), pero dentro del <script>
+        // Esto crea un único manejador de eventos para toda la página.
+        $(document).on('select2:open', () => {
+            // Usamos un pequeño delay para darle tiempo al navegador a renderizar el campo de búsqueda.
+            // Aumentamos a 50ms para máxima compatibilidad.
+            setTimeout(() => {
+                // Buscamos el campo de búsqueda que está visible en el DOM y le damos el foco.
+                const searchField = document.querySelector('.select2-container--open .select2-search__field');
+                if (searchField) {
+                    searchField.focus();
+                }
+            }, 50); 
+        });
+        // --- FIN DE LA CORRECCIÓN DEFINITIVA ---
     </script>
 }

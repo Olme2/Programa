@@ -86,5 +86,20 @@
                 }
             });
         });
+        // --- INICIO DE LA CORRECCIÓN DEFINITIVA ---
+        // Pega este bloque de código AFUERA del $(document).ready(), pero dentro del <script>
+        // Esto crea un único manejador de eventos para toda la página.
+        $(document).on('select2:open', () => {
+            // Usamos un pequeño delay para darle tiempo al navegador a renderizar el campo de búsqueda.
+            // Aumentamos a 50ms para máxima compatibilidad.
+            setTimeout(() => {
+                // Buscamos el campo de búsqueda que está visible en el DOM y le damos el foco.
+                const searchField = document.querySelector('.select2-container--open .select2-search__field');
+                if (searchField) {
+                    searchField.focus();
+                }
+            }, 50); 
+        });
+        // --- FIN DE LA CORRECCIÓN DEFINITIVA ---
     </script>
 }
