@@ -4,43 +4,46 @@
 }
 
 <div class="container-fluid">
-    <h1>Listado de Ventas</h1>
-    <p></p>
-    <form id="filtro-form" class="row g-3 align-items-center p-3 mb-3 bg-light border rounded">
-        <div class="row">
-            <h2 class="col-md-3">Filtros</h2>
-            <div class="col-md-2"></div>
-            <h2 class="col-md-4">Cantidad de ventas: <span id="cantidad-general-display" class="fw-bold"></span></h2>
-            <h2 class="col-md-3">Total: <span id="total-general-display" class="fw-bold text-success"></span></h2>
-        </div>
-        <div class="col-xl-2 col-md-6">
-            <label asp-for="FechaInicio" class="form-label">Fecha de Inicio</label>
-            <input asp-for="FechaInicio" type="date" class="form-control filtro-control" />
-        </div>
-        <div class="col-xl-2 col-md-6">
-            <label asp-for="FechaFin" class="form-label">Fecha de Fin</label>
-            <input asp-for="FechaFin" type="date" class="form-control filtro-control" />
-        </div>
-        <div class="col-xl-2 col-md-6">
-            <label asp-for="Turno" class="form-label"></label>
-            <select asp-for="Turno" class="form-select filtro-control" asp-items="Html.GetEnumSelectList<VentasVM.IndexVentasVM.Turnos>()"></select>
-        </div>
-        <div class="col-xl-2 col-md-6">
-            <label asp-for="IdMetodoPago" class="form-label"></label>
-            <select asp-for="IdMetodoPago" class="form-select filtro-control filtroMetodoPago">
-                <option value="" selected>Todos</option>
-                @foreach(var metodo in Model.MetodosPago){
-                    <option value="@metodo.IdMetodo">@metodo.Metodo</option>
-                }
-            </select>
-        </div>
-        <div class="col-xl-4 col-md-6">
-            <label asp-for="Busqueda" class="form-label">Buscar</label>
-            <input asp-for="Busqueda" class="form-control filtro-control" placeholder="Producto o Promoción..." />
-        </div>
-    </form>
 
-    <div class="table-responsive">
+    <div class="row col-md-12">
+        <form id="filtro-form" class="row g-3 align-items-center p-3 mb-3 bg-light border rounded">
+            <div class="row">
+                <h2>Filtros</h2>
+            </div>
+            <div class="col-xl-2 col-md-6">
+                <label asp-for="FechaInicio" class="form-label">Fecha de Inicio</label>
+                <input asp-for="FechaInicio" type="date" class="form-control filtro-control" />
+            </div>
+            <div class="col-xl-2 col-md-6">
+                <label asp-for="FechaFin" class="form-label">Fecha de Fin</label>
+                <input asp-for="FechaFin" type="date" class="form-control filtro-control" />
+            </div>
+            <div class="col-xl-2 col-md-6">
+                <label asp-for="Turno" class="form-label"></label>
+                <select asp-for="Turno" class="form-select filtro-control" asp-items="Html.GetEnumSelectList<VentasVM.IndexVentasVM.Turnos>()"></select>
+            </div>
+            <div class="col-xl-2 col-md-6">
+                <label asp-for="IdMetodoPago" class="form-label"></label>
+                <select asp-for="IdMetodoPago" class="form-select filtro-control filtroMetodoPago">
+                    <option value="" selected>Todos</option>
+                    @foreach(var metodo in Model.MetodosPago){
+                        <option value="@metodo.IdMetodo">@metodo.Metodo</option>
+                    }
+                </select>
+            </div>
+            <div class="col-xl-4 col-md-6">
+                <label asp-for="Busqueda" class="form-label">Buscar</label>
+                <input asp-for="Busqueda" class="form-control filtro-control" placeholder="Producto o Promoción..." />
+            </div>
+        </form>
+    </div>
+    <div class="row col-md-12">
+        <h1 class="col-md-4">Listado de Ventas</h1>
+        <h1 class="col-md-4">Cantidad de ventas: <span id="cantidad-general-display" class="fw-bold"></span></h1>
+        <h1 class="col-md-4">Total: <span id="total-general-display" class="fw-bold text-success"></span></h1>
+    </div>
+    <div class="row col-md-12"><hr></div>
+    <div class="table-responsive row col-md-12">
         <table class="table table-hover table-sm">
             <thead class="table-dark">
                 <tr>

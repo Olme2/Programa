@@ -112,9 +112,23 @@
                     <span id="total-display" class="text-success">$0.00</span>
                 </div>
 
-                <div class="mt-3">
+                <!-- Vueltos -->
+                <div class="summary-item">
+                    <span>Vuelto de <strong>$1.000</strong>:</span>
+                    <span id="vuelto-1000-display">$0.00</span>
+                </div>
+                <div class="summary-item">
+                    <span>Vuelto de <strong>$10.000</strong>:</span>
+                    <span id="vuelto-10000-display">$0.00</span>
+                </div>
+                <div class="summary-item mb-3">
+                    <span>Vuelto de <strong>$20.000</strong>:</span>
+                    <span id="vuelto-20000-display">$0.00</span>
+                </div>
+                <!-- Detalle reducido -->
+                <div class="mt-2">
                     <label asp-for="Detalle" class="form-label">Detalle (Opcional)</label>
-                    <textarea asp-for="Detalle" class="form-control" rows="3"></textarea>
+                    <textarea asp-for="Detalle" class="form-control" rows="2"></textarea>
                 </div>
 
                 <div class="mt-4">
@@ -230,6 +244,7 @@
 
             function recalcularTotalVenta() {
                 let subtotal = 0;
+                
                 productosContainer.find('.detalle-item-producto').each(function() {
                     const row = $(this);
                     const precio = parseFloat(row.find('.precio-unitario-hidden').val()) || 0;
@@ -250,11 +265,22 @@
                 const redondeo = parseFloat($('#Redondeo').val()) || 0;
                 const recargo = parseFloat($('#Recargo').val() || 0);
                 const total = (subtotal+redondeo)*(1+recargo/100);
+                const vuelto1000 = calcularVuelto(total, 1000);
+                const vuelto10000 = calcularVuelto(total, 10000);
+                const vuelto20000 = calcularVuelto(total, 20000);
                 $('#recargo-display').text((subtotal*(recargo/100)).toLocaleString('es-AR', { style: 'currency', currency: 'ARS' }));
                 $('#subtotal-display').text(subtotal.toLocaleString('es-AR', { style: 'currency', currency: 'ARS' }));
                 $('#total-display').text(total.toLocaleString('es-AR', { style: 'currency', currency: 'ARS' }));
+                $('#vuelto-1000-display').text(vuelto1000.toLocaleString('es-AR', { style: 'currency', currency: 'ARS' }));
+                $('#vuelto-10000-display').text(vuelto10000.toLocaleString('es-AR', { style: 'currency', currency: 'ARS' }));
+                $('#vuelto-20000-display').text(vuelto20000.toLocaleString('es-AR', { style: 'currency', currency: 'ARS' }));
             }
-            
+            function calcularVuelto(total, billete) {
+                // Ejemplo: total = 34300, billete = 10000 => Math.ceil(34300 / 10000) * 10000 = 40000
+                // Vuelto: 40000 - 34300 = 5700
+                const pagoRedondeado = Math.ceil(total / billete) * billete;
+                return pagoRedondeado - total;
+            }
             // --- MANEJADORES DE EVENTOS ---
 
             $('#btn-agregar-producto').click(function () {
