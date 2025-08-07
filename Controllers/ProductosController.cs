@@ -212,7 +212,7 @@ public class ProductosController : Controller
             {
                 case "stock":
                     // Siempre ordenamos por Activo descendente primero.
-                    productosOrdenados = query.OrderByDescending(p => p.Activo).ThenByDescending(p => p.Stock);
+                    productosOrdenados = query.OrderByDescending(p => p.Activo).ThenBy(p => p.Stock);
                     break;
                 default: // "alfabetico"
                     productosOrdenados = query.OrderByDescending(p => p.Activo).ThenBy(p => p.Producto);

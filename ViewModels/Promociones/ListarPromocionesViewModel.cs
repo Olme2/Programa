@@ -25,7 +25,7 @@ public class ListarPromocionesVM
     public DateOnly? Fin { get; set; }
     public bool Activa { get; set; }
     public bool EsEliminable { get; set; }
-    public int Stock { get; set; }
-    public int VentaSemanal {get; set; }
+    public decimal Stock { get; set; }
+    public decimal VentaSemanal {get; set; }
     public ListarPromocionesVM() { }
 }

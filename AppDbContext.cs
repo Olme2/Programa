@@ -1,5 +1,4 @@
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
 
 namespace entornoPolleria
 {
@@ -136,7 +135,7 @@ namespace entornoPolleria
                 entity.HasKey(e => new { e.IdVenta, e.IdPromocion });
                 entity.Property(e => e.IdVenta).HasColumnName("id_venta").IsRequired();
                 entity.Property(e => e.IdPromocion).HasColumnName("id_promocion").IsRequired();
-                entity.Property(e => e.Cantidad).HasColumnName("cantidad").HasColumnType("smallint").IsRequired();
+                entity.Property(e => e.Cantidad).HasColumnName("cantidad").HasColumnType("numeric(6,2)").IsRequired();
                 entity.Property(e => e.CostoPromo).HasColumnName("costo_promo").HasColumnType("numeric(7,2)").IsRequired();
                 entity.Property(e => e.PrecioPromo).HasColumnName("precio_promo").HasColumnType("numeric(7,2)").IsRequired();
                 entity.HasOne<Ventas>()

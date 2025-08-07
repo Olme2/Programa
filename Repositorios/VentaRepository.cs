@@ -62,10 +62,10 @@ public class VentaRepository : IVentaRepository
                 Metodo = v.Metodo.Metodo,
                 ProductosYPromociones = v.VentaPromociones.Any()
                     ? string.Concat(
-                            string.Join("<br>", v.VentaPromociones.Select(vp => vp.Promocion.Promocion)),
+                            string.Join("<br>", v.VentaPromociones.Select(vp => vp.Promocion.Promocion + " " + vp.Cantidad)),
                             "<br>",
-                            string.Join("<br>", v.DetallesVenta.Select(dv => dv.Producto.Producto)))
-                    : string.Join("<br>", v.DetallesVenta.Select(dv => dv.Producto.Producto)),
+                            string.Join("<br>", v.DetallesVenta.Select(dv => dv.Producto.Producto + " " + dv.Cantidad)))
+                    : string.Join("<br>", v.DetallesVenta.Select(dv => dv.Producto.Producto + " " + dv.Cantidad)),
                 Total = v.CalcularPrecioTotal(),
                 Fecha = v.Fecha,
                 Hora = v.Hora,

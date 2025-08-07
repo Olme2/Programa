@@ -21,11 +21,12 @@
 {
     @foreach (var venta in Model)
     {
-        <tr>
+        <tr class="venta">
             @* Aplicamos la función de resaltado al listado de productos *@
+            <td class="numeroVenta"></td>
             <td>@ResaltarCoincidencia(venta.ProductosYPromociones)</td>
-            <td>@venta.Metodo</td>
-            <td class="totalProducto">$@venta.Total.ToString("N2", CG.CulturaES)</td>
+            <td class="metodoPagoVenta">@venta.Metodo</td>
+            <td class="totalVenta">$@venta.Total.ToString("N2", CG.CulturaES)</td>
             <td>@venta.Fecha.ToString("dd/MM") | @venta.Hora.ToString("HH:mm")</td>
             <td>
                 @{
@@ -48,6 +49,6 @@
 else
 {
     <tr>
-        <td colspan="5" class="text-center">No se encontraron ventas para los filtros seleccionados.</td>
+        <td colspan="12" class="text-center"><h3>No se encontraron ventas para los filtros seleccionados.</h3></td>
     </tr>
 }

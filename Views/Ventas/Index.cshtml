@@ -9,7 +9,8 @@
     <form id="filtro-form" class="row g-3 align-items-center p-3 mb-3 bg-light border rounded">
         <div class="row">
             <h2 class="col-md-3">Filtros</h2>
-            <div class="col-md-6"></div>
+            <div class="col-md-2"></div>
+            <h2 class="col-md-4">Cantidad de ventas: <span id="cantidad-general-display" class="fw-bold"></span></h2>
             <h2 class="col-md-3">Total: <span id="total-general-display" class="fw-bold text-success"></span></h2>
         </div>
         <div class="col-xl-2 col-md-6">
@@ -26,7 +27,7 @@
         </div>
         <div class="col-xl-2 col-md-6">
             <label asp-for="IdMetodoPago" class="form-label"></label>
-            <select asp-for="IdMetodoPago" class="form-select filtro-control">
+            <select asp-for="IdMetodoPago" class="form-select filtro-control filtroMetodoPago">
                 <option value="" selected>Todos</option>
                 @foreach(var metodo in Model.MetodosPago){
                     <option value="@metodo.IdMetodo">@metodo.Metodo</option>
@@ -43,6 +44,7 @@
         <table class="table table-hover table-sm">
             <thead class="table-dark">
                 <tr>
+                    <th>N°</th>
                     <th>Promociones/Productos</th>
                     <th>Método de Pago</th>
                     <th>Total</th>
@@ -87,29 +89,36 @@
             }
             function calcularYMostrarTotalGeneral() {
                 let totalGeneral = 0;
-            
-                // 1. Buscamos todas las celdas que contienen el total de cada venta.
-                $('#tabla-ventas-body .totalProducto').each(function() {
-                    
-                    // 2. Limpiamos el texto para convertirlo en un número que JavaScript entienda.
-                    // Ej: "$1.500,75" -> "1500.75"
-                    const textoCelda = $(this).text();
-                    const valorNumerico = parseFloat(textoCelda.replace('$', '').replace(/\./g, '').replace(',', '.')) || 0;
-                    
-                    // 3. Lo sumamos al total general.
-                    totalGeneral += valorNumerico;
+                let cantidadGeneral = $('#tabla-ventas-body .venta').length;
+                let cantidadGeneralConYo = cantidadGeneral;
+                let num = cantidadGeneralConYo;
+                $('#tabla-ventas-body .venta').each(function() {
+                    const metodoPago = $(this).find('.metodoPagoVenta').text().trim();
+                    const textoTotal = $(this).find('.totalVenta').text();
+                    const valorNumerico = parseFloat(textoTotal.replace('$', '').replace(/\./g, '').replace(',', '.')) || 0;
+
+                    if(metodoPago === "Yo") {
+                        cantidadGeneral--;
+                        // NO sumamos este valor al totalGeneral
+                    } else {
+                        totalGeneral += valorNumerico;
+                    }
+                    $(this).find(".numeroVenta").text(num--);
                 });
-            
+                if($('.filtroMetodoPago option:selected').select().text().trim() == "Yo"){
+                    cantidadGeneral = cantidadGeneralConYo;
+                }
                 // 4. Formateamos el resultado y lo mostramos en el span que creamos.
                 const totalFormateado = totalGeneral.toLocaleString('es-AR', { style: 'currency', currency: 'ARS' });
                 $('#total-general-display').text(totalFormateado);
+                $('#cantidad-general-display').text(cantidadGeneral);
             }
             // Actualizar tabla al cambiar cualquier filtro
             $('.filtro-control').on('change', function() {
                 actualizarTablaVentas();
             });
             // Actualizar al escribir en el buscador
-             $('#Busqueda').on('keyup', function() {
+            $('#Busqueda').on('keyup', function() {
                 actualizarTablaVentas();
             });
             calcularYMostrarTotalGeneral();

@@ -32,14 +32,14 @@ public class PromocionesRepository : IPromocionesRepository
                 Ganancia = p.Precio - p.DetallesPromocion.Sum(d => d.Producto.Costo * d.Cantidad),
                 PorcentajeGanancia = (p.DetallesPromocion.Sum(d => d.Producto.Costo * d.Cantidad) > 0) ? (p.Precio - p.DetallesPromocion.Sum(d => d.Producto.Costo * d.Cantidad)) / p.DetallesPromocion.Sum(d => d.Producto.Costo * d.Cantidad) : 0,
                 EsEliminable = !_context.VentasPromociones.Any(vp => vp.IdPromocion == p.IdPromocion),
-                Stock = (int)p.DetallesPromocion
+                Stock = p.DetallesPromocion
                         .Where(d => d.Cantidad > 0)
-                        .Select(d => Math.Floor(d.Producto.Stock / d.Cantidad))
+                        .Select(d => d.Producto.Stock / d.Cantidad)
                         .Min(),
                 VentaSemanal = _context.VentasPromociones
                                 .Where(vp => vp.IdPromocion == p.IdPromocion &&
                                 _context.Ventas.Any(v => v.IdVenta == vp.IdVenta && v.Fecha >= unaSemanaAtras && v.Fecha <= hoy))
-                                .Sum(dv => (int?)dv.Cantidad) ?? 0,
+                                .Sum(dv => (decimal?)dv.Cantidad) ?? 0,
             })
             .ToList();
     }

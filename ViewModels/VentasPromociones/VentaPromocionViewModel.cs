@@ -8,8 +8,8 @@ public class VentaPromocionVM
     public int IdPromocion { get; set; }
 
     [Required]
-    [Range(1, short.MaxValue, ErrorMessage = "La cantidad debe ser al menos 1.")]
-    public short Cantidad { get; set; }
+    [Range(0.001, 999.999, ErrorMessage = "La cantidad debe ser como mínimo 0,001 y maximo 999,999.")]
+    public decimal Cantidad { get; set; }
     [Required]
     [Range(0.01, 99999.99, ErrorMessage = "El precio debe ser entre 0.01 y 99.999,99.")]
     public decimal CostoPromo { get; set; }

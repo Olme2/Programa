@@ -4,7 +4,7 @@ public class VentasPromociones
 {
     public long IdVenta { get; set; }
     public int IdPromocion { get; set; }
-    public short Cantidad { get; set; }
+    public decimal Cantidad { get; set; }
     public decimal CostoPromo { get; set; }
     public decimal PrecioPromo { get; set; }
     public virtual Promociones Promocion { get; set; }
@@ -13,7 +13,7 @@ public class VentasPromociones
         Promocion = null!;
     }
 
-    private VentasPromociones(int idPromocion, short cantidad, decimal costoPromo, decimal precioPromo)
+    private VentasPromociones(int idPromocion, decimal cantidad, decimal costoPromo, decimal precioPromo)
     {
         IdPromocion = idPromocion;
         Cantidad = cantidad;
@@ -36,9 +36,9 @@ public class VentasPromociones
     {
         return CostoPromo * Cantidad;
     }
-    public int CalcularStock()
+    public decimal CalcularStock()
     {
-        return (int)Promocion.DetallesPromocion.Where(d => d.Cantidad > 0).Select(d => Math.Floor(d.Producto.Stock / d.Cantidad)).Min();
+        return Promocion.DetallesPromocion.Where(d => d.Cantidad > 0).Select(d => d.Producto.Stock / d.Cantidad).Min();
     }
     public decimal CalcularPrecio()
     {

@@ -11,7 +11,7 @@
             <span class="input-group-text">Ordenar por</span>
             <select id="ordenar-por" name="ordenarPor" class="form-select">
                 <option value="alfabetico" selected="@(ViewData["OrdenActual"]?.ToString() == "alfabetico")">Nombre (A-Z)</option>
-                <option value="stock" selected="@(ViewData["OrdenActual"]?.ToString() == "stock")">Stock (Mayor a Menor)</option>
+                <option value="stock" selected="@(ViewData["OrdenActual"]?.ToString() == "stock")">Stock (Menor a Mayor)</option>
             </select>
         </div>
     </div>
