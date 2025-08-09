@@ -39,7 +39,11 @@ public class VentaRepository : IVentaRepository
 
         if (filtro.IdMetodoPago.HasValue)
         {
-            query = query.Where(v => v.IdMetodo == filtro.IdMetodoPago.Value);
+            if (filtro.IdMetodoPago == 12) {
+                query = query.Where(v => v.IdMetodo != 1 && v.IdMetodo != 11);
+            } else {
+                query = query.Where(v => v.IdMetodo == filtro.IdMetodoPago.Value);
+            }
         }
 
         if (!string.IsNullOrEmpty(filtro.Busqueda))
