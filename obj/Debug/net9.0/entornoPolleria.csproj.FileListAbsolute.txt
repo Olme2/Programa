@@ -166,7 +166,6 @@ C:\Users\Valentino\OneDrive\Desktop\Polleria\Programa\obj\Debug\net9.0\entornoPo
 C:\Users\Valentino\OneDrive\Desktop\Polleria\Programa\obj\Debug\net9.0\entornoPolleria.genruntimeconfig.cache
 C:\Users\Valentino\OneDrive\Desktop\Polleria\Programa\obj\Debug\net9.0\ref\entornoPolleria.dll
 C:\Users\Valentino\OneDrive\Desktop\Polleria\Programa\obj\Debug\net9.0\compressed\0lbsggp66v-2bqgk4g6hm.gz
-C:\Users\Valentino\OneDrive\Desktop\Polleria\Programa\obj\Debug\net9.0\compressed\m2bgq4xnl9-ijiayk4mgx.gz
 C:\Users\Valentino\OneDrive\Desktop\Polleria\Programa\bin\Debug\net9.0\Microsoft.Build.Locator.dll
 C:\Users\Valentino\OneDrive\Desktop\Polleria\Programa\bin\Debug\net9.0\Microsoft.CodeAnalysis.Workspaces.MSBuild.BuildHost.dll
 C:\Users\Valentino\OneDrive\Desktop\Polleria\Programa\bin\Debug\net9.0\Microsoft.CodeAnalysis.Workspaces.MSBuild.dll
@@ -193,3 +192,5 @@ C:\Users\Valentino\OneDrive\Desktop\Polleria\Programa\bin\Debug\net9.0\ru\Micros
 C:\Users\Valentino\OneDrive\Desktop\Polleria\Programa\bin\Debug\net9.0\tr\Microsoft.CodeAnalysis.Workspaces.MSBuild.BuildHost.resources.dll
 C:\Users\Valentino\OneDrive\Desktop\Polleria\Programa\bin\Debug\net9.0\zh-Hans\Microsoft.CodeAnalysis.Workspaces.MSBuild.BuildHost.resources.dll
 C:\Users\Valentino\OneDrive\Desktop\Polleria\Programa\bin\Debug\net9.0\zh-Hant\Microsoft.CodeAnalysis.Workspaces.MSBuild.BuildHost.resources.dll
+C:\Users\Valentino\OneDrive\Desktop\Polleria\Programa\bin\Debug\net9.0\Newtonsoft.Json.dll
+C:\Users\Valentino\OneDrive\Desktop\Polleria\Programa\obj\Debug\net9.0\compressed\m2bgq4xnl9-kahsdh6l8t.gz

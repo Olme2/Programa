@@ -1,6 +1,6 @@
 {
   "Version": 1,
-  "Hash": "L/tyPWDajU9gS4fnP80cUjuj4MrM2W1//HH4/aEPajA=",
+  "Hash": "TKZGWhDCSdwDeSbv2V4rLsNYt/28dtAZAoIA7CY9x1E=",
   "Source": "entornoPolleria",
   "BasePath": "_content/entornoPolleria",
   "Mode": "Default",
@@ -815,12 +815,12 @@
       "OriginalItemSpec": "C:\\Users\\Valentino\\OneDrive\\Desktop\\Polleria\\Programa\\wwwroot\\lib\\bootstrap\\dist\\js\\bootstrap.esm.js"
     },
     {
-      "Identity": "C:\\Users\\Valentino\\OneDrive\\Desktop\\Polleria\\Programa\\obj\\Debug\\net9.0\\compressed\\m2bgq4xnl9-ijiayk4mgx.gz",
+      "Identity": "C:\\Users\\Valentino\\OneDrive\\Desktop\\Polleria\\Programa\\obj\\Debug\\net9.0\\compressed\\m2bgq4xnl9-kahsdh6l8t.gz",
       "SourceId": "entornoPolleria",
       "SourceType": "Discovered",
       "ContentRoot": "C:\\Users\\Valentino\\OneDrive\\Desktop\\Polleria\\Programa\\obj\\Debug\\net9.0\\compressed\\",
       "BasePath": "_content/entornoPolleria",
-      "RelativePath": "css/site#[.{fingerprint=ijiayk4mgx}]?.css.gz",
+      "RelativePath": "css/site#[.{fingerprint=kahsdh6l8t}]?.css.gz",
       "AssetKind": "All",
       "AssetMode": "All",
       "AssetRole": "Alternative",
@@ -829,8 +829,8 @@
       "RelatedAsset": "C:\\Users\\Valentino\\OneDrive\\Desktop\\Polleria\\Programa\\wwwroot\\css\\site.css",
       "AssetTraitName": "Content-Encoding",
       "AssetTraitValue": "gzip",
-      "Fingerprint": "lcy61x8el4",
-      "Integrity": "ZbhyYLZbEJBKqjaK1CBi06ObCKNhQ7es12E+uLFr93U=",
+      "Fingerprint": "ob8i83tr9e",
+      "Integrity": "pH5gWGGemGxVbUweZjjoWs5zlUuLP9mQy08mTk0RR5Q=",
       "CopyToOutputDirectory": "Never",
       "CopyToPublishDirectory": "PreserveNewest",
       "OriginalItemSpec": "C:\\Users\\Valentino\\OneDrive\\Desktop\\Polleria\\Programa\\wwwroot\\css\\site.css"
@@ -1354,8 +1354,8 @@
       "RelatedAsset": "",
       "AssetTraitName": "",
       "AssetTraitValue": "",
-      "Fingerprint": "ijiayk4mgx",
-      "Integrity": "Xm5dukxIiycWFN9VraBtTJDkdlxM72nWyKwG4SwGThY=",
+      "Fingerprint": "kahsdh6l8t",
+      "Integrity": "jPcnqEv5FZ4DhLCpJvCMRTU4/rwC9kRw2SlaA6w/hjY=",
       "CopyToOutputDirectory": "Never",
       "CopyToPublishDirectory": "PreserveNewest",
       "OriginalItemSpec": "wwwroot\\css\\site.css"
@@ -2603,12 +2603,12 @@
   "Endpoints": [
     {
       "Route": "css/site.css",
-      "AssetFile": "C:\\Users\\Valentino\\OneDrive\\Desktop\\Polleria\\Programa\\obj\\Debug\\net9.0\\compressed\\m2bgq4xnl9-ijiayk4mgx.gz",
+      "AssetFile": "C:\\Users\\Valentino\\OneDrive\\Desktop\\Polleria\\Programa\\obj\\Debug\\net9.0\\compressed\\m2bgq4xnl9-kahsdh6l8t.gz",
       "Selectors": [
         {
           "Name": "Content-Encoding",
           "Value": "gzip",
-          "Quality": "0,000976562500"
+          "Quality": "0,000925925926"
         }
       ],
       "ResponseHeaders": [
@@ -2618,15 +2618,15 @@
         },
         {
           "Name": "Content-Length",
-          "Value": "1023"
+          "Value": "1079"
         },
         {
           "Name": "ETag",
-          "Value": "\"ZbhyYLZbEJBKqjaK1CBi06ObCKNhQ7es12E+uLFr93U=\""
+          "Value": "\"pH5gWGGemGxVbUweZjjoWs5zlUuLP9mQy08mTk0RR5Q=\""
         },
         {
           "Name": "Last-Modified",
-          "Value": "Fri, 25 Jul 2025 13:33:34 GMT"
+          "Value": "Thu, 07 Aug 2025 01:50:31 GMT"
         },
         {
           "Name": "Cache-Control",
@@ -2646,13 +2646,13 @@
         },
         {
           "Name": "ETag",
-          "Value": "W/\"Xm5dukxIiycWFN9VraBtTJDkdlxM72nWyKwG4SwGThY=\""
+          "Value": "W/\"jPcnqEv5FZ4DhLCpJvCMRTU4/rwC9kRw2SlaA6w/hjY=\""
         }
       ],
       "EndpointProperties": [
         {
           "Name": "integrity",
-          "Value": "sha256-Xm5dukxIiycWFN9VraBtTJDkdlxM72nWyKwG4SwGThY="
+          "Value": "sha256-jPcnqEv5FZ4DhLCpJvCMRTU4/rwC9kRw2SlaA6w/hjY="
         }
       ]
     },
@@ -2667,7 +2667,7 @@
         },
         {
           "Name": "Content-Length",
-          "Value": "2326"
+          "Value": "2608"
         },
         {
           "Name": "Content-Type",
@@ -2675,11 +2675,11 @@
         },
         {
           "Name": "ETag",
-          "Value": "\"Xm5dukxIiycWFN9VraBtTJDkdlxM72nWyKwG4SwGThY=\""
+          "Value": "\"jPcnqEv5FZ4DhLCpJvCMRTU4/rwC9kRw2SlaA6w/hjY=\""
         },
         {
           "Name": "Last-Modified",
-          "Value": "Fri, 25 Jul 2025 13:33:34 GMT"
+          "Value": "Thu, 07 Aug 2025 01:50:31 GMT"
         },
         {
           "Name": "Cache-Control",
@@ -2689,13 +2689,13 @@
       "EndpointProperties": [
         {
           "Name": "integrity",
-          "Value": "sha256-Xm5dukxIiycWFN9VraBtTJDkdlxM72nWyKwG4SwGThY="
+          "Value": "sha256-jPcnqEv5FZ4DhLCpJvCMRTU4/rwC9kRw2SlaA6w/hjY="
         }
       ]
     },
     {
       "Route": "css/site.css.gz",
-      "AssetFile": "C:\\Users\\Valentino\\OneDrive\\Desktop\\Polleria\\Programa\\obj\\Debug\\net9.0\\compressed\\m2bgq4xnl9-ijiayk4mgx.gz",
+      "AssetFile": "C:\\Users\\Valentino\\OneDrive\\Desktop\\Polleria\\Programa\\obj\\Debug\\net9.0\\compressed\\m2bgq4xnl9-kahsdh6l8t.gz",
       "Selectors": [],
       "ResponseHeaders": [
         {
@@ -2704,7 +2704,7 @@
         },
         {
           "Name": "Content-Length",
-          "Value": "1023"
+          "Value": "1079"
         },
         {
           "Name": "Content-Type",
@@ -2712,11 +2712,11 @@
         },
         {
           "Name": "ETag",
-          "Value": "\"ZbhyYLZbEJBKqjaK1CBi06ObCKNhQ7es12E+uLFr93U=\""
+          "Value": "\"pH5gWGGemGxVbUweZjjoWs5zlUuLP9mQy08mTk0RR5Q=\""
         },
         {
           "Name": "Last-Modified",
-          "Value": "Fri, 25 Jul 2025 13:33:34 GMT"
+          "Value": "Thu, 07 Aug 2025 01:50:31 GMT"
         },
         {
           "Name": "Cache-Control",
@@ -2734,18 +2734,18 @@
       "EndpointProperties": [
         {
           "Name": "integrity",
-          "Value": "sha256-ZbhyYLZbEJBKqjaK1CBi06ObCKNhQ7es12E+uLFr93U="
+          "Value": "sha256-pH5gWGGemGxVbUweZjjoWs5zlUuLP9mQy08mTk0RR5Q="
         }
       ]
     },
     {
-      "Route": "css/site.ijiayk4mgx.css",
-      "AssetFile": "C:\\Users\\Valentino\\OneDrive\\Desktop\\Polleria\\Programa\\obj\\Debug\\net9.0\\compressed\\m2bgq4xnl9-ijiayk4mgx.gz",
+      "Route": "css/site.kahsdh6l8t.css",
+      "AssetFile": "C:\\Users\\Valentino\\OneDrive\\Desktop\\Polleria\\Programa\\obj\\Debug\\net9.0\\compressed\\m2bgq4xnl9-kahsdh6l8t.gz",
       "Selectors": [
         {
           "Name": "Content-Encoding",
           "Value": "gzip",
-          "Quality": "0,000976562500"
+          "Quality": "0,000925925926"
         }
       ],
       "ResponseHeaders": [
@@ -2755,15 +2755,15 @@
         },
         {
           "Name": "Content-Length",
-          "Value": "1023"
+          "Value": "1079"
         },
         {
           "Name": "ETag",
-          "Value": "\"ZbhyYLZbEJBKqjaK1CBi06ObCKNhQ7es12E+uLFr93U=\""
+          "Value": "\"pH5gWGGemGxVbUweZjjoWs5zlUuLP9mQy08mTk0RR5Q=\""
         },
         {
           "Name": "Last-Modified",
-          "Value": "Fri, 25 Jul 2025 13:33:34 GMT"
+          "Value": "Thu, 07 Aug 2025 01:50:31 GMT"
         },
         {
           "Name": "Cache-Control",
@@ -2783,13 +2783,13 @@
         },
         {
           "Name": "ETag",
-          "Value": "W/\"Xm5dukxIiycWFN9VraBtTJDkdlxM72nWyKwG4SwGThY=\""
+          "Value": "W/\"jPcnqEv5FZ4DhLCpJvCMRTU4/rwC9kRw2SlaA6w/hjY=\""
         }
       ],
       "EndpointProperties": [
         {
           "Name": "fingerprint",
-          "Value": "ijiayk4mgx"
+          "Value": "kahsdh6l8t"
         },
         {
           "Name": "label",
@@ -2797,12 +2797,12 @@
         },
         {
           "Name": "integrity",
-          "Value": "sha256-Xm5dukxIiycWFN9VraBtTJDkdlxM72nWyKwG4SwGThY="
+          "Value": "sha256-jPcnqEv5FZ4DhLCpJvCMRTU4/rwC9kRw2SlaA6w/hjY="
         }
       ]
     },
     {
-      "Route": "css/site.ijiayk4mgx.css",
+      "Route": "css/site.kahsdh6l8t.css",
       "AssetFile": "C:\\Users\\Valentino\\OneDrive\\Desktop\\Polleria\\Programa\\wwwroot\\css\\site.css",
       "Selectors": [],
       "ResponseHeaders": [
@@ -2812,7 +2812,7 @@
         },
         {
           "Name": "Content-Length",
-          "Value": "2326"
+          "Value": "2608"
         },
         {
           "Name": "Content-Type",
@@ -2820,11 +2820,11 @@
         },
         {
           "Name": "ETag",
-          "Value": "\"Xm5dukxIiycWFN9VraBtTJDkdlxM72nWyKwG4SwGThY=\""
+          "Value": "\"jPcnqEv5FZ4DhLCpJvCMRTU4/rwC9kRw2SlaA6w/hjY=\""
         },
         {
           "Name": "Last-Modified",
-          "Value": "Fri, 25 Jul 2025 13:33:34 GMT"
+          "Value": "Thu, 07 Aug 2025 01:50:31 GMT"
         },
         {
           "Name": "Cache-Control",
@@ -2834,7 +2834,7 @@
       "EndpointProperties": [
         {
           "Name": "fingerprint",
-          "Value": "ijiayk4mgx"
+          "Value": "kahsdh6l8t"
         },
         {
           "Name": "label",
@@ -2842,13 +2842,13 @@
         },
         {
           "Name": "integrity",
-          "Value": "sha256-Xm5dukxIiycWFN9VraBtTJDkdlxM72nWyKwG4SwGThY="
+          "Value": "sha256-jPcnqEv5FZ4DhLCpJvCMRTU4/rwC9kRw2SlaA6w/hjY="
         }
       ]
     },
     {
-      "Route": "css/site.ijiayk4mgx.css.gz",
-      "AssetFile": "C:\\Users\\Valentino\\OneDrive\\Desktop\\Polleria\\Programa\\obj\\Debug\\net9.0\\compressed\\m2bgq4xnl9-ijiayk4mgx.gz",
+      "Route": "css/site.kahsdh6l8t.css.gz",
+      "AssetFile": "C:\\Users\\Valentino\\OneDrive\\Desktop\\Polleria\\Programa\\obj\\Debug\\net9.0\\compressed\\m2bgq4xnl9-kahsdh6l8t.gz",
       "Selectors": [],
       "ResponseHeaders": [
         {
@@ -2857,7 +2857,7 @@
         },
         {
           "Name": "Content-Length",
-          "Value": "1023"
+          "Value": "1079"
         },
         {
           "Name": "Content-Type",
@@ -2865,11 +2865,11 @@
         },
         {
           "Name": "ETag",
-          "Value": "\"ZbhyYLZbEJBKqjaK1CBi06ObCKNhQ7es12E+uLFr93U=\""
+          "Value": "\"pH5gWGGemGxVbUweZjjoWs5zlUuLP9mQy08mTk0RR5Q=\""
         },
         {
           "Name": "Last-Modified",
-          "Value": "Fri, 25 Jul 2025 13:33:34 GMT"
+          "Value": "Thu, 07 Aug 2025 01:50:31 GMT"
         },
         {
           "Name": "Cache-Control",
@@ -2887,7 +2887,7 @@
       "EndpointProperties": [
         {
           "Name": "fingerprint",
-          "Value": "ijiayk4mgx"
+          "Value": "kahsdh6l8t"
         },
         {
           "Name": "label",
@@ -2895,7 +2895,7 @@
         },
         {
           "Name": "integrity",
-          "Value": "sha256-ZbhyYLZbEJBKqjaK1CBi06ObCKNhQ7es12E+uLFr93U="
+          "Value": "sha256-pH5gWGGemGxVbUweZjjoWs5zlUuLP9mQy08mTk0RR5Q="
         }
       ]
     },

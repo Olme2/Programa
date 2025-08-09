@@ -4,6 +4,7 @@ using VentasVM; // Namespace para los ViewModels de Venta
 using VentasPromocionesVM;
 using DetallesVentasVM;
 using System.Globalization;
+using TempDataExtension;
 
 public class VentasController : Controller
 {
@@ -34,23 +35,26 @@ public class VentasController : Controller
         try
         {
             var horaActual = TimeOnly.FromDateTime(DateTime.Now);
-            var nueveAM = TimeOnly.FromDateTime(DateTime.Parse("9:00"));
-            var viewModel = new IndexVentasVM()
+            var viewModel = TempData.Get<IndexVentasVM>("FiltrosVentas");
+            if (viewModel == null)
             {
-                FechaInicio = filtro.FechaInicio == default ? DateTime.Today : filtro.FechaInicio,
-                FechaFin = filtro.FechaFin == default ? DateTime.Today : filtro.FechaFin,
-                Busqueda = filtro.Busqueda,
-                IdMetodoPago = filtro.IdMetodoPago,
-            };
-            viewModel.Turno = horaActual switch
-            {
-                var h when h >= new TimeOnly(9, 0) && h <= new TimeOnly(14, 0) => IndexVentasVM.Turnos.Mañana,
-                var h when h >= new TimeOnly(17, 30) && h <= new TimeOnly(21, 30) => IndexVentasVM.Turnos.Tarde,
-                _ => IndexVentasVM.Turnos.Todos
-            };
+                viewModel = new IndexVentasVM()
+                {
+                    FechaInicio = filtro.FechaInicio == default ? DateTime.Today : filtro.FechaInicio,
+                    FechaFin = filtro.FechaFin == default ? DateTime.Today : filtro.FechaFin,
+                    Busqueda = filtro.Busqueda,
+                    IdMetodoPago = filtro.IdMetodoPago,
+                };
+                viewModel.Turno = horaActual switch
+                {
+                    var h when h >= new TimeOnly(9, 0) && h <= new TimeOnly(14, 0) => IndexVentasVM.Turnos.Mañana,
+                    var h when h >= new TimeOnly(17, 30) && h <= new TimeOnly(21, 30) => IndexVentasVM.Turnos.Tarde,
+                    _ => IndexVentasVM.Turnos.Todos
+                };
+            }
             viewModel.Ventas = _ventaRepo.ObtenerListadoVentas(viewModel).ToList();
             viewModel.MetodosPago = _metodosPagoRepo.ObtenerListadoMetodosPago().ToList();
-
+            TempData.Set("FiltrosVentas", viewModel);
             return View(viewModel);
         }
         catch (Exception e)
@@ -66,6 +70,7 @@ public class VentasController : Controller
     {
         try
         {
+            TempData.Set("FiltrosVentas", filtro);
             var ventas = _ventaRepo.ObtenerListadoVentas(filtro);
             ViewData["BusquedaActual"] = filtro.Busqueda;
             return PartialView("_VentasTabla", ventas.ToList());
@@ -75,6 +80,16 @@ public class VentasController : Controller
             _logger.LogError(e, "Error en la búsqueda dinámica de ventas.");
             return StatusCode(500);
         }
+    }
+
+    [HttpGet]
+    public IActionResult ResetearFiltros()
+    {
+        // 1. La única responsabilidad de esta acción es limpiar los filtros guardados en TempData.
+        TempData.Remove("FiltrosVentas");
+
+        // 2. Redirigimos de vuelta al Index. La lógica del Index se encargará del resto.
+        return RedirectToAction("Index");
     }
 
     [HttpGet]
