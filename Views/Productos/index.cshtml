@@ -1,54 +1,108 @@
-@model List<ProductosVM.ListarProductosVM>
+@model ProductosVM.IndexProductosVM
 @{
     ViewData["Title"] = "Productos";
 }
 
-<h1>Listado de Productos</h1>
+<div class="container-fluid">
+    <div class="row col-md-12">
+        <form id="filtro-form" class="row g-3 align-items-center p-3 mb-3 bg-light border rounded">
 
-<div class="row g-3 align-items-center mb-3">
-    <div class="col-md-4">
-        <div class="input-group">
-            <span class="input-group-text">Ordenar por</span>
-            <select id="ordenar-por" name="ordenarPor" class="form-select">
-                <option value="alfabetico" selected="@(ViewData["OrdenActual"]?.ToString() == "alfabetico")">Nombre (A-Z)</option>
-                <option value="stock" selected="@(ViewData["OrdenActual"]?.ToString() == "stock")">Stock (Menor a Mayor)</option>
-            </select>
-        </div>
-    </div>
-    <div class="col-md-6">
-        <input type="text" id="buscador-producto" name="busqueda" class="form-control" placeholder="Buscar por Producto o Proveedor..." value="@ViewData["BusquedaActual"]" />
-    </div>
-    <div class="col-md-2">
-    <div class="form-check form-switch bg-light border rounded p-2 d-flex justify-content-center align-items-center h-100">
-        <input class="form-check-input me-2" id="mostrar-inactivos" type="checkbox" name="Inactivos">
-        <label class="form-check-label" for="mostrar-inactivos">Ver Inactivos</label>
-    </div>
-</div>
-</div>
+            @* Fila para el Título y el Botón Resetear *@
+            <div class="row">
+                <h2 class="col-md-4">Filtros</h2>
+                <div class="col-md-4"></div>
+                <div class="col-md-4">
+                    <a asp-action="ResetearFiltros" class="btn btn-secondary w-100">
+                        <i class="bi bi-arrow-counterclockwise"></i> Resetear Filtros
+                    </a>
+                </div>
+            </div>
 
-<div class="table-responsive">
-    <table class="table table-hover">
-        <thead class="table-dark">
-            <tr>
-                <th>Producto</th>
-                <th>Proveedor</th>
-                <th>Stock</th>
-                <th>Costo</th>
-                <th>Precio</th>
-                <th>Ganancia</th>
-                <th>% Ganancia</th>
-                <th>Venta Semanal</th>
-                <th>Acciones</th>
-            </tr>
-        </thead>
-        <tbody id="tabla-productos-body">
-            @await Html.PartialAsync("_ProductosTabla", Model)
-        </tbody>
-    </table>
+            @* Fila para los Controles de Filtro *@
+            <div class="col-xl-4 col-md-4">
+                <label asp-for="OrdenarPor" class="form-label">Ordenar por</label>
+                <select asp-for="OrdenarPor" class="form-select filtro-control">
+                    <option value="alfabetico">Nombre (A-Z)</option>
+                    <option value="stock">Stock (Menor a Mayor)</option>
+                </select>
+            </div>
+            <div class="col-xl-4 col-md-4">
+                <label asp-for="Busqueda" class="form-label">Búsqueda</label>
+                <input asp-for="Busqueda" type="text" class="form-control" placeholder="Buscar por Producto o Proveedor..." />
+            </div>
+            <div class="col-xl-4 col-md-4">
+                <label for="Inactivos" class="form-label">Inactivos</label>
+                <div class="form-control form-switch bg-white border rounded d-flex justify-content-center align-items-center">
+                    <input asp-for="Inactivos" class="form-check-input me-2 filtro-control" type="checkbox">
+                    <label asp-for="Inactivos" class="form-check-label">Ver Inactivos</label>
+                </div>
+            </div>
+        </form>
+    </div>
+    <h1>Listado de Productos</h1>
+    <div class="row col-md-12"><hr></div>
+
+    <div class="table-responsive row col-md-12">
+        <table class="table table-hover table-sm">
+            <thead class="table-dark">
+                <tr>
+                    <th>Producto</th>
+                    <th>Proveedor</th>
+                    <th>Stock</th>
+                    <th>Costo</th>
+                    <th>Precio</th>
+                    <th>Ganancia</th>
+                    <th>% Ganancia</th>
+                    <th>Venta Semanal</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody id="tabla-productos-body">
+                <partial name="_ProductosTabla" model="Model.Productos" />
+            </tbody>
+        </table>
+    </div>
 </div>
 
 <a asp-action="Alta" class="btn btn-success btn-lg btn-float">+</a>
 
 @section Scripts {
     <script src="~/js/site.js" asp-append-version="true"></script>
+     <script>
+        $(document).ready(function() {
+            let debounceTimeout;
+
+            function actualizarTablaProductos() {
+                const form = $('#filtro-form');
+                const container = $('#tabla-productos-body');
+
+                $.ajax({
+                    url: '@Url.Action("FiltrarProductos", "Productos")',
+                    type: 'POST',
+                    data: form.serialize(),
+                    success: function(response) {
+                        container.html(response);
+                    },
+                    error: function() {
+                        container.html('<div class="alert alert-danger">Error al cargar los productos.</div>');
+                    }
+                });
+            }
+
+            // --- Eventos para disparar el filtro ---
+            $('.filtro-control').on('change', function() {
+                actualizarTablaProductos();
+            });
+
+            $('#Busqueda').on('keyup', function() {
+                clearTimeout(debounceTimeout);
+                debounceTimeout = setTimeout(function() {
+                    actualizarTablaProductos();
+                }, 0); // 500ms de espera antes de buscar
+            });
+
+            // --- Llamada inicial al cargar la página ---
+            actualizarTablaProductos();
+        });
+    </script>
 }

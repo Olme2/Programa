@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using ProductosVM;
-
+using TempDataExtension;
 public class ProductosController : Controller
 {
     private readonly ILogger<ProductosController> _logger;
@@ -18,17 +18,39 @@ public class ProductosController : Controller
     [HttpGet]
     public IActionResult Index()
     {
-        try
+        var viewModel = TempData.Get<IndexProductosVM>("FiltrosProductos");
+
+        if (viewModel == null)
         {
-            var productosVM = _productosRepo.ObtenerListadoProductos().Where(p => p.Activo).OrderBy(p => p.Producto).ToList();                
-            return View(productosVM);
+            viewModel = new IndexProductosVM();
         }
-        catch (Exception e)
-        {
-            _logger.LogError(e, "Error al obtener el listado de productos.");
-            TempData["ErrorMessage"] = "No se pudo cargar el listado de productos.";
-            return View(new List<ListarProductosVM>());
-        }
+
+        TempData.Set("FiltrosProductos", viewModel);
+
+        // La lista inicial de productos estará vacía. AJAX la llenará.
+        viewModel.Productos = new List<ListarProductosVM>();
+
+        return View(viewModel);
+    }
+
+    [HttpPost]
+    public IActionResult FiltrarProductos(IndexProductosVM viewModel)
+    {
+        // Guardamos el estado actual de los filtros
+        TempData.Set("FiltrosProductos", viewModel);
+
+        // Usamos la misma lógica de filtrado que ya tenías
+        var productos = _productosRepo.ObtenerListadoProductos(viewModel);
+        ViewData["BusquedaActual"] = viewModel.Busqueda;
+        // La vista parcial espera una lista de ListarProductosVM
+        return PartialView("_ProductosTabla", productos);
+    }
+
+    [HttpGet]
+    public IActionResult ResetearFiltros()
+    {
+        TempData.Remove("FiltrosProductos");
+        return RedirectToAction("Index");
     }
 
     [HttpGet]
@@ -180,54 +202,4 @@ public class ProductosController : Controller
         }
     }
 
-    [HttpGet]
-    public IActionResult _BuscarProductos(string? busqueda, string ordenarPor, bool inactivos)
-    {
-        try
-        {
-            // 1. Empezamos con la consulta base.
-            var query = _productosRepo.ObtenerListadoProductos();
-
-            // 2. Aplicamos el filtro de inactivos.
-            // Si el checkbox NO está marcado, filtramos para mostrar solo los activos.
-            if (!inactivos)
-            {
-                query = query.Where(p => p.Activo);
-            }
-
-            // 3. Aplicamos el filtro de búsqueda por texto.
-            if (!string.IsNullOrEmpty(busqueda))
-            {
-                query = query.Where(p =>
-                    p.Producto.Contains(busqueda, StringComparison.CurrentCultureIgnoreCase) ||
-                    p.Proveedor.Contains(busqueda, StringComparison.CurrentCultureIgnoreCase)
-                );
-            }
-
-            // 4. Aplicamos el ordenamiento.
-            // Usamos IOrderedEnumerable para poder encadenar el ordenamiento.
-            IOrderedEnumerable<ListarProductosVM> productosOrdenados;
-
-            switch (ordenarPor)
-            {
-                case "stock":
-                    // Siempre ordenamos por Activo descendente primero.
-                    productosOrdenados = query.OrderByDescending(p => p.Activo).ThenBy(p => p.Stock);
-                    break;
-                default: // "alfabetico"
-                    productosOrdenados = query.OrderByDescending(p => p.Activo).ThenBy(p => p.Producto);
-                    break;
-            }
-
-            ViewData["BusquedaActual"] = busqueda;
-            
-            // 5. Devolvemos la vista parcial con la lista filtrada y ordenada.
-            return PartialView("_ProductosTabla", productosOrdenados.ToList());
-        }
-        catch (Exception e)
-        {
-            _logger.LogError(e, "Error en la búsqueda dinámica de productos.");
-            return StatusCode(500); // Es una buena práctica devolver un código de error para AJAX.
-        }
-    }
 }

@@ -43,6 +43,66 @@ public class ProductosRepository : IProductosRepository
             }).ToList();
     }
 
+    public IEnumerable<ListarProductosVM> ObtenerListadoProductos(IndexProductosVM filtro)
+    {
+        var unaSemanaAtras = DateOnly.FromDateTime(DateTime.Now.AddDays(-7));
+        var hoy = DateOnly.FromDateTime(DateTime.Now);
+        IQueryable<Productos> productosQuery = _context.Productos.Include(p => p.Proveedor);
+
+        if (!filtro.Inactivos)
+        {
+            productosQuery = productosQuery.Where(p => p.Activo);
+        }
+
+        // 3. Aplicamos el filtro de búsqueda de texto.
+        //    Solo si el string de búsqueda no es nulo o vacío.
+        if (!string.IsNullOrEmpty(filtro.Busqueda))
+        {
+            var textoBusqueda = filtro.Busqueda.ToLower().Trim();
+            productosQuery = productosQuery.Where(p =>
+                p.Producto.ToLower().Contains(textoBusqueda) ||
+                (p.Proveedor != null && p.Proveedor.Proveedor.ToLower().Contains(textoBusqueda))
+            );
+        }
+        // 4. Aplicamos el ordenamiento.
+        switch (filtro.OrdenarPor)
+        {
+            case "stock":
+                productosQuery = productosQuery.OrderBy(p => p.Stock);
+                break;
+            case "alfabetico":
+            default: // Si llega un valor inesperado, ordenamos alfabéticamente por defecto.
+                productosQuery = productosQuery.OrderBy(p => p.Producto);
+                break;
+        }
+        var productos = productosQuery.Select(p => new ListarProductosVM
+        {
+            IdProducto = p.IdProducto,
+            Producto = p.Producto,
+            Proveedor = p.Proveedor.Proveedor,
+            Stock = p.Stock,
+            Costo = p.Costo,
+            Precio = p.Precio,
+            Activo = p.Activo,
+            Ganancia = p.Precio - p.Costo,
+            PorcentajeGanancia = (p.Costo > 0) ? (100 * (p.Precio - p.Costo) / p.Costo) : 0,
+            EsEliminable = !_context.DetallesVentas.Any(dv => dv.IdProducto == p.IdProducto) &&
+                                   !_context.DetallesPromociones.Any(dp => dp.IdProducto == p.IdProducto) &&
+                                   !_context.DetallesCompras.Any(dc => dc.IdProducto == p.IdProducto),
+            VentaSemanal = _context.DetallesVentas
+                                .Where(dv => dv.IdProducto == p.IdProducto && _context.Ventas.Any(v => v.IdVenta == dv.IdVenta && v.Fecha >= unaSemanaAtras && v.Fecha <= hoy))
+                                .Select(dv => (decimal?)dv.Cantidad)
+                                .Concat(
+                                    _context.VentasPromociones
+                                        .Where(vp => _context.Ventas.Any(v => v.IdVenta == vp.IdVenta && v.Fecha >= unaSemanaAtras && v.Fecha <= hoy))
+                                        .SelectMany(vp => _context.DetallesPromociones
+                                            .Where(dp => dp.IdPromocion == vp.IdPromocion && dp.IdProducto == p.IdProducto)
+                                            .Select(dp => (decimal?)vp.Cantidad * dp.Cantidad)
+                                        )).Sum() ?? 0
+        }).ToList();
+        return productos;
+    }
+    
     public Productos? ObtenerPorId(int id)
     {
         return _context.Productos.Include(p => p.Proveedor).FirstOrDefault(p => p.IdProducto == id);
