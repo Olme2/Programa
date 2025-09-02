@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using ProductosVM;
+using System.Text;
 using TempDataExtension;
 public class ProductosController : Controller
 {
@@ -201,5 +202,35 @@ public class ProductosController : Controller
             return RedirectToAction(nameof(Index));
         }
     }
+    [HttpGet]
+    public IActionResult GenerarListaDePreciosTexto()
+    {
+        try
+        {
+            var productos = _productosRepo.ObtenerProductosActivosParaLista();
+            var promociones = _promocionesRepo.ObtenerPromocionesActivasParaLista();
 
+            var sb = new StringBuilder();
+
+            sb.AppendLine("*PRODUCTOS*");
+            foreach (var producto in productos)
+            {
+                sb.AppendLine($"{producto.Nombre} | ${producto.Precio.ToString("N2", CG.CulturaES)}");
+            }
+
+            sb.AppendLine(); // Línea en blanco para separar
+            sb.AppendLine("*PROMOCIONES*");
+            foreach (var promo in promociones)
+            {
+                sb.AppendLine($"{promo.Nombre} | ${promo.Precio.ToString("N2", CG.CulturaES)}");
+            }
+
+            return Json(new { success = true, listaDePrecios = sb.ToString() });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error al generar la lista de precios.");
+            return Json(new { success = false, message = "Error al generar la lista." });
+        }
+    }
 }

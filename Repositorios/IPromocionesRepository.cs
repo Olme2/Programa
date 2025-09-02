@@ -8,4 +8,5 @@ public interface IPromocionesRepository
     void Eliminar(int id);
     bool PuedeSerEliminada(int id);
     void DesactivarPorIdProducto(int id);
+    IEnumerable<(string Nombre, decimal Precio)> ObtenerPromocionesActivasParaLista();
 }

@@ -8,4 +8,5 @@ public interface IProductosRepository
     void Actualizar(Productos producto);
     void Eliminar(int id);
     bool PuedeSerEliminado(int id);
+    IEnumerable<(string Nombre, decimal Precio)> ObtenerProductosActivosParaLista();
 }

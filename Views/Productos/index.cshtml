@@ -5,6 +5,9 @@
 
 <div class="container-fluid">
     <div class="row col-md-12">
+<button type="button" id="btnCopiarListaPrecios" class="btn btn-info">
+        <i class="bi bi-clipboard"></i> Copiar Lista de Precios
+</button>
         <form id="filtro-form" class="row g-3 align-items-center p-3 mb-3 bg-light border rounded">
 
             @* Fila para el Título y el Botón Resetear *@
@@ -63,7 +66,6 @@
         </table>
     </div>
 </div>
-
 <a asp-action="Alta" class="btn btn-success btn-lg btn-float">+</a>
 
 @section Scripts {
@@ -103,6 +105,48 @@
 
             // --- Llamada inicial al cargar la página ---
             actualizarTablaProductos();
+            $('#btnCopiarListaPrecios').on('click', function() {
+            const boton = $(this);
+            const iconoOriginal = boton.find('i').attr('class');
+            const textoOriginal = boton.text().trim();
+
+            // Cambiamos el estado del botón a "Cargando..."
+            boton.prop('disabled', true).html('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Copiando...');
+
+            $.ajax({
+                url: '@Url.Action("GenerarListaDePreciosTexto", "Productos")',
+                type: 'GET',
+                success: function(response) {
+                    if (response.success) {
+                        // Usamos la API del Portapapeles del navegador
+                        navigator.clipboard.writeText(response.listaDePrecios).then(function() {
+                            // Éxito al copiar
+                            boton.removeClass('btn-info').addClass('btn-success').html('<i class="bi bi-check-lg"></i> ¡Copiado!');
+                        }, function(err) {
+                            // Error al copiar
+                            boton.removeClass('btn-info').addClass('btn-danger').html('<i class="bi bi-x-lg"></i> Error al copiar');
+                            console.error('Error al copiar al portapapeles: ', err);
+                        });
+                    } else {
+                        // Error en el servidor
+                        boton.removeClass('btn-info').addClass('btn-danger').html('<i class="bi bi-x-lg"></i> Error en servidor');
+                    }
+                },
+                error: function() {
+                    // Error de AJAX
+                    boton.removeClass('btn-info').addClass('btn-danger').html('<i class="bi bi-x-lg"></i> Falló la conexión');
+                },
+                complete: function() {
+                    // Después de 3 segundos, restauramos el botón a su estado original
+                    setTimeout(function() {
+                        boton.prop('disabled', false)
+                             .removeClass('btn-success btn-danger')
+                             .addClass('btn-info')
+                             .html(`<i class="${iconoOriginal}"></i> ${textoOriginal}`);
+                    }, 3000);
+                }
+                });
+            });
         });
     </script>
 }

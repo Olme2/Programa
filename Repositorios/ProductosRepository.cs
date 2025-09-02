@@ -31,7 +31,7 @@ public class ProductosRepository : IProductosRepository
                                    !_context.DetallesPromociones.Any(dp => dp.IdProducto == p.IdProducto) &&
                                    !_context.DetallesCompras.Any(dc => dc.IdProducto == p.IdProducto),
                 VentaSemanal = _context.DetallesVentas
-                                .Where(dv => dv.IdProducto == p.IdProducto &&_context.Ventas.Any(v => v.IdVenta == dv.IdVenta && v.Fecha >= unaSemanaAtras && v.Fecha <= hoy))
+                                .Where(dv => dv.IdProducto == p.IdProducto && _context.Ventas.Any(v => v.IdVenta == dv.IdVenta && v.Fecha >= unaSemanaAtras && v.Fecha <= hoy))
                                 .Select(dv => (decimal?)dv.Cantidad)
                                 .Concat(
                                     _context.VentasPromociones
@@ -102,7 +102,7 @@ public class ProductosRepository : IProductosRepository
         }).ToList();
         return productos;
     }
-    
+
     public Productos? ObtenerPorId(int id)
     {
         return _context.Productos.Include(p => p.Proveedor).FirstOrDefault(p => p.IdProducto == id);
@@ -130,7 +130,15 @@ public class ProductosRepository : IProductosRepository
         }
     }
     public bool PuedeSerEliminado(int id)
-        {
-            return !_context.DetallesPromociones.Any(d => d.IdProducto == id) && !_context.DetallesVentas.Any(d => d.IdProducto == id) && !_context.DetallesCompras.Any(d => d.IdProducto == id);
-        }
+    {
+        return !_context.DetallesPromociones.Any(d => d.IdProducto == id) && !_context.DetallesVentas.Any(d => d.IdProducto == id) && !_context.DetallesCompras.Any(d => d.IdProducto == id);
+    }
+    public IEnumerable<(string Nombre, decimal Precio)> ObtenerProductosActivosParaLista()
+    {
+        return _context.Productos
+            .Where(p => p.Activo)
+            .OrderBy(p => p.Producto)
+            .Select(p => new ValueTuple<string, decimal>(p.Producto, p.Precio))
+            .ToList();
+    }
 }

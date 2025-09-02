@@ -56,8 +56,8 @@ public class ComprasController : Controller
         try
         {
             TempData.Set("FiltrosCompras", viewModel);
-            var compras = _comprasRepo.ObtenerListadoCompras(viewModel);
-            return PartialView("_ComprasTabla", compras.ToList());
+            var compras = _comprasRepo.ObtenerListadoCompras(viewModel).ToList();
+            return PartialView("_ComprasTabla", compras);
         }
         catch (Exception e)
         {
@@ -116,7 +116,7 @@ public class ComprasController : Controller
             return RedirectToAction(nameof(Index));
         }
 
-        var proveedores = _proveedoresRepo.ObtenerTodos().Select(p => new SelectListItem(p.Proveedor, p.IdProveedor.ToString())).ToList();
+        var proveedores = _proveedoresRepo.ObtenerListadoProveedores().ToList();
         var viewModel = new ModificarCompraVM(compra, proveedores);
         
         return View(viewModel);
@@ -148,7 +148,7 @@ public class ComprasController : Controller
             }
         }
         
-        var proveedores = _proveedoresRepo.ObtenerTodos().Select(p => new SelectListItem(p.Proveedor, p.IdProveedor.ToString())).ToList();
+        var proveedores = _proveedoresRepo.ObtenerListadoProveedores().ToList();
         viewModel.Proveedores = proveedores;
         return View(viewModel);
     }
@@ -189,17 +189,12 @@ public class ComprasController : Controller
 
     private void RepoblarAltaCompraViewModel(AltaCompraVM viewModel)
     {
-        viewModel.Proveedores = _proveedoresRepo.ObtenerTodos()
-            .Select(p => new SelectListItem(p.Proveedor, p.IdProveedor.ToString()))
-            .ToList();
+        viewModel.Proveedores = _proveedoresRepo.ObtenerListadoProveedores().ToList();
     }
 
     private Compras MapearAltaViewModelAEntidad(AltaCompraVM viewModel)
     {
-        var detalles = viewModel.DetallesCompra
-            .Select(d => new DetallesCompras(d.IdProducto, d.Cantidad, d.PrecioCosto))
-            .ToList();
-
+        var detalles = viewModel.DetallesCompra.Select(dc => DetallesCompras.CrearDesdeViewModel(dc)).ToList();
         return new Compras(viewModel.IdProveedor, viewModel.Fecha, viewModel.Detalle, detalles);
     }
     
@@ -208,18 +203,12 @@ public class ComprasController : Controller
         // Creamos una entidad temporal con los datos actualizados.
         var detallesActualizados = viewModel.DetallesCompra.Select(d =>
         {
-            var detalle = new DetallesCompras(d.IdProducto, d.Cantidad, d.PrecioCosto);
+            var detalle = new DetallesCompras(d.IdProducto, d.Cantidad, d.CostoUnitario);
             // Si el detalle ya existía, le asignamos su ID original para que el repositorio sepa que debe actualizarlo.
-            if (d.IdDetalleCompra > 0)
-            {
-                typeof(DetallesCompras).GetProperty("IdDetalleCompra").SetValue(detalle, d.IdDetalleCompra);
-            }
             return detalle;
         }).ToList();
 
         var compra = new Compras(viewModel.IdProveedor, viewModel.Fecha, viewModel.Detalle, detallesActualizados);
-        typeof(Compras).GetProperty("IdCompra").SetValue(compra, viewModel.IdCompra);
-
         return compra;
     }
 

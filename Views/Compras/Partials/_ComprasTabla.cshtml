@@ -1,0 +1,35 @@
+@model List<ComprasVM.ListarComprasVM>
+@using Microsoft.AspNetCore.Html
+
+@if(Model.Any()){        
+    @foreach (var compra in Model)
+    {
+        <tr class="compra">
+            <td class="numeroCompra"></td>
+            <td>@compra.Productos</td>
+            <td class="proveedorCompra">@compra.Proveedor</td>
+            <td>@compra.Fecha.ToString("dd/MM")</td>
+            <td class="totalCompra">$@compra.Total.ToString("N2", CG.CulturaES)</td>
+            <td>
+                @{
+                    string detalleCorto = compra.Detalle ?? "-";
+                    if (detalleCorto.Length > 15)
+                    {
+                        detalleCorto = detalleCorto.Substring(0, 15) + "...";
+                    }
+                }
+                <span title="@compra.Detalle">@detalleCorto</span>
+            </td>
+            <td>
+                <a asp-action="Modificar" asp-route-id="@compra.IdCompra" class="btn btn-warning btn-sm">Editar</a>
+                <a asp-action="Eliminar" asp-route-id="@compra.IdCompra" class="btn btn-danger btn-sm">Eliminar</a>
+            </td>
+        </tr>
+    }
+}
+else
+{
+    <tr>
+        <td colspan="12" class="text-center"><h3>No se encontraron compras para los filtros seleccionados.</h3></td>
+    </tr>
+}

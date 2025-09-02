@@ -92,4 +92,13 @@ public class PromocionesRepository : IPromocionesRepository
         }
         _context.SaveChanges();
     }
+    public IEnumerable<(string Nombre, decimal Precio)> ObtenerPromocionesActivasParaLista()
+    {
+        var hoy = DateOnly.FromDateTime(DateTime.Now);
+        return _context.Promociones
+            .Where(p =>p.Inicio <= hoy && (p.Fin == null || p.Fin >= hoy))
+            .OrderBy(p => p.Promocion)
+            .Select(p => new ValueTuple<string, decimal>(p.Promocion, p.Precio))
+            .ToList();
+    }
 }
