@@ -11,7 +11,6 @@ public class DetallePromocionVM
     [Required(ErrorMessage = "La cantidad es obligatoria.")]
     [Range(0.001, 999.999, ErrorMessage = "La cantidad debe ser como mínimo 0,001 y maximo 999,999.")]
     public decimal Cantidad { get; set; }
-
     public string? NombreProducto { get; set; }
 
     public decimal Costo { get; set; }

@@ -9,7 +9,7 @@ public class ModificarPromocionVM : IValidatableObject
     [Required]
     public int IdPromocion { get; set; }
     [Required(ErrorMessage = "El nombre de la promoción es obligatorio.")]
-    [StringLength(50, ErrorMessage = "El nombre no puede exceder los 50 caracteres.")]
+    [StringLength(75, ErrorMessage = "El nombre no puede exceder los 75 caracteres.")]
     public string Promocion { get; set; }
     [Required(ErrorMessage = "El precio es obligatorio.")]
     [Range(0.01, 99999.99, ErrorMessage = "El precio debe estar entre 0,01 y 99.999,99.")]

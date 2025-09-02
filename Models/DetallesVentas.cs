@@ -7,11 +7,8 @@ public class DetallesVentas
     public decimal Cantidad { get; set; }
     public decimal CostoUnitario { get; set; }
     public decimal PrecioUnitario { get; set; }
-    public virtual Productos Producto { get; set; }
-    private DetallesVentas()
-    {
-        Producto = null!;
-    }
+    public virtual Productos Producto { get; set; } = null!;
+    private DetallesVentas(){}
 
     private DetallesVentas(int idProducto, decimal cantidad, decimal costoUnitario, decimal precioUnitario)
     {

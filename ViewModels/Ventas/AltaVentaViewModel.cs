@@ -18,21 +18,24 @@ public class AltaVentaVM : IValidatableObject
 
     [Required]
     public TimeOnly Hora { get; set; }
+
     [Display(Name = "Recargo (%)")]
     [Range(0.00, 100.00, ErrorMessage = "El recargo no puede ser negativo ni mayor al 100%.")]
-    public decimal Recargo { get; set; } = 0; // Campo para el recargo, con valor por defecto 0.
+    public decimal Recargo { get; set; } = 0;
+
+    [StringLength(100, ErrorMessage = "El detalle no puede exceder los 100 caracteres.")]
     public string? Detalle { get; set; }
+
     [Required(ErrorMessage = "El campo redondeo no puede estar vacio")]
     [Display(Name = "Redondeo")]
     [Range(-999999.99, 999999.99, ErrorMessage = "El redondeo debe estar entre -999.999,99 y 999.999,99.")]
     public decimal Redondeo { get; set; } = 0;
+
     public List<DetalleVentaVM> DetallesVenta { get; set; }
-    public List<VentaPromocionVM> VentaPromociones { get; set; }
-    
-    // Propiedades para rellenar los selectores del formulario
+    public List<VentaPromocionVM> VentaPromociones { get; set; }    
     public List<ListarProductosVM> Productos { get; set; }
     public List<ListarPromocionesVM> Promociones { get; set; }
-    public List<SelectListItem> MetodosPago { get; set; } // Cambiado para que sea más fácil de usar en la vista.
+    public List<SelectListItem> MetodosPago { get; set; }
 
     public AltaVentaVM()
     {

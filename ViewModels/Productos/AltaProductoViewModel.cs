@@ -5,7 +5,7 @@ using ProveedoresVM;
 public class AltaProductoVM : IValidatableObject
 {
     [Required(ErrorMessage = "El nombre del producto es obligatorio.")]
-    [StringLength(50, ErrorMessage = "El nombre no puede exceder los 50 caracteres.")]
+    [StringLength(75, ErrorMessage = "El nombre no puede exceder los 75 caracteres.")]
     public string Producto { get; set; }
 
     [Required(ErrorMessage = "Debe seleccionar un proveedor.")]
@@ -13,7 +13,7 @@ public class AltaProductoVM : IValidatableObject
     public int IdProveedor { get; set; }
 
     [Required(ErrorMessage = "El stock inicial es obligatorio.")]
-    [Range(0, 99999.999, ErrorMessage = "El stock no puede ser negativo ni mayor a 99.999,999.")]
+    [Range(0, 9999.999, ErrorMessage = "El stock no puede ser negativo ni mayor a 9.999,999.")]
     public decimal Stock { get; set; } = -1;
 
     [Required(ErrorMessage = "El costo es obligatorio.")]

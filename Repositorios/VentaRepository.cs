@@ -1,5 +1,4 @@
 using Microsoft.EntityFrameworkCore;
-using Microsoft.AspNetCore.Html;
 using entornoPolleria;
 using VentasVM;
 
@@ -79,7 +78,7 @@ public class VentaRepository : IVentaRepository
 
         return ventasVM.OrderByDescending(v => v.Fecha).ThenByDescending(v => v.Hora).ToList();
     }
-    public Ventas? ObtenerVentaPorId(long id)
+    public Ventas? ObtenerPorId(long id)
     {
         try
         {
@@ -98,16 +97,16 @@ public class VentaRepository : IVentaRepository
             throw;
         }
     }
-    public void CrearVenta(Ventas nuevaVenta)
+    public void Crear(Ventas venta)
     {
         using var transaction = _context.Database.BeginTransaction();
         try
         {
             // Paso 1: Validar stock antes de hacer nada.
-            ValidarStockParaVenta(nuevaVenta);
+            ValidarStockParaVenta(venta);
             // Paso 2: Añadir la venta al contexto.
             // EF Core se encargará de añadir los detalles en cascada.
-            _context.Ventas.Add(nuevaVenta);
+            _context.Ventas.Add(venta);
             // Paso 3: Guardar cambios. Los triggers de la BD se ejecutarán aquí.
             _context.SaveChanges();
             // Paso 4: Si todo fue bien, confirmar la transacción.
@@ -120,15 +119,15 @@ public class VentaRepository : IVentaRepository
             throw; // Relanzar la excepción para que el controlador la maneje.
         }
     }
-    public void ActualizarVenta(Ventas ventaModificada)
+    public void Actualizar(Ventas venta)
     {
         // La lógica de actualización es compleja y requiere un manejo cuidadoso
         // de las entidades para evitar conflictos con el tracking de EF Core.
         // Por ahora, implementamos la estructura y la lógica se puede añadir después.
-        _context.Ventas.Update(ventaModificada);
+        _context.Ventas.Update(venta);
         _context.SaveChanges();
     }
-    public void EliminarVenta(long id)
+    public void Eliminar(long id)
     {
         var venta = _context.Ventas.Find(id);
         if (venta != null)

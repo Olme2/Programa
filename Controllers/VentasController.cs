@@ -130,7 +130,7 @@ public class VentasController : Controller
         try
         {
             var nuevaVenta = Ventas.CrearDesdeViewModel(viewModel);
-            _ventaRepo.CrearVenta(nuevaVenta);
+            _ventaRepo.Crear(nuevaVenta);
 
             TempData["SuccessMessage"] = "Venta registrada con éxito.";
             return RedirectToAction(nameof(Index));
@@ -278,7 +278,7 @@ public class VentasController : Controller
     [HttpGet]
     public IActionResult Modificar(long id)
     {
-        var venta = _ventaRepo.ObtenerVentaPorId(id);
+        var venta = _ventaRepo.ObtenerPorId(id);
         if (venta == null)
         {
             TempData["ErrorMessage"] = "No existe venta con ese id.";
@@ -304,14 +304,14 @@ public class VentasController : Controller
 
         try
         {
-            var venta = _ventaRepo.ObtenerVentaPorId(viewModel.IdVenta);
+            var venta = _ventaRepo.ObtenerPorId(viewModel.IdVenta);
             if (venta == null)
             {
                 TempData["ErrorMessage"] = "No existe venta con ese id.";
                 return RedirectToAction(nameof(Index));
             }
             venta.ActualizarDesdeViewModel(viewModel);
-            _ventaRepo.ActualizarVenta(venta);
+            _ventaRepo.Actualizar(venta);
             TempData["SuccessMessage"] = "Venta modificada con éxito.";
             return RedirectToAction(nameof(Index));
         }
@@ -375,7 +375,7 @@ public class VentasController : Controller
         {
             // Usamos el mismo método del Index, filtrando por el ID específico.
             // Esto nos da el ViewModel que la vista necesita sin escribir lógica de mapeo nueva.
-            var venta = _ventaRepo.ObtenerVentaPorId(id);
+            var venta = _ventaRepo.ObtenerPorId(id);
             if (venta == null)
             {
                 TempData["ErrorMessage"] = "La venta que intenta eliminar no fue encontrada.";
@@ -401,7 +401,7 @@ public class VentasController : Controller
     {
         try
         {
-            _ventaRepo.EliminarVenta(IdVenta);
+            _ventaRepo.Eliminar(IdVenta);
             TempData["SuccessMessage"] = "Venta eliminada con éxito.";
         }
         catch (Exception e)

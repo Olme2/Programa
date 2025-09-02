@@ -6,7 +6,7 @@ public class ModificarMetodoPago
     [Required]
     public short IdMetodo { get; set; }
     [Required(ErrorMessage = "Nombre de Método de pago Obligatorio")]
-    [StringLength(30, ErrorMessage = "El nombre del metodo de pago no puede ser mayor a 30 caracteres")]
+    [StringLength(50, ErrorMessage = "El nombre del metodo de pago no puede ser mayor a 50 caracteres")]
     public string Metodo { get; set; }
 
     public ModificarMetodoPago()

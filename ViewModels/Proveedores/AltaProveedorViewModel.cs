@@ -4,7 +4,7 @@ namespace ProveedoresVM;
 public class AltaProveedorVM
 {
     [Required(ErrorMessage = "El nombre del proveedor es obligatorio.")]
-    [StringLength(50, ErrorMessage = "El nombre no puede exceder los 50 caracteres.")]
+    [StringLength(75, ErrorMessage = "El nombre no puede exceder los 75 caracteres.")]
     public string Proveedor { get; set; } = string.Empty;
 
     [StringLength(100, ErrorMessage = "El contacto no puede exceder los 100 caracteres.")]

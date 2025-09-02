@@ -1,26 +1,48 @@
+using System.ComponentModel.DataAnnotations;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using DetallesComprasVM;
 using ProductosVM;
+using ProveedoresVM;
 
-namespace ComprasVM;
-
-public class AltaCompraVM
+public class AltaCompraVM : IValidatableObject
 {
-    private int idProveedor;
-    private decimal total;
-    private DateOnly fecha;
-    private string? detalle;
-    private List<ListarDetallesCompraVM> detalles;
+    [Required(ErrorMessage = "Debe seleccionar un proveedor.")]
+    [Display(Name = "Proveedor")]
+    public int IdProveedor { get; set; }
+
+    [Required(ErrorMessage = "Debe seleccionar una fecha.")]
+    [DataType(DataType.Date)]
+    public DateOnly Fecha { get; set; }
+
+    [StringLength(100, ErrorMessage = "El detalle no puede exceder los 100 caracteres.")]
+    public string? Detalle { get; set; }
+
+    public List<DetalleCompraVM> DetallesCompra { get; set; }
+    public List<ListarProductosVM> Productos { get; set; }
+    public List<ListarProveedoresVM> Proveedores { get; set; }
 
     public AltaCompraVM()
     {
-        total = 0;
-        fecha = DateOnly.FromDateTime(DateTime.Now);
-        detalles = new List<ListarDetallesCompraVM>();
+        Fecha = DateOnly.FromDateTime(DateTime.Now);
+        DetallesCompra = new List<DetalleCompraVM>();
+        Productos = new List<ListarProductosVM>();
+        Proveedores = new List<ListarProveedoresVM>();
     }
-    
-    public int IdProveedor { get => idProveedor;  set => idProveedor = value; }
-    public decimal Total { get => total; set => total = value; }
-    public DateOnly Fecha { get => fecha; set => fecha = value; }
-    public string? Detalle { get => detalle; set => detalle = value; }
-    public List<ListarDetallesCompraVM> Detalles { get => detalles; set => detalles = value; }
+
+    public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
+    {
+        if (DetallesCompra.Count == 0)
+        {
+            yield return new ValidationResult("La compra debe contener al menos un producto."
+            );
+        }
+        var productosDuplicados = DetallesCompra
+            .GroupBy(d => d.IdProducto)
+            .Any(g => g.Count() > 1);
+
+        if (productosDuplicados)
+        {
+            yield return new ValidationResult("No se puede agregar el mismo producto más de una vez a la compra.");
+        }
+    }
 }

@@ -27,11 +27,6 @@ public class VentasPromociones
         return new VentasPromociones(promocionVM.IdPromocion, promocionVM.Cantidad, promocionVM.CostoPromo, promocionVM.PrecioPromo);
     }
 
-    public static VentasPromociones CrearDesdeViewModel(ModificarVentaPromocionVM promocionVM)
-    {
-        return new VentasPromociones(promocionVM.IdPromocion, promocionVM.Cantidad, promocionVM.CostoPromo, promocionVM.PrecioPromo);
-    }
-
     public decimal CalcularCosto()
     {
         return CostoPromo * Cantidad;

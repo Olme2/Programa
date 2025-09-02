@@ -1,15 +1,34 @@
+using System.ComponentModel.DataAnnotations;
 namespace ComprasVM;
 
 public class ListarComprasVM
 {
-    private int idCompra;
-    private string proveedor = string.Empty;
-    private decimal total;
-    private DateOnly fecha;
-    private string? detalle;
-    public int IdCompra { get => idCompra; set => idCompra = value; }
-    public string Proveedor { get => proveedor;  set => proveedor = value; }
-    public decimal Total { get => total; set => total = value; }
-    public DateOnly Fecha { get => fecha; set => fecha = value; }
-    public string? Detalle { get => detalle; set => detalle = value; }
+    public int IdCompra { get; set; }
+
+    [Display(Name = "Productos")]
+    public string Productos { get; set; } = string.Empty;
+
+    [Display(Name = "Proveedor")]
+    public string Proveedor { get; set; } = string.Empty;
+
+    [DataType(DataType.Currency)]
+    public decimal Total { get; set; }
+
+    [Display(Name = "Fecha")]
+    [DisplayFormat(DataFormatString = "{0:dd/MM}")]
+    public DateOnly Fecha { get; set; }
+
+    public string? Detalle { get; set; }
+
+    public ListarComprasVM() { }
+
+    public ListarComprasVM(Compras compra)
+    {
+        IdCompra = compra.IdCompra;
+        Productos = string.Concat("Productos: ", string.Join(",", compra.DetallesCompra.Select(dc => dc.Producto.Producto)));
+        Proveedor = compra.Proveedor.Proveedor;
+        Total = compra.CalcularTotal();
+        Fecha = compra.Fecha;
+        Detalle = compra.Detalle;
+    }
 }

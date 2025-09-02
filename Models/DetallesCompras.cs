@@ -1,32 +1,28 @@
+using ComprasVM;
 using DetallesComprasVM;
-
 public class DetallesCompras
 {
-    private int idCompra;
-    private int idProducto;
-    private decimal cantidad;
-    private decimal costoUnitario;
-
-    public DetallesCompras(){}
-
-    public DetallesCompras(AltaDetalleCompraVM detalleCompraVM)
+    public int IdCompra { get; set; }
+    public int IdProducto { get; set; }
+    public decimal Cantidad { get; set; }
+    public decimal CostoUnitario { get; set; }
+    public virtual Productos Producto { get; set; } = null!;
+    public virtual Compras Compra { get; set; } = null!;
+    private DetallesCompras() { }
+    public DetallesCompras(int idProducto, decimal cantidad, decimal costoUnitario)
     {
-        idCompra = detalleCompraVM.IdCompra;
-        idProducto = detalleCompraVM.IdProducto;
-        cantidad = detalleCompraVM.Cantidad;
-        costoUnitario = detalleCompraVM.CostoUnitario;
+        IdProducto = idProducto;
+        Cantidad = cantidad;
+        CostoUnitario = costoUnitario;
     }
 
-    public DetallesCompras(ModificarDetalleCompraVM detalleCompraVM)
+    public static DetallesCompras CrearDesdeViewModel(DetalleCompraVM detalleVM)
     {
-        idCompra = detalleCompraVM.IdCompra;
-        idProducto = detalleCompraVM.IdProducto;
-        cantidad = detalleCompraVM.Cantidad;
-        costoUnitario = detalleCompraVM.CostoUnitario;
+        return new DetallesCompras(detalleVM.IdProducto, detalleVM.Cantidad, detalleVM.CostoUnitario);
     }
 
-    public int IdCompra { get => idCompra; set => idCompra = value; }
-    public int IdProducto { get => idProducto; set => idProducto = value; }
-    public decimal Cantidad { get => cantidad; set => cantidad = value; }
-    public decimal CostoUnitario { get => costoUnitario; set => costoUnitario = value; }
+    public decimal CalcularTotal()
+    {
+        return CostoUnitario * Cantidad;
+    }
 }
