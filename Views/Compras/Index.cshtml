@@ -3,9 +3,6 @@
     ViewData["Title"] = "Listado de Compras";
 }
 
-<h1>@ViewData["Title"]</h1>
-<hr />
-
 <div class="container-fluid">
     <div class="row col-md-12">
         <form id="filtro-form" class="row g-3 align-items-center p-3 mb-3 bg-light border rounded">
@@ -18,29 +15,29 @@
                     </a>
                 </div>
             </div>
-            <div class="col-xl-4 col-md-6">
-                <label asp-for="FechaInicio" class="form-label"></label>
+            <div class="col-xl-3 col-md-6">
+                <label asp-for="FechaInicio" class="form-label">Fecha de Inicio</label>
                 <input asp-for="FechaInicio" type="date" class="form-control filtro-control" />
             </div>
-            <div class="col-xl-4 col-md-6">
-                <label asp-for="FechaFin" class="form-label"></label>
+            <div class="col-xl-3 col-md-6">
+                <label asp-for="FechaFin" class="form-label">Fecha de Fin</label>
                 <input asp-for="FechaFin" type="date" class="form-control filtro-control" />
             </div>
-            <div class="col-xl-4 col-md-6">
+            <div class="col-xl-3 col-md-6">
                 <label asp-for="IdProveedor" class="form-label"></label>
                 <select asp-for="IdProveedor" class="form-select filtro-control">
                     <option value="" selected>Todos</option>
-                    @foreach(var proveedor in Model.Proveedores){
-                        <option value="@proveedor.IdProveedor">@proveedor.Proveedor</option>
+                    @foreach(var prov in Model.Proveedores){
+                        <option value="@prov.IdProveedor">@prov.Proveedor</option>
                     }
                 </select>
             </div>
         </form>
     </div>
     <div class="row col-md-12">
-        <h1 class="row col-md-4">Listado de Compras</h1>
-        <div class="col-md-4"></div>
-        <h1 class="row col-md-4">Total: <span id="total-general-display" class="fw-bold text-success"></span></h1>
+        <h1 class="col-md-4">Listado de Compras</h1>
+        <h1 class="col-md-4">Cantidad: <span id="cantidad-general-display" class="fw-bold"></span></h1>
+        <h1 class="col-md-4">Total: <span id="total-general-display" class="fw-bold text-success"></span></h1>
     </div>
     <div class="row col-md-12"><hr></div>
     <div class="table-responsive row col-md-12">
@@ -53,11 +50,11 @@
                     <th>Fecha</th>
                     <th>Total</th>
                     <th>Detalle</th>
-                    <th style="width: 220px;">Acciones</th>
+                    <th style="width: 150px;">Acciones</th>
                 </tr>
             </thead>
-            <tbody id="tabla-compras-container">
-                <partial name="_ComprasTabla" model="Model.Compras"/>
+            <tbody id="tabla-compras-body">
+                <partial name="_ComprasTabla" model="Model.Compras" />
             </tbody>
         </table>
     </div>
@@ -67,68 +64,50 @@
 
 @section Scripts {
     <script>
-        $(document).ready(function() {
+        $(document).ready(function () {
+            function actualizarTablaVentas() {
+                var data = {
+                    FechaInicio: $('#FechaInicio').val(),
+                    FechaFin: $('#FechaFin').val(),
+                    IdProveedor: $('#IdProveedor').val()
+                };
 
-            // Función #1: Se encarga de calcular los totales y numerar las filas del lado del cliente.
-            function calcularYMostrarTotales() {
-                let totalGeneral = 0;
-                let cantidadGeneral = 0;
-                
-                // Seleccionamos todas las filas de compra que están visibles en la tabla
-                $('#tabla-compras-container tr.compra').each(function(index) {
-                    cantidadGeneral++;
-                    
-                    // Numeramos la fila
-                    $(this).find('.numeroCompra').text(cantidadGeneral);
-                    
-                    // Leemos el texto del total de la fila
-                    const textoTotal = $(this).find('.totalCompra').text();
-                    
-                    // Convertimos el texto de moneda (ej: "$1.234,56") a un número
-                    const valorNumerico = parseFloat(textoTotal.replace('$', '').replace(/\./g, '').replace(',', '.')) || 0;
-                    
-                    totalGeneral += valorNumerico;
-                });
-
-                // Formateamos el total a moneda local (ARS)
-                const totalFormateado = totalGeneral.toLocaleString('es-AR', { style: 'currency', currency: 'ARS' });
-
-                // Mostramos los resultados en los spans correspondientes
-                $('#total-compras-display').text(totalFormateado);
-                $('#cantidad-compras-display').text(cantidadGeneral);
-            }
-
-            // Función #2: Se encarga de llamar al controlador para filtrar los datos.
-            function actualizarTablaCompras() {
-                const form = $('#filtro-form');
-                const container = $('#tabla-compras-container');
-                
                 $.ajax({
-                    url: '@Url.Action("FiltrarCompras", "Compras")',
-                    type: 'POST',
-                    data: form.serialize(),
-                    success: function(response) {
-                        // 1. Reemplazamos el contenido de la tabla con la respuesta del servidor
-                        container.html(response);
-                        
-                        // 2. Una vez actualizada la tabla, llamamos a la función para que calcule los totales
-                        calcularYMostrarTotales();
+                    url: '@Url.Action("_BuscarCompras", "Compras")',
+                    type: 'POST', // Changed to POST to match Controller if needed, or check Controller method attribute
+                    data: data,
+                    success: function (result) {
+                        $('#tabla-compras-body').html(result);
+                        calcularYMostrarTotalGeneral();
                     },
-                    error: function() {
-                        container.html('<tr><td colspan="7"><div class="alert alert-danger">Error al cargar las compras.</div></td></tr>');
+                    error: function () {
+                        alert("Error al cargar los datos. Intente nuevamente.");
                     }
                 });
             }
+            function calcularYMostrarTotalGeneral() {
+                let totalGeneral = 0;
+                let cantidadGeneral = $('#tabla-compras-body .compra').length;
+                let num = cantidadGeneral;
+                
+                $('#tabla-compras-body .compra').each(function() {
+                    const textoTotal = $(this).find('.totalCompra').text();
+                    const valorNumerico = parseFloat(textoTotal.replace('$', '').replace(/\./g, '').replace(',', '.')) || 0;
 
-            // --- MANEJADORES DE EVENTOS ---
+                    totalGeneral += valorNumerico;
+                    $(this).find(".numeroCompra").text(num--);
+                });
 
-            // Cuando un control de filtro cambia, actualizamos la tabla.
+                const totalFormateado = totalGeneral.toLocaleString('es-AR', { style: 'currency', currency: 'ARS' });
+                $('#total-general-display').text(totalFormateado);
+                $('#cantidad-general-display').text(cantidadGeneral);
+            }
+
             $('.filtro-control').on('change', function() {
-                actualizarTablaCompras();
+                actualizarTablaVentas();
             });
 
-            // Realizamos una carga inicial de datos cuando la página está lista.
-            actualizarTablaCompras();
+            calcularYMostrarTotalGeneral();
         });
     </script>
 }

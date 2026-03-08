@@ -53,10 +53,18 @@ public class AppDbContext : DbContext
         {
             entity.ToTable("compra");
             entity.HasKey(e => e.IdCompra);
-            entity.Property(e => e.IdCompra).HasColumnName("id_compra").UseIdentityColumn();
+            entity.Property(e => e.IdCompra)
+                  .HasColumnName("id_compra")
+                  .UseIdentityAlwaysColumn(); // PostgreSQL identity strategy
             entity.Property(e => e.IdProveedor).HasColumnName("id_proveedor").IsRequired();
             entity.Property(e => e.Fecha).HasColumnName("fecha").IsRequired();
             entity.Property(e => e.Detalle).HasColumnName("detalle").HasMaxLength(100);
+            
+            // Relación con Proveedor
+            entity.HasOne(c => c.Proveedor)
+                  .WithMany() // Asumimos que no hay colección 'Compras' en Proveedor, o si la hay, EF la encontrará, pero esto explicita la FK
+                  .HasForeignKey(c => c.IdProveedor)
+                  .IsRequired();
         });
 
         // DetallesCompras
@@ -68,6 +76,17 @@ public class AppDbContext : DbContext
             entity.Property(e => e.IdProducto).HasColumnName("id_producto").IsRequired();
             entity.Property(e => e.Cantidad).HasColumnName("cantidad").HasColumnType("numeric(7,3)").IsRequired();
             entity.Property(e => e.CostoUnitario).HasColumnName("costo_unitario").HasColumnType("numeric(8,2)").IsRequired();
+            // Configuración de la relación con Compras
+            entity.HasOne(d => d.Compra)
+                .WithMany(c => c.DetallesCompra)
+                .HasForeignKey(d => d.IdCompra)
+                .IsRequired()
+                .OnDelete(DeleteBehavior.Cascade);
+            // Configuración de la relación con Productos (Opcional si ya se infiere, pero bueno explicitar)
+            entity.HasOne(d => d.Producto)
+                .WithMany()
+                .HasForeignKey(d => d.IdProducto)
+                .IsRequired();
         });
 
         // Promociones

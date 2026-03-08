@@ -54,10 +54,57 @@ public class ComprasRepository : IComprasRepository
         }
     }
 
-    public void Crear(Compras compra)
+    public async Task Crear(Compras compra)
     {
-        _context.Compras.Add(compra);
-        _context.SaveChanges();
+        using var transaction = await _context.Database.BeginTransactionAsync();
+        try
+        {
+            // 1. Guardar la compra base primero
+            compra.IdCompra = 0; // Force Identity Generation
+            _context.Compras.Add(compra);
+            await _context.SaveChangesAsync();
+
+            // 2. Procesar productos de forma aislada para evitar conflictos de tracking
+            foreach (var detalle in compra.DetallesCompra)
+            {
+                // Usamos AsTracking() para asegurar que EF sepa que vamos a modificarlo
+                var producto = await _context.Productos.AsTracking()
+                                .FirstOrDefaultAsync(p => p.IdProducto == detalle.IdProducto);
+                
+                if (producto != null)
+                {
+                    // Actualizar Stock
+                    decimal stockPrevio = producto.Stock;
+                    decimal costoPrevio = producto.Costo;
+                    
+                    producto.Stock += detalle.Cantidad;
+
+                    // Actualizar Costo (Ponderado)
+                    if (stockPrevio + detalle.Cantidad > 0)
+                    {
+                        producto.Costo = ((stockPrevio * costoPrevio) + (detalle.Cantidad * detalle.CostoUnitario)) 
+                                        / (stockPrevio + detalle.Cantidad);
+                    }
+                    else
+                    {
+                        producto.Costo = detalle.CostoUnitario;
+                    }
+                    
+                    // Forzamos el estado a modificado
+                    _context.Entry(producto).State = EntityState.Modified;
+                }
+            }
+
+            await _context.SaveChangesAsync();
+            await transaction.CommitAsync();
+        }
+        catch (Exception ex)
+        {
+            await transaction.RollbackAsync();
+            // Log exacto para la consola (aunque _logger sería ideal, Console sirve para dotnet watch rápido)
+            Console.WriteLine($"FATAL DB ERROR: {ex.Message} Inner: {ex.InnerException?.Message}");
+            throw;
+        }
     }
     
 

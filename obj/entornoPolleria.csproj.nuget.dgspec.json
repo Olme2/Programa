@@ -1,23 +1,23 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Programa\\entornoPolleria.csproj": {}
+    "C:\\Users\\Valentino\\OneDrive\\Desktop\\Polleria\\Programa\\entornoPolleria.csproj": {}
   },
   "projects": {
-    "C:\\Programa\\entornoPolleria.csproj": {
+    "C:\\Users\\Valentino\\OneDrive\\Desktop\\Polleria\\Programa\\entornoPolleria.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Programa\\entornoPolleria.csproj",
+        "projectUniqueName": "C:\\Users\\Valentino\\OneDrive\\Desktop\\Polleria\\Programa\\entornoPolleria.csproj",
         "projectName": "entornoPolleria",
-        "projectPath": "C:\\Programa\\entornoPolleria.csproj",
-        "packagesPath": "C:\\Users\\Adriana\\.nuget\\packages\\",
-        "outputPath": "C:\\Programa\\obj\\",
+        "projectPath": "C:\\Users\\Valentino\\OneDrive\\Desktop\\Polleria\\Programa\\entornoPolleria.csproj",
+        "packagesPath": "C:\\Users\\Valentino\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\Valentino\\OneDrive\\Desktop\\Polleria\\Programa\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
         ],
         "configFilePaths": [
-          "C:\\Users\\Adriana\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\Valentino\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
@@ -84,7 +84,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.100/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.100-rc.1.24452.12/PortableRuntimeIdentifierGraph.json"
         }
       }
     }

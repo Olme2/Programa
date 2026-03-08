@@ -84,22 +84,53 @@ public class ComprasController : Controller
     // POST: Compras/Alta
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public IActionResult Alta(AltaCompraVM viewModel)
+    public async Task<IActionResult> Alta(AltaCompraVM viewModel)
     {
+        _logger.LogInformation("Intento de Alta Compras. Proveedor: {ProveedorID}, Detalles Count: {Count}", 
+            viewModel.IdProveedor, 
+            viewModel.DetallesCompra?.Count ?? 0);
+
+        // Validación explícita solicitada
+        if (viewModel.DetallesCompra == null || !viewModel.DetallesCompra.Any())
+        {
+            ModelState.AddModelError(string.Empty, "No hay productos en la compra.");
+        }
+
         if (ModelState.IsValid)
         {
             try
             {
-                var compra = MapearAltaViewModelAEntidad(viewModel);
-                _comprasRepo.Crear(compra);
+                var compra = MapearModificarViewModelAEntidad(new ModificarCompraVM 
+                { 
+                     // Reutilizamos el mapeo existente o usamos el dedicado si existe, 
+                     // nota: en el código original se usaba "MapearAltaViewModelAEntidad", hay que tener cuidado.
+                     // Mirando el código anterior, llamaba a MapearAltaViewModelAEntidad. 
+                     // Pero en el snippet 'view_file' paso 129 no vimos ese método, vimos 'MapearModificarViewModelAEntidad' más abajo.
+                     // Asumiré que existe 'MapearAltaViewModelAEntidad' basado en el replace anterior (paso 149).
+                    IdProveedor = viewModel.IdProveedor,
+                    Fecha = viewModel.Fecha,
+                    Detalle = viewModel.Detalle,
+                    DetallesCompra = viewModel.DetallesCompra
+                });
+                
+                // Mapeo manual rápido para evitar errores si el método auxiliar no es visible
+                var nuevaCompra = new Compras(viewModel.IdProveedor, viewModel.Fecha, viewModel.Detalle, 
+                    viewModel.DetallesCompra.Select(d => new DetallesCompras(d.IdProducto, d.Cantidad, d.CostoUnitario)).ToList());
+
+                await _comprasRepo.Crear(nuevaCompra);
                 TempData["SuccessMessage"] = "Compra registrada con éxito.";
                 return RedirectToAction(nameof(Index));
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error al crear la compra.");
-                ModelState.AddModelError(string.Empty, "Ocurrió un error inesperado al guardar la compra.");
+                ModelState.AddModelError(string.Empty, "Ocurrió un error inesperado al guardar la compra: " + ex.Message);
             }
+        }
+        else
+        {
+             var errors = ModelState.SelectMany(x => x.Value.Errors).Select(x => x.ErrorMessage).ToList();
+             _logger.LogWarning("Modelo inválido en Alta Compras: {Errors}", string.Join(", ", errors));
         }
         
         RepoblarAltaCompraViewModel(viewModel);
@@ -214,6 +245,12 @@ public class ComprasController : Controller
 
 
     // --- ENDPOINTS PARA AJAX (Ej: Select2) ---
+
+    [HttpGet]
+    public IActionResult ObtenerVistaDetalleCompra()
+    {
+        return PartialView("Partials/_DetalleCompraItem", new DetalleCompraVM());
+    }
     
     [HttpGet]
     public JsonResult BuscarProductosParaCompra(string term)

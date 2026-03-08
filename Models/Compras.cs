@@ -1,10 +1,17 @@
-// En Models/Compras.cs
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+
 namespace ComprasVM;
 using DetallesComprasVM;
 public class Compras
 {
+    [Key]
+    [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
     public int IdCompra { get; set; }
+    
+    [ForeignKey("Proveedor")]
     public int IdProveedor { get; set; }
+    
     public DateOnly Fecha { get; set; }
     public string? Detalle { get; set; }
     public readonly List<DetallesCompras> _detallesCompras = new();
