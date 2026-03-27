@@ -64,11 +64,13 @@ app.MapControllerRoute(
     pattern: "{controller=Ventas}/{action=Alta}");
 try
 {
+    // Solo intenta abrir el navegador si no es un entorno de desarrollo o si explícitamente se desea
+    Console.WriteLine("Iniciando sistema en http://localhost:5146...");
     System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo("http://localhost:5146") { UseShellExecute = true });
 }
 catch (Exception ex)
 {
-    // Opcional: Manejar el caso en que no se pueda abrir el navegador.
     Console.WriteLine("No se pudo abrir el navegador automáticamente: " + ex.Message);
 }
-app.Run();
+
+app.Run("http://localhost:5146");

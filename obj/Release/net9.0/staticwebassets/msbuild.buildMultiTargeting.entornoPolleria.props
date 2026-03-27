@@ -1,3 +1,0 @@
-﻿<Project>
-  <Import Project="..\build\entornoPolleria.props" />
-</Project>
