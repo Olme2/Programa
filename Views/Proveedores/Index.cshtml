@@ -2,35 +2,44 @@
 @{
     ViewData["Title"] = "Proveedores";
 }
-<h1>Listado de Proveedores</h1>
 
-<div class="row g-3 align-items-center mb-3">
-    <div class="col-sm-5">
-        <input type="text" id="buscador-proveedor" name="busqueda" class="form-control" placeholder="Buscar por nombre..." value="@ViewData["BusquedaActual"]" />
-    </div>
-    <div class="col-sm-4">
-        <select id="filtro-deuda" name="filtroDeuda" class="form-select">
-            <option value="todos" selected>Mostrar Todos</option>
-            <option value="conDeuda">Sólo con Deuda</option>
-            <option value="sinDeuda">Sólo sin Deuda</option>
-        </select>
+<div class="filter-panel">
+    <div class="filter-title">Filtros</div>
+    <div class="row g-2 align-items-end">
+        <div class="col-md-6">
+            <label class="form-label">Buscar</label>
+            <input type="text" id="buscador-proveedor" name="busqueda" class="form-control"
+                   placeholder="Buscar por nombre..." value="@ViewData["BusquedaActual"]" />
+        </div>
+        <div class="col-md-4">
+            <label class="form-label">Deuda</label>
+            <select id="filtro-deuda" name="filtroDeuda" class="form-select">
+                <option value="todos" selected>Mostrar Todos</option>
+                <option value="conDeuda">Sólo con Deuda</option>
+                <option value="sinDeuda">Sólo sin Deuda</option>
+            </select>
+        </div>
     </div>
 </div>
 
-<table class="table table-hover">
-    <thead class="table-dark">
-        <tr>
-            <th>Proveedor</th>
-            <th>Contacto</th>
-            <th>Deuda</th>
-            <th style="width: 200px;">Acciones</th>
-        </tr>
-    </thead>
-    <tbody id="tabla-proveedores-body">
-        @await Html.PartialAsync("_ProveedoresTabla", Model)
-    </tbody>
-</table>
-<a asp-action="Alta" class="btn btn-success btn-lg btn-float">+</a>
+<div class="table-wrapper">
+    <table class="table table-hover">
+        <thead>
+            <tr>
+                <th>Proveedor</th>
+                <th>Contacto</th>
+                <th>Deuda</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody id="tabla-proveedores-body">
+            @await Html.PartialAsync("_ProveedoresTabla", Model)
+        </tbody>
+    </table>
+</div>
+
+<a asp-action="Alta" class="btn btn-float">+</a>
+
 @section Scripts {
     <script src="~/js/site.js" asp-append-version="true"></script>
 }

@@ -3,24 +3,27 @@
     ViewData["Title"] = "Promociones";
 }
 
-<h1>Listado de Promociones</h1>
-<p>Gestiona las ofertas y combos especiales.</p>
-
-<div class="row g-3 align-items-center mb-3">
-    <div class="col-md-9">
-        <input type="text" id="buscador-promocion" name="busqueda" class="form-control" placeholder="Buscar por nombre de promoción o producto..." value="@ViewData["BusquedaActual"]" />
-    </div>
-    <div class="col-md-3">
-        <div class="form-check form-switch bg-light border rounded p-2 d-flex justify-content-center align-items-center h-100">
-            <input class="form-check-input me-2" id="mostrar-inactivos" type="checkbox" name="Inactivos">
-            <label class="form-check-label" for="mostrar-inactivos">Ver Inactivas</label>
+<div class="filter-panel">
+    <div class="filter-title">Filtros</div>
+    <div class="row g-2 align-items-center">
+        <div class="col-md-8">
+            <label class="form-label">Buscar</label>
+            <input type="text" id="buscador-promocion" name="busqueda" class="form-control"
+                   placeholder="Buscar por nombre de promoción o producto..." value="@ViewData["BusquedaActual"]" />
+        </div>
+        <div class="col-md-4">
+            <label class="form-label">Estado</label>
+            <div class="form-check form-switch pt-1">
+                <input class="form-check-input" id="mostrar-inactivos" type="checkbox" name="Inactivos" />
+                <label class="form-check-label" for="mostrar-inactivos">Ver Inactivas</label>
+            </div>
         </div>
     </div>
 </div>
 
-<div class="table-responsive">
+<div class="table-wrapper">
     <table class="table table-hover">
-        <thead class="table-dark">
+        <thead>
             <tr>
                 <th>Promoción</th>
                 <th>Productos</th>
@@ -31,47 +34,31 @@
                 <th>% Ganancia</th>
                 <th>Inicio/Fin</th>
                 <th>Estado</th>
-                <th style="width: 220px;">Acciones</th>
+                <th>Acciones</th>
             </tr>
         </thead>
         <tbody id="tabla-promociones-body">
-            @* El contenido de la tabla se carga aquí a través de la vista parcial *@
             <partial name="_PromocionesTabla" model="Model" />
         </tbody>
     </table>
 </div>
 
-@* Botón flotante para crear una nueva promoción *@
-<a asp-action="Alta" class="btn btn-success btn-lg btn-float">+</a>
+<a asp-action="Alta" class="btn btn-float">+</a>
 
 @section Scripts {
-    <script type="text/javascript">
+    <script>
         $(document).ready(function () {
-            
             function actualizarTablaPromociones() {
-                var busqueda = $('#buscador-promocion').val();
-                var inactivos = $('#mostrar-inactivos').is(':checked');
                 $.ajax({
                     url: '@Url.Action("_BuscarPromociones", "Promociones")',
                     type: 'GET',
-                    data: {
-                        busqueda: busqueda,
-                        inactivos: inactivos
-                    },
-                    success: function (result) {
-                        $('#tabla-promociones-body').html(result);
-                    },
-                    error: function (err) {
-                        console.error("Error al buscar promociones:", err);
-                        // Opcional: Mostrar un mensaje de error en la UI
-                    }
+                    data: { busqueda: $('#buscador-promocion').val(), inactivos: $('#mostrar-inactivos').is(':checked') },
+                    success: function (result) { $('#tabla-promociones-body').html(result); },
+                    error: function (err) { console.error("Error al buscar promociones:", err); }
                 });
             }
-
-            // Disparamos la búsqueda cada vez que el usuario escribe en el input
             $('#buscador-promocion').on('keyup', actualizarTablaPromociones);
             $('#mostrar-inactivos').on('change', actualizarTablaPromociones);
-
         });
     </script>
 }

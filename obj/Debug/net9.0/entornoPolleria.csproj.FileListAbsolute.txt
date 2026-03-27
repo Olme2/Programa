@@ -326,7 +326,6 @@ C:\Users\Valentino\OneDrive\Desktop\Polleria\Programa\obj\Debug\net9.0\entornoPo
 C:\Users\Valentino\OneDrive\Desktop\Polleria\Programa\obj\Debug\net9.0\scopedcss\Views\Shared\_Layout.cshtml.rz.scp.css
 C:\Users\Valentino\OneDrive\Desktop\Polleria\Programa\obj\Debug\net9.0\scopedcss\bundle\entornoPolleria.styles.css
 C:\Users\Valentino\OneDrive\Desktop\Polleria\Programa\obj\Debug\net9.0\scopedcss\projectbundle\entornoPolleria.bundle.scp.css
-C:\Users\Valentino\OneDrive\Desktop\Polleria\Programa\obj\Debug\net9.0\compressed\m2bgq4xnl9-kahsdh6l8t.gz
 C:\Users\Valentino\OneDrive\Desktop\Polleria\Programa\obj\Debug\net9.0\compressed\w1z6minnks-61n19gt1b8.gz
 C:\Users\Valentino\OneDrive\Desktop\Polleria\Programa\obj\Debug\net9.0\compressed\0lbsggp66v-2bqgk4g6hm.gz
 C:\Users\Valentino\OneDrive\Desktop\Polleria\Programa\obj\Debug\net9.0\compressed\vekt4abu90-nakmwdwsxp.gz
@@ -402,3 +401,4 @@ C:\Users\Valentino\OneDrive\Desktop\Polleria\Programa\obj\Debug\net9.0\refint\en
 C:\Users\Valentino\OneDrive\Desktop\Polleria\Programa\obj\Debug\net9.0\entornoPolleria.pdb
 C:\Users\Valentino\OneDrive\Desktop\Polleria\Programa\obj\Debug\net9.0\entornoPolleria.genruntimeconfig.cache
 C:\Users\Valentino\OneDrive\Desktop\Polleria\Programa\obj\Debug\net9.0\ref\entornoPolleria.dll
+C:\Users\Valentino\OneDrive\Desktop\Polleria\Programa\obj\Debug\net9.0\compressed\m2bgq4xnl9-mv71p85tci.gz

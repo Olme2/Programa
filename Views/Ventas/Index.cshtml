@@ -1,73 +1,81 @@
 @model VentasVM.IndexVentasVM
 @{
-    ViewData["Title"] = "Listado de Ventas";
+    ViewData["Title"] = "Ventas";
 }
 
-<div class="container-fluid">
-    <div class="row col-md-12">
-        <form id="filtro-form" class="row g-3 align-items-center p-3 mb-3 bg-light border rounded">
-            <div class="row">
-                <h2 class="col-md-4">Filtros</h2>
-                <div class="col-md-4"></div>
-                <div class="col-md-4">
-                    <a asp-action="ResetearFiltros" class="btn btn-secondary w-100">
-                        <i class="bi bi-arrow-counterclockwise"></i> Resetear Filtros
-                    </a>
-                </div>
-            </div>
-            <div class="col-xl-2 col-md-6">
-                <label asp-for="FechaInicio" class="form-label">Fecha de Inicio</label>
-                <input asp-for="FechaInicio" type="date" class="form-control filtro-control" />
-            </div>
-            <div class="col-xl-2 col-md-6">
-                <label asp-for="FechaFin" class="form-label">Fecha de Fin</label>
-                <input asp-for="FechaFin" type="date" class="form-control filtro-control" />
-            </div>
-            <div class="col-xl-2 col-md-6">
-                <label asp-for="Turno" class="form-label"></label>
-                <select asp-for="Turno" class="form-select filtro-control" asp-items="Html.GetEnumSelectList<VentasVM.IndexVentasVM.Turnos>()"></select>
-            </div>
-            <div class="col-xl-2 col-md-6">
-                <label asp-for="IdMetodoPago" class="form-label"></label>
-                <select asp-for="IdMetodoPago" class="form-select filtro-control filtroMetodoPago">
-                    <option value="" selected>Todos</option>
-                    @foreach(var metodo in Model.MetodosPago){
-                        <option value="@metodo.IdMetodo">@metodo.Metodo</option>
-                    }
-                </select>
-            </div>
-            <div class="col-xl-4 col-md-6">
-                <label asp-for="Busqueda" class="form-label">Buscar</label>
-                <input asp-for="Busqueda" class="form-control filtro-control" placeholder="Producto o Promoción..." />
-            </div>
-        </form>
+<!-- Filtros -->
+<div class="filter-panel">
+    <div class="filter-title">Filtros</div>
+    <form id="filtro-form" class="row g-2 align-items-end">
+        <div class="col-xl-2 col-md-4">
+            <label asp-for="FechaInicio" class="form-label">Fecha Inicio</label>
+            <input asp-for="FechaInicio" type="date" class="form-control filtro-control" />
+        </div>
+        <div class="col-xl-2 col-md-4">
+            <label asp-for="FechaFin" class="form-label">Fecha Fin</label>
+            <input asp-for="FechaFin" type="date" class="form-control filtro-control" />
+        </div>
+        <div class="col-xl-2 col-md-4">
+            <label asp-for="Turno" class="form-label">Turno</label>
+            <select asp-for="Turno" class="form-select filtro-control" asp-items="Html.GetEnumSelectList<VentasVM.IndexVentasVM.Turnos>()"></select>
+        </div>
+        <div class="col-xl-2 col-md-4">
+            <label asp-for="IdMetodoPago" class="form-label">Método de Pago</label>
+            <select asp-for="IdMetodoPago" class="form-select filtro-control filtroMetodoPago">
+                <option value="" selected>Todos</option>
+                @foreach(var metodo in Model.MetodosPago){
+                    <option value="@metodo.IdMetodo">@metodo.Metodo</option>
+                }
+            </select>
+        </div>
+        <div class="col-xl-4 col-md-8">
+            <label asp-for="Busqueda" class="form-label">Buscar</label>
+            <input asp-for="Busqueda" class="form-control filtro-control" placeholder="Producto o Promoción..." />
+        </div>
+        <div class="col-auto">
+            <a asp-action="ResetearFiltros" class="btn btn-secondary">↺ Resetear</a>
+        </div>
+    </form>
+</div>
+
+<!-- Stats -->
+<div class="stat-row">
+    <div class="stat-chip">
+        <div class="label">Cantidad</div>
+        <div class="value" id="cantidad-general-display">—</div>
     </div>
-    <div class="row col-md-12 align-items-center">
-        <h1 class="col-md-3">Listado de Ventas</h1>
-        <h5 class="col-md-2">Cantidad: <span id="cantidad-general-display" class="fw-bold"></span></h5>
-        <h5 class="col-md-2">Costo: <span id="costo-general-display" class="fw-bold text-danger"></span></h5>
-        <h5 class="col-md-2">Venta: <span id="total-general-display" class="fw-bold text-primary"></span></h5>
-        <h5 class="col-md-3">Ganancia: <span id="ganancia-general-display" class="fw-bold text-success"></span></h5>
+    <div class="stat-chip danger">
+        <div class="label">Costo</div>
+        <div class="value" id="costo-general-display">—</div>
     </div>
-    <div class="row col-md-12"><hr></div>
-    <div class="table-responsive row col-md-12">
-        <table class="table table-hover table-sm">
-            <thead class="table-dark">
-                <tr>
-                    <th>N°</th>
-                    <th>Promociones/Productos</th>
-                    <th>Método de Pago</th>
-                    <th>Total</th>
-                    <th>Fecha y Hora</th>
-                    <th>Detalle</th>
-                    <th style="width: 220px;">Acciones</th>
-                </tr>
-            </thead>
-            <tbody id="tabla-ventas-body">
-                <partial name="_VentasTabla" model="Model.Ventas" />
-            </tbody>
-        </table>
+    <div class="stat-chip info">
+        <div class="label">Venta</div>
+        <div class="value" id="total-general-display">—</div>
     </div>
+    <div class="stat-chip success">
+        <div class="label">Ganancia</div>
+        <div class="value" id="ganancia-general-display">—</div>
+    </div>
+</div>
+
+<!-- Tabla -->
+<div class="table-wrapper">
+    <table class="table table-hover table-sm">
+        <thead>
+            <tr>
+                <th>N°</th>
+                <th>Promociones/Productos</th>
+                <th>Método de Pago</th>
+                <th>Total</th>
+                <th>Fecha y Hora</th>
+                <th>Detalle</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody id="tabla-ventas-body">
+            <partial name="_VentasTabla" model="Model.Ventas" />
+        </tbody>
+    </table>
 </div>
 
 <a asp-action="Alta" class="btn btn-success btn-lg btn-float">+</a>
