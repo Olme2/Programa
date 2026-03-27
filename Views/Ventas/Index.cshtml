@@ -22,11 +22,19 @@
         <div class="col-xl-2 col-md-4">
             <label asp-for="IdMetodoPago" class="form-label">Método de Pago</label>
             <select asp-for="IdMetodoPago" class="form-select filtro-control filtroMetodoPago">
-                <option value="" selected>Todos</option>
-                @foreach(var metodo in Model.MetodosPago){
-                    <option value="@metodo.IdMetodo">@metodo.Metodo</option>
-                }
+                <option value="">Todos</option>
+                <optgroup label="Agrupados">
+                    <option value="-2">💵 Efectivo</option>
+                    <option value="-1">💳 Virtuales</option>
+                </optgroup>
+                <optgroup label="Individual">
+                    @foreach (var metodo in Model.MetodosPago)
+                    {
+                        <option value="@metodo.IdMetodo">@metodo.Metodo</option>
+                    }
+                </optgroup>
             </select>
+
         </div>
         <div class="col-xl-4 col-md-8">
             <label asp-for="Busqueda" class="form-label">Buscar</label>

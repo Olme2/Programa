@@ -1,0 +1,73 @@
+@model GastosVM.IndexGastosVM
+@{
+    ViewData["Title"] = "Gastos";
+}
+
+<div class="filter-panel">
+    <div class="filter-title">Filtros</div>
+    <form method="get" class="row g-2 align-items-end">
+        <div class="col-md-3">
+            <label asp-for="FechaInicio" class="form-label">Fecha Inicio</label>
+            <input asp-for="FechaInicio" type="date" class="form-control" />
+        </div>
+        <div class="col-md-3">
+            <label asp-for="FechaFin" class="form-label">Fecha Fin</label>
+            <input asp-for="FechaFin" type="date" class="form-control" />
+        </div>
+        <div class="col-auto">
+            <button type="submit" class="btn btn-primary">Filtrar</button>
+        </div>
+    </form>
+</div>
+
+<div class="stat-row">
+    <div class="stat-chip">
+        <div class="label">Gastos registrados</div>
+        <div class="value">@Model.Gastos.Count</div>
+    </div>
+    <div class="stat-chip danger">
+        <div class="label">Total gastos</div>
+        <div class="value">$@Model.Total.ToString("N2", CG.CulturaES)</div>
+    </div>
+</div>
+
+<div class="table-wrapper">
+    <table class="table table-hover table-sm">
+        <thead>
+            <tr>
+                <th>Fecha</th>
+                <th>Concepto</th>
+                <th>Monto</th>
+                <th>Observación</th>
+                <th>Acción</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (Model.Gastos.Any())
+            {
+                @foreach (var g in Model.Gastos)
+                {
+                    <tr>
+                        <td>@g.Fecha.ToString("dd/MM/yyyy")</td>
+                        <td class="fw-medium">@g.Nombre</td>
+                        <td class="text-danger fw-bold">$@g.Monto.ToString("N2", CG.CulturaES)</td>
+                        <td class="text-muted small">@(g.Observacion ?? "-")</td>
+                        <td>
+                            <form asp-action="Eliminar" method="post" onsubmit="return confirm('¿Eliminar este gasto?')">
+                                @Html.AntiForgeryToken()
+                                <input type="hidden" name="id" value="@g.IdGasto" />
+                                <button type="submit" class="btn btn-danger btn-sm">Eliminar</button>
+                            </form>
+                        </td>
+                    </tr>
+                }
+            }
+            else
+            {
+                <tr><td colspan="5" class="text-center text-muted py-3">No hay gastos en el período seleccionado.</td></tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+<a asp-action="Alta" class="btn btn-float">+</a>

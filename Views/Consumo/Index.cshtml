@@ -1,0 +1,78 @@
+@model ConsumoVM.IndexConsumoVM
+@{
+    ViewData["Title"] = "Consumo";
+}
+
+<div class="filter-panel">
+    <div class="filter-title">Filtros</div>
+    <form method="get" class="row g-2 align-items-end">
+        <div class="col-md-3">
+            <label asp-for="FechaInicio" class="form-label">Fecha Inicio</label>
+            <input asp-for="FechaInicio" type="date" class="form-control" />
+        </div>
+        <div class="col-md-3">
+            <label asp-for="FechaFin" class="form-label">Fecha Fin</label>
+            <input asp-for="FechaFin" type="date" class="form-control" />
+        </div>
+        <div class="col-auto">
+            <button type="submit" class="btn btn-primary">Filtrar</button>
+        </div>
+    </form>
+</div>
+
+@{
+    var totalCosto = Model.Consumos.Sum(c => c.TotalCosto);
+}
+<div class="stat-row">
+    <div class="stat-chip">
+        <div class="label">Registros</div>
+        <div class="value">@Model.Consumos.Count</div>
+    </div>
+    <div class="stat-chip danger">
+        <div class="label">Costo Total</div>
+        <div class="value">$@totalCosto.ToString("N2", CG.CulturaES)</div>
+    </div>
+</div>
+
+<div class="table-wrapper">
+    <table class="table table-hover table-sm">
+        <thead>
+            <tr>
+                <th>Fecha</th>
+                <th>Hora</th>
+                <th>Productos</th>
+                <th>Costo</th>
+                <th>Detalle</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (Model.Consumos.Any())
+            {
+                @foreach (var c in Model.Consumos)
+                {
+                    <tr>
+                        <td>@c.Fecha.ToString("dd/MM/yyyy")</td>
+                        <td>@c.Hora.ToString("HH:mm")</td>
+                        <td>@Html.Raw(c.Productos.Replace(", ", "<br>"))</td>
+                        <td class="text-danger fw-bold">$@c.TotalCosto.ToString("N2", CG.CulturaES)</td>
+                        <td><span title="@c.Detalle">@(c.Detalle?.Length > 20 ? c.Detalle.Substring(0, 20) + "…" : c.Detalle ?? "-")</span></td>
+                        <td>
+                            <form asp-action="Eliminar" method="post" onsubmit="return confirm('¿Eliminar este consumo? El stock será devuelto.')">
+                                @Html.AntiForgeryToken()
+                                <input type="hidden" name="id" value="@c.IdConsumo" />
+                                <button type="submit" class="btn btn-danger btn-sm">Eliminar</button>
+                            </form>
+                        </td>
+                    </tr>
+                }
+            }
+            else
+            {
+                <tr><td colspan="6" class="text-center text-muted py-3">No hay consumos en el período seleccionado.</td></tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+<a asp-action="Alta" class="btn btn-float">+</a>

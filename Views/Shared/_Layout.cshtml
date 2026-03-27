@@ -25,6 +25,16 @@
             </div>
         </a>
 
+        <div class="sidebar-section-label">General</div>
+        <ul class="sidebar-nav">
+            <li>
+                <a asp-controller="Dashboard" asp-action="Index"
+                   class="@(ViewContext.RouteData.Values["controller"]?.ToString() == "Dashboard" ? "active" : "")">
+                    <span class="nav-icon">📊</span> Dashboard
+                </a>
+            </li>
+        </ul>
+
         <div class="sidebar-section-label">Principal</div>
         <ul class="sidebar-nav">
             <li>
@@ -56,9 +66,21 @@
                 </a>
             </li>
             <li>
+                <a asp-controller="Consumo" asp-action="Index"
+                   class="@(ViewContext.RouteData.Values["controller"]?.ToString() == "Consumo" ? "active" : "")">
+                    <span class="nav-icon">🍽️</span> Consumo
+                </a>
+            </li>
+            <li>
+                <a asp-controller="Produccion" asp-action="Index"
+                   class="@(ViewContext.RouteData.Values["controller"]?.ToString() == "Produccion" ? "active" : "")">
+                    <span class="nav-icon">🏭</span> Producción
+                </a>
+            </li>
+            <li>
                 <a asp-controller="Proveedores" asp-action="Index"
                    class="@(ViewContext.RouteData.Values["controller"]?.ToString() == "Proveedores" ? "active" : "")">
-                    <span class="nav-icon">🏭</span> Proveedores
+                    <span class="nav-icon">🚚</span> Proveedores
                 </a>
             </li>
         </ul>
@@ -75,6 +97,12 @@
                 <a asp-controller="MetodosPago" asp-action="Index"
                    class="@(ViewContext.RouteData.Values["controller"]?.ToString() == "MetodosPago" ? "active" : "")">
                     <span class="nav-icon">💳</span> Métodos de Pago
+                </a>
+            </li>
+            <li>
+                <a asp-controller="Gastos" asp-action="Index"
+                   class="@(ViewContext.RouteData.Values["controller"]?.ToString() == "Gastos" ? "active" : "")">
+                    <span class="nav-icon">💸</span> Gastos
                 </a>
             </li>
         </ul>

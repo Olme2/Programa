@@ -1,0 +1,69 @@
+@model ProduccionVM.IndexProduccionVM
+@{
+    ViewData["Title"] = "Producción";
+}
+
+<div class="filter-panel">
+    <div class="filter-title">Filtros</div>
+    <form method="get" class="row g-2 align-items-end">
+        <div class="col-md-3">
+            <label asp-for="FechaInicio" class="form-label">Fecha Inicio</label>
+            <input asp-for="FechaInicio" type="date" class="form-control" />
+        </div>
+        <div class="col-md-3">
+            <label asp-for="FechaFin" class="form-label">Fecha Fin</label>
+            <input asp-for="FechaFin" type="date" class="form-control" />
+        </div>
+        <div class="col-auto">
+            <button type="submit" class="btn btn-primary">Filtrar</button>
+        </div>
+    </form>
+</div>
+
+<div class="stat-row">
+    <div class="stat-chip">
+        <div class="label">Registros</div>
+        <div class="value">@Model.Producciones.Count</div>
+    </div>
+</div>
+
+<div class="table-wrapper">
+    <table class="table table-hover table-sm">
+        <thead>
+            <tr>
+                <th>Fecha</th>
+                <th>Hora</th>
+                <th>Productos retirados</th>
+                <th>Detalle</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (Model.Producciones.Any())
+            {
+                @foreach (var p in Model.Producciones)
+                {
+                    <tr>
+                        <td>@p.Fecha.ToString("dd/MM/yyyy")</td>
+                        <td>@p.Hora.ToString("HH:mm")</td>
+                        <td>@Html.Raw(p.Productos.Replace(", ", "<br>"))</td>
+                        <td><span title="@p.Detalle">@(p.Detalle?.Length > 20 ? p.Detalle.Substring(0, 20) + "…" : p.Detalle ?? "-")</span></td>
+                        <td>
+                            <form asp-action="Eliminar" method="post" onsubmit="return confirm('¿Eliminar este retiro? El stock será devuelto.')">
+                                @Html.AntiForgeryToken()
+                                <input type="hidden" name="id" value="@p.IdProduccion" />
+                                <button type="submit" class="btn btn-danger btn-sm">Eliminar</button>
+                            </form>
+                        </td>
+                    </tr>
+                }
+            }
+            else
+            {
+                <tr><td colspan="5" class="text-center text-muted py-3">No hay retiros de producción en el período seleccionado.</td></tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+<a asp-action="Alta" class="btn btn-float">+</a>

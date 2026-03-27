@@ -1,0 +1,285 @@
+@model DashboardVM.DashboardVM
+@{
+    ViewData["Title"] = "Dashboard";
+    var periodos = new[] {
+        ("semana", "Última semana"),
+        ("mes", "Último mes"),
+        ("semestre", "Últimos 6 meses"),
+        ("anio", "Último año"),
+        ("custom", "Personalizado"),
+    };
+}
+
+<!-- ── SELECTOR DE PERÍODO ──────────────────────────────────── -->
+<div class="filter-panel mb-4">
+    <div class="filter-title">Período de análisis</div>
+    <form method="get" id="form-periodo" class="d-flex flex-wrap gap-2 align-items-end">
+        <div class="d-flex gap-1 flex-wrap">
+            @foreach (var (key, label) in periodos)
+            {
+                <a href="@Url.Action("Index", "Dashboard", new { periodo = key })"
+                   class="btn btn-sm @(Model.Periodo == key ? "btn-primary" : "btn-outline-secondary")">
+                    @label
+                </a>
+            }
+        </div>
+
+        <div id="custom-dates" class="d-flex gap-2 align-items-end @(Model.Periodo == "custom" ? "" : "d-none")">
+            <div>
+                <label class="form-label mb-0 small">Desde</label>
+                <input type="date" name="fechaInicio" class="form-control form-control-sm"
+                       value="@Model.FechaInicio.ToString("yyyy-MM-dd")" />
+            </div>
+            <div>
+                <label class="form-label mb-0 small">Hasta</label>
+                <input type="date" name="fechaFin" class="form-control form-control-sm"
+                       value="@Model.FechaFin.ToString("yyyy-MM-dd")" />
+            </div>
+            <input type="hidden" name="periodo" value="custom" />
+            <button type="submit" class="btn btn-sm btn-primary">Aplicar</button>
+        </div>
+    </form>
+    <p class="text-muted small mt-2 mb-0">
+        📅 @Model.FechaInicio.ToString("dd/MM/yyyy") — @Model.FechaFin.ToString("dd/MM/yyyy")
+    </p>
+</div>
+
+<!-- ── KPI CHIPS ──────────────────────────────────────────────── -->
+<div class="stat-row mb-4" style="flex-wrap:wrap; gap: 0.75rem;">
+    <div class="stat-chip success" style="flex:1 1 140px;">
+        <div class="label">💰 Venta Total</div>
+        <div class="value">$@Model.TotalVenta.ToString("N2", CG.CulturaES)</div>
+        <div class="sublabel">@Model.CantidadVentas ventas</div>
+    </div>
+    <div class="stat-chip" style="flex:1 1 140px;">
+        <div class="label">📦 Costo Ventas</div>
+        <div class="value">$@Model.TotalCostoVentas.ToString("N2", CG.CulturaES)</div>
+    </div>
+    <div class="stat-chip" style="flex:1 1 140px;">
+        <div class="label">🍽️ Consumo</div>
+        <div class="value">$@Model.TotalCostoConsumo.ToString("N2", CG.CulturaES)</div>
+        <div class="sublabel">@Model.CantidadConsumos registros</div>
+    </div>
+    <div class="stat-chip" style="flex:1 1 140px;">
+        <div class="label">🏭 Producción</div>
+        <div class="value">$@Model.TotalCostoProduccion.ToString("N2", CG.CulturaES)</div>
+        <div class="sublabel">@Model.CantidadProducciones registros</div>
+    </div>
+    <div class="stat-chip danger" style="flex:1 1 140px;">
+        <div class="label">💸 Gastos Extra</div>
+        <div class="value">$@Model.TotalGastos.ToString("N2", CG.CulturaES)</div>
+    </div>
+    <div class="stat-chip" style="flex:1 1 140px; border-color:#e67e22;">
+        <div class="label">🔢 Costo Total</div>
+        <div class="value" style="color:#e67e22;">$@Model.CostoTotal.ToString("N2", CG.CulturaES)</div>
+        <div class="sublabel">@Model.CostoPct% de la venta</div>
+    </div>
+    <div class="stat-chip @(Model.Ganancia >= 0 ? "success" : "danger")" style="flex:1 1 160px;">
+        <div class="label">✅ Ganancia Neta</div>
+        <div class="value">$@Model.Ganancia.ToString("N2", CG.CulturaES)</div>
+        <div class="sublabel">Margen: @Model.MargenPct%</div>
+    </div>
+</div>
+
+<!-- ── GRÁFICOS ───────────────────────────────────────────────── -->
+<div class="row g-4 mb-4">
+    <!-- Line chart: Venta vs Ganancia -->
+    <div class="col-lg-8">
+        <div class="card h-100">
+            <div class="card-header">📈 Evolución — Venta vs Ganancia</div>
+            <div class="card-body">
+                <canvas id="chart-historico" style="max-height:280px;"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- Doughnut: distribución de costos -->
+    <div class="col-lg-4">
+        <div class="card h-100">
+            <div class="card-header">🍩 Distribución del Costo</div>
+            <div class="card-body d-flex align-items-center justify-content-center">
+                @if (Model.DistribucionCosto.Any())
+                {
+                    <canvas id="chart-distribucion" style="max-height:260px;"></canvas>
+                }
+                else
+                {
+                    <p class="text-muted">Sin datos en este período.</p>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ── TABLAS ─────────────────────────────────────────────────── -->
+<div class="row g-4">
+    <!-- Top productos -->
+    <div class="col-lg-6">
+        <div class="table-wrapper" style="margin-bottom:0">
+            <div class="filter-title mb-2">🏆 Top Productos (por venta)</div>
+            <table class="table table-sm table-hover mb-0">
+                <thead><tr><th>Producto</th><th>Cantidad</th><th>Venta</th></tr></thead>
+                <tbody>
+                    @if (Model.TopProductos.Any())
+                    {
+                        @foreach (var t in Model.TopProductos)
+                        {
+                            <tr>
+                                <td class="fw-medium">@t.Producto</td>
+                                <td>@t.Cantidad.ToString("N3", CG.CulturaES)</td>
+                                <td class="text-success fw-bold">$@t.TotalVenta.ToString("N2", CG.CulturaES)</td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr><td colspan="3" class="text-center text-muted">Sin ventas en el período.</td></tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Gastos del período -->
+    <div class="col-lg-6">
+        <div class="table-wrapper" style="margin-bottom:0">
+            <div class="filter-title mb-2">💸 Gastos del período</div>
+            <table class="table table-sm table-hover mb-0">
+                <thead><tr><th>Fecha</th><th>Concepto</th><th>Monto</th></tr></thead>
+                <tbody>
+                    @if (Model.DetalleGastos.Any())
+                    {
+                        @foreach (var g in Model.DetalleGastos.Take(8))
+                        {
+                            <tr>
+                                <td>@g.Fecha.ToString("dd/MM")</td>
+                                <td title="@g.Observacion">@g.Nombre</td>
+                                <td class="text-danger fw-bold">$@g.Monto.ToString("N2", CG.CulturaES)</td>
+                            </tr>
+                        }
+                        @if (Model.DetalleGastos.Count > 8)
+                        {
+                            <tr><td colspan="3" class="text-muted small text-center">
+                                ... y @(Model.DetalleGastos.Count - 8) más.
+                                <a asp-controller="Gastos" asp-action="Index">Ver todos</a>
+                            </td></tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr><td colspan="3" class="text-center text-muted">Sin gastos en el período.</td></tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script>
+// ── Datos desde Razor ────────────────────────────────────────────────────
+const labels  = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.SerieHistorica.Select(p => p.Label)));
+const ventas  = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.SerieHistorica.Select(p => p.Venta)));
+const costos  = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.SerieHistorica.Select(p => p.Costo)));
+const ganancias = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.SerieHistorica.Select(p => p.Ganancia)));
+
+const distLabels = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.DistribucionCosto.Select(d => d.Etiqueta)));
+const distMontos = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.DistribucionCosto.Select(d => d.Monto)));
+
+Chart.defaults.color = '#a0aec0';
+Chart.defaults.font.family = "'Inter', sans-serif";
+
+// ── Line chart ───────────────────────────────────────────────────────────
+const ctxL = document.getElementById('chart-historico');
+if (ctxL) {
+    new Chart(ctxL, {
+        type: 'line',
+        data: {
+            labels,
+            datasets: [
+                {
+                    label: 'Venta',
+                    data: ventas,
+                    borderColor: '#27ae60',
+                    backgroundColor: 'rgba(39,174,96,.12)',
+                    tension: 0.4,
+                    fill: true,
+                    pointRadius: 3,
+                },
+                {
+                    label: 'Ganancia',
+                    data: ganancias,
+                    borderColor: '#e67e22',
+                    backgroundColor: 'rgba(230,126,34,.1)',
+                    tension: 0.4,
+                    fill: true,
+                    pointRadius: 3,
+                    borderDash: [5,3],
+                },
+            ],
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            interaction: { mode: 'index', intersect: false },
+            plugins: {
+                legend: { position: 'top' },
+                tooltip: {
+                    callbacks: {
+                        label: ctx => ' $' + ctx.parsed.y.toLocaleString('es-AR', { minimumFractionDigits: 2 }),
+                    }
+                }
+            },
+            scales: {
+                y: {
+                    grid: { color: 'rgba(255,255,255,.05)' },
+                    ticks: { callback: v => '$' + v.toLocaleString('es-AR') },
+                },
+                x: { grid: { color: 'rgba(255,255,255,.05)' } }
+            }
+        }
+    });
+}
+
+// ── Doughnut chart ───────────────────────────────────────────────────────
+const ctxD = document.getElementById('chart-distribucion');
+if (ctxD && distLabels.length > 0) {
+    new Chart(ctxD, {
+        type: 'doughnut',
+        data: {
+            labels: distLabels,
+            datasets: [{
+                data: distMontos,
+                backgroundColor: ['#e74c3c','#e67e22','#3498db','#9b59b6'],
+                borderWidth: 0,
+                hoverOffset: 8,
+            }]
+        },
+        options: {
+            cutout: '65%',
+            plugins: {
+                legend: { position: 'bottom', labels: { boxWidth: 12 } },
+                tooltip: {
+                    callbacks: {
+                        label: ctx => ' $' + ctx.parsed.toLocaleString('es-AR', { minimumFractionDigits: 2 }),
+                    }
+                }
+            }
+        }
+    });
+}
+
+// ── Mostrar fechas custom ───────────────────────────────────────────────
+document.querySelectorAll('a[href*="custom"]').forEach(btn => {
+    btn.addEventListener('click', function(e) {
+        e.preventDefault();
+        document.getElementById('custom-dates').classList.remove('d-none');
+    });
+});
+@if (Model.Periodo == "custom") {
+    <text>document.getElementById('custom-dates').classList.remove('d-none');</text>
+}
+</script>
+}

@@ -9,6 +9,7 @@ public class Ventas
     public TimeOnly Hora { get; set; }
     public string? Detalle { get; set; }
     public decimal Redondeo { get; set; }
+    public string Tipo { get; set; } = "venta"; // venta | consumo | produccion
     public List<DetallesVentas> _detallesVenta = new List<DetallesVentas>();
     public IReadOnlyCollection<DetallesVentas> DetallesVenta => _detallesVenta.AsReadOnly();
     public List<VentasPromociones> _ventaPromociones = new List<VentasPromociones>();
@@ -36,6 +37,14 @@ public class Ventas
         var detalles = ventaVM.DetallesVenta.Select(DetallesVentas.CrearDesdeViewModel).ToList();
         var promociones = ventaVM.VentaPromociones.Select(VentasPromociones.CrearDesdeViewModel).ToList();
         return new Ventas(ventaVM.IdMetodo, ventaVM.Fecha, ventaVM.Hora, ventaVM.Detalle, ventaVM.Redondeo, detalles, promociones);
+    }
+
+    // Crea un egreso interno (consumo o produccion) que usa la infra de venta sin precio de venta
+    public static Ventas CrearEgreso(string tipo, short idMetodo, DateOnly fecha, TimeOnly hora, string? detalle, List<DetallesVentas> detalles)
+    {
+        var v = new Ventas(idMetodo, fecha, hora, detalle, 0, detalles, new List<VentasPromociones>());
+        v.Tipo = tipo;
+        return v;
     }
     public void ActualizarDesdeViewModel(ModificarVentaVM ventaVM)
     {

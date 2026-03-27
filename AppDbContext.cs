@@ -16,6 +16,8 @@ public class AppDbContext : DbContext
     public DbSet<Promociones> Promociones { get; set; }
     public DbSet<DetallesPromociones> DetallesPromociones { get; set; }
     public DbSet<VentasPromociones> VentasPromociones { get; set; }
+    public DbSet<Gasto> Gastos { get; set; }
+
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -132,6 +134,7 @@ public class AppDbContext : DbContext
             entity.Property(e => e.Hora).HasColumnName("hora").IsRequired();
             entity.Property(e => e.Detalle).HasColumnName("detalle").HasMaxLength(100);
             entity.Property(e => e.Redondeo).HasColumnName("redondeo").HasColumnType("numeric(8,2)").IsRequired();
+            entity.Property(e => e.Tipo).HasColumnName("tipo").HasMaxLength(20).HasDefaultValue("venta").IsRequired();
         });
 
         // DetallesVentas
@@ -183,5 +186,17 @@ public class AppDbContext : DbContext
 
         modelBuilder.UseSerialColumns();
         modelBuilder.HasPostgresExtension("pgcrypto");
+
+        // Gasto
+        modelBuilder.Entity<Gasto>(entity =>
+        {
+            entity.ToTable("gasto");
+            entity.HasKey(e => e.IdGasto);
+            entity.Property(e => e.IdGasto).HasColumnName("id_gasto").UseIdentityAlwaysColumn();
+            entity.Property(e => e.Fecha).HasColumnName("fecha").IsRequired();
+            entity.Property(e => e.Nombre).HasColumnName("nombre").HasMaxLength(100).IsRequired();
+            entity.Property(e => e.Monto).HasColumnName("monto").HasColumnType("numeric(10,2)").IsRequired();
+            entity.Property(e => e.Observacion).HasColumnName("observacion").HasMaxLength(255);
+        });
     }
-}
+}

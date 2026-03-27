@@ -32,6 +32,11 @@ builder.Services.AddScoped<IPromocionesRepository, PromocionesRepository>();
 builder.Services.AddScoped<IVentaRepository, VentaRepository>();
 builder.Services.AddScoped<IMetodosPagoRepository, MetodosPagoRepository>();
 builder.Services.AddScoped<IComprasRepository, ComprasRepository>();
+builder.Services.AddScoped<IConsumoRepository, ConsumoRepository>();
+builder.Services.AddScoped<IProduccionRepository, ProduccionRepository>();
+builder.Services.AddScoped<IGastosRepository, GastosRepository>();
+builder.Services.AddScoped<IDashboardRepository, DashboardRepository>();
+
 
 var app = builder.Build();
 

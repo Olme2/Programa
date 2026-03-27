@@ -24,6 +24,12 @@ public class DetallesVentas
         return new DetallesVentas(detalleVM.IdProducto, detalleVM.Cantidad, detalleVM.CostoUnitario, detalleVM.PrecioUnitario);
     }
 
+    // Para consumo (precio=0) y produccion (costo=precio=0)
+    public static DetallesVentas CrearParaEgreso(int idProducto, decimal cantidad, decimal costoUnitario)
+    {
+        return new DetallesVentas(idProducto, cantidad, costoUnitario, 0);
+    }
+
 
     public decimal CalcularCosto()
     {

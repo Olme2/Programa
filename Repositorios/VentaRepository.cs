@@ -33,16 +33,19 @@ public class VentaRepository : IVentaRepository
 
         var query = _context.Ventas.AsQueryable();
 
-        // Filtrado
-        query = query.Where(v => v.Fecha >= fechaInicio && v.Fecha <= fechaFin && v.Hora >= horaInicio && v.Hora <= horaFin);
+        // Filtrado — excluye egresos internos (consumo/produccion)
+        query = query.Where(v => v.Tipo == "venta" && v.Fecha >= fechaInicio && v.Fecha <= fechaFin && v.Hora >= horaInicio && v.Hora <= horaFin);
+
 
         if (filtro.IdMetodoPago.HasValue)
         {
-            if (filtro.IdMetodoPago == 12) {
-                query = query.Where(v => v.IdMetodo != 1 && v.IdMetodo != 11);
-            } else {
+            // -1 = Virtuales (todo menos efectivo), -2 = solo Efectivo, >0 = método específico
+            if (filtro.IdMetodoPago == -1)
+                query = query.Where(v => v.Metodo.Metodo != "Efectivo");
+            else if (filtro.IdMetodoPago == -2)
+                query = query.Where(v => v.Metodo.Metodo == "Efectivo");
+            else
                 query = query.Where(v => v.IdMetodo == filtro.IdMetodoPago.Value);
-            }
         }
 
         if (!string.IsNullOrEmpty(filtro.Busqueda))
