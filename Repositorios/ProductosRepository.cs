@@ -141,4 +141,71 @@ public class ProductosRepository : IProductosRepository
             .Select(p => new ValueTuple<string, decimal>(p.Producto, p.Precio))
             .ToList();
     }
-}
+
+    public EstadisticasProductoVM ObtenerEstadisticas(int idProducto, DateTime fechaInicio, DateTime fechaFin)
+    {
+        var producto = _context.Productos
+            .Include(p => p.Proveedor)
+            .FirstOrDefault(p => p.IdProducto == idProducto);
+
+        if (producto == null)
+            return new EstadisticasProductoVM();
+
+        var inicio = DateOnly.FromDateTime(fechaInicio);
+        var fin    = DateOnly.FromDateTime(fechaFin);
+
+        var filas = _context.DetallesVentas
+            .Join(_context.Ventas,
+                dv => dv.IdVenta,
+                v  => v.IdVenta,
+                (dv, v) => new { dv, v })
+            .Where(x => x.dv.IdProducto == idProducto
+                     && x.v.Fecha >= inicio
+                     && x.v.Fecha <= fin)
+            .Select(x => new FilaEstadisticaVM
+            {
+                Fecha    = x.v.Fecha,
+                Hora     = x.v.Hora,
+                Cantidad = x.dv.Cantidad,
+                Origen   = "Venta directa",
+            })
+            .ToList();
+
+        // También incluir cantidades vendidas dentro de promociones
+        var filasPromo = _context.VentasPromociones
+            .Join(_context.Ventas,
+                vp => vp.IdVenta,
+                v  => v.IdVenta,
+                (vp, v) => new { vp, v })
+            .Where(x => x.v.Fecha >= inicio && x.v.Fecha <= fin)
+            .Join(_context.DetallesPromociones,
+                x  => x.vp.IdPromocion,
+                dp => dp.IdPromocion,
+                (x, dp) => new { x.vp, x.v, dp })
+            .Where(x => x.dp.IdProducto == idProducto)
+            .Select(x => new FilaEstadisticaVM
+            {
+                Fecha    = x.v.Fecha,
+                Hora     = x.v.Hora,
+                Cantidad = x.vp.Cantidad * x.dp.Cantidad,
+                Origen   = x.vp.Promocion.Promocion,
+            })
+            .ToList();
+
+        var todasLasFilas = filas
+            .Concat(filasPromo)
+            .OrderByDescending(f => f.Fecha)
+            .ThenByDescending(f => f.Hora)
+            .ToList();
+
+        return new EstadisticasProductoVM
+        {
+            IdProducto      = producto.IdProducto,
+            NombreProducto  = producto.Producto,
+            NombreProveedor = producto.Proveedor?.Proveedor ?? "-",
+            FechaInicio     = fechaInicio,
+            FechaFin        = fechaFin,
+            Filas           = todasLasFilas,
+        };
+    }
+}

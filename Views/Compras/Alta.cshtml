@@ -16,7 +16,7 @@
                 <div class="card-body row">
                     <div class="col-md-6 mb-3">
                         <label asp-for="IdProveedor" class="form-label"></label>
-                        <select asp-for="IdProveedor" class="form-select">
+                        <select asp-for="IdProveedor" class="form-select" id="IdProveedor">
                             <option value="">Seleccione un Proveedor</option>
                             @foreach (var p in Model.Proveedores)
                             {
@@ -97,16 +97,20 @@
                 return true;
             });
 
+            function getIdProveedor() {
+                return parseInt($('#IdProveedor').val()) || 0;
+            }
+
             function inicializarSelect2Producto(element) {
                 element.select2({
                     placeholder: 'Buscar producto...',
                     minimumInputLength: 0,
                     ajax: {
-                        url: '@Url.Action("BuscarProductosParaCompra", "Compras")',
+                        url: '@Url.Action("BuscarProductosPorProveedor", "Compras")',
                         dataType: 'json',
                         delay: 0,
                         data: function (params) {
-                            return { term: params.term };
+                            return { term: params.term || '', idProveedor: getIdProveedor() };
                         },
                         processResults: function (data) { return { results: data.results }; }
                     },
@@ -122,10 +126,9 @@
                     $(this).find('input, select').each(function() {
                         const oldName = $(this).attr('name');
                         if (oldName) {
-                            // Extract just the property name (IdProducto, Cantidad, etc)
                             const propertyName = oldName.substring(oldName.lastIndexOf('.') + 1).replace(']', '');
                             const newName = `DetallesCompra[${index}].${propertyName}`;
-                            $(this).attr('name', newName); // Re-assign with correct index
+                            $(this).attr('name', newName);
                         }
                     });
                 });
@@ -145,10 +148,21 @@
                 $('#total-display').text(total.toLocaleString('es-AR', { style: 'currency', currency: 'ARS' }));
             }
 
+            // Cuando cambia el proveedor, limpiar filas para forzar coherencia
+            $('#IdProveedor').on('change', function () {
+                productosContainer.empty();
+                recalcularTotalCompra();
+                $('#advertenciaAgregarProducto').text('');
+            });
+
             $('#btn-agregar-producto').click(function () {
+                if (getIdProveedor() === 0) {
+                    $('#advertenciaAgregarProducto').text("Primero seleccione un Proveedor.");
+                    return;
+                }
                 const ultimaFila = productosContainer.find('.detalle-item-producto').last();
                 if (ultimaFila.length > 0 && !ultimaFila.find('.producto-search').val()) {
-                    $('#advertenciaAgregarProducto').text("Por favor seleccione un producto antes de agregar otro");
+                    $('#advertenciaAgregarProducto').text("Por favor seleccione un producto antes de agregar otro.");
                     return;
                 }
 

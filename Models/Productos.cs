@@ -9,7 +9,11 @@ public class Productos
     public decimal Costo { get; set; }
     public decimal Precio { get; set; }
     public bool Activo { get; set; }
-    
+    /// <summary>Costo que se activará cuando el stock baje del umbral (gestionado por el trigger de Postgres).</summary>
+    public decimal? CostoPendiente { get; set; }
+    /// <summary>Nivel de stock al que se activa CostoPendiente.</summary>
+    public decimal? StockUmbral { get; set; }
+
     public virtual Proveedores Proveedor { get; set; }
 
     // --- CONSTRUCTORES ---

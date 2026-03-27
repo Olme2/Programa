@@ -42,10 +42,12 @@
             </div>
         </form>
     </div>
-    <div class="row col-md-12">
-        <h1 class="col-md-4">Listado de Ventas</h1>
-        <h1 class="col-md-4">Cantidad de ventas: <span id="cantidad-general-display" class="fw-bold"></span></h1>
-        <h1 class="col-md-4">Total: <span id="total-general-display" class="fw-bold text-success"></span></h1>
+    <div class="row col-md-12 align-items-center">
+        <h1 class="col-md-3">Listado de Ventas</h1>
+        <h5 class="col-md-2">Cantidad: <span id="cantidad-general-display" class="fw-bold"></span></h5>
+        <h5 class="col-md-2">Costo: <span id="costo-general-display" class="fw-bold text-danger"></span></h5>
+        <h5 class="col-md-2">Venta: <span id="total-general-display" class="fw-bold text-primary"></span></h5>
+        <h5 class="col-md-3">Ganancia: <span id="ganancia-general-display" class="fw-bold text-success"></span></h5>
     </div>
     <div class="row col-md-12"><hr></div>
     <div class="table-responsive row col-md-12">
@@ -96,29 +98,35 @@
                 });
             }
             function calcularYMostrarTotalGeneral() {
-                let totalGeneral = 0;
-                let cantidadGeneral = $('#tabla-ventas-body .venta').length;
-                let cantidadGeneralConYo = cantidadGeneral;
-                let num = cantidadGeneralConYo;
-                $('#tabla-ventas-body .venta').each(function() {
-                    const metodoPago = $(this).find('.metodoPagoVenta').text().trim();
-                    const textoTotal = $(this).find('.totalVenta').text();
-                    const valorNumerico = parseFloat(textoTotal.replace('$', '').replace(/\./g, '').replace(',', '.')) || 0;
+                let totalVenta   = 0;
+                let totalCosto   = 0;
+                let cantidadGeneral    = $('#tabla-ventas-body .venta').length;
+                let cantidadConYo      = cantidadGeneral;
+                let num                = cantidadConYo;
 
-                    if(metodoPago === "Yo") {
+                $('#tabla-ventas-body .venta').each(function() {
+                    const metodoPago   = $(this).find('.metodoPagoVenta').text().trim();
+                    const textoTotal   = $(this).find('.totalVenta').text();
+                    const valorVenta   = parseFloat(textoTotal.replace('$', '').replace(/\./g, '').replace(',', '.')) || 0;
+                    const valorCosto   = parseFloat($(this).data('costo')) || 0;
+
+                    if (metodoPago === "Yo") {
                         cantidadGeneral--;
-                        // NO sumamos este valor al totalGeneral
                     } else {
-                        totalGeneral += valorNumerico;
+                        totalVenta += valorVenta;
+                        totalCosto += valorCosto;
                     }
                     $(this).find(".numeroVenta").text(num--);
                 });
-                if($('.filtroMetodoPago option:selected').select().text().trim() == "Yo"){
-                    cantidadGeneral = cantidadGeneralConYo;
+
+                if ($('.filtroMetodoPago option:selected').text().trim() === "Yo") {
+                    cantidadGeneral = cantidadConYo;
                 }
-                // 4. Formateamos el resultado y lo mostramos en el span que creamos.
-                const totalFormateado = totalGeneral.toLocaleString('es-AR', { style: 'currency', currency: 'ARS' });
-                $('#total-general-display').text(totalFormateado);
+
+                const fmt = (v) => v.toLocaleString('es-AR', { style: 'currency', currency: 'ARS' });
+                $('#total-general-display').text(fmt(totalVenta));
+                $('#costo-general-display').text(fmt(totalCosto));
+                $('#ganancia-general-display').text(fmt(totalVenta - totalCosto));
                 $('#cantidad-general-display').text(cantidadGeneral);
             }
             // Actualizar tabla al cambiar cualquier filtro

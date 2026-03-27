@@ -84,55 +84,29 @@ public class ComprasController : Controller
     // POST: Compras/Alta
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Alta(AltaCompraVM viewModel)
+    public IActionResult Alta(AltaCompraVM viewModel)
     {
-        _logger.LogInformation("Intento de Alta Compras. Proveedor: {ProveedorID}, Detalles Count: {Count}", 
-            viewModel.IdProveedor, 
-            viewModel.DetallesCompra?.Count ?? 0);
-
-        // Validación explícita solicitada
         if (viewModel.DetallesCompra == null || !viewModel.DetallesCompra.Any())
-        {
             ModelState.AddModelError(string.Empty, "No hay productos en la compra.");
-        }
 
         if (ModelState.IsValid)
         {
             try
             {
-                var compra = MapearModificarViewModelAEntidad(new ModificarCompraVM 
-                { 
-                     // Reutilizamos el mapeo existente o usamos el dedicado si existe, 
-                     // nota: en el código original se usaba "MapearAltaViewModelAEntidad", hay que tener cuidado.
-                     // Mirando el código anterior, llamaba a MapearAltaViewModelAEntidad. 
-                     // Pero en el snippet 'view_file' paso 129 no vimos ese método, vimos 'MapearModificarViewModelAEntidad' más abajo.
-                     // Asumiré que existe 'MapearAltaViewModelAEntidad' basado en el replace anterior (paso 149).
-                    IdProveedor = viewModel.IdProveedor,
-                    Fecha = viewModel.Fecha,
-                    Detalle = viewModel.Detalle,
-                    DetallesCompra = viewModel.DetallesCompra
-                });
-                
-                // Mapeo manual rápido para evitar errores si el método auxiliar no es visible
-                var nuevaCompra = new Compras(viewModel.IdProveedor, viewModel.Fecha, viewModel.Detalle, 
+                var nuevaCompra = new Compras(viewModel.IdProveedor, viewModel.Fecha, viewModel.Detalle,
                     viewModel.DetallesCompra.Select(d => new DetallesCompras(d.IdProducto, d.Cantidad, d.CostoUnitario)).ToList());
 
-                await _comprasRepo.Crear(nuevaCompra);
+                _comprasRepo.Crear(nuevaCompra);
                 TempData["SuccessMessage"] = "Compra registrada con éxito.";
                 return RedirectToAction(nameof(Index));
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error al crear la compra.");
-                ModelState.AddModelError(string.Empty, "Ocurrió un error inesperado al guardar la compra: " + ex.Message);
+                ModelState.AddModelError(string.Empty, "Error al guardar la compra: " + ex.Message);
             }
         }
-        else
-        {
-             var errors = ModelState.SelectMany(x => x.Value.Errors).Select(x => x.ErrorMessage).ToList();
-             _logger.LogWarning("Modelo inválido en Alta Compras: {Errors}", string.Join(", ", errors));
-        }
-        
+
         RepoblarAltaCompraViewModel(viewModel);
         return View(viewModel);
     }
@@ -159,28 +133,33 @@ public class ComprasController : Controller
     public IActionResult Modificar(int id, ModificarCompraVM viewModel)
     {
         if (id != viewModel.IdCompra)
-        {
             return BadRequest();
-        }
+
+        if (viewModel.DetallesCompra == null || !viewModel.DetallesCompra.Any())
+            ModelState.AddModelError(string.Empty, "La compra debe contener al menos un producto.");
 
         if (ModelState.IsValid)
         {
             try
             {
-                var compraActualizada = MapearModificarViewModelAEntidad(viewModel);
-                _comprasRepo.Actualizar(compraActualizada);
+                var compraActualizada = new Compras(
+                    viewModel.IdProveedor,
+                    viewModel.Fecha,
+                    viewModel.Detalle,
+                    viewModel.DetallesCompra.Select(d => new DetallesCompras(d.IdProducto, d.Cantidad, d.CostoUnitario)).ToList());
+
+                _comprasRepo.Actualizar(id, compraActualizada);
                 TempData["SuccessMessage"] = "Compra modificada con éxito.";
                 return RedirectToAction(nameof(Index));
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error al modificar la compra con ID {Id}", id);
-                ModelState.AddModelError(string.Empty, "Ocurrió un error inesperado al guardar los cambios.");
+                ModelState.AddModelError(string.Empty, "Error al guardar los cambios: " + ex.Message);
             }
         }
-        
-        var proveedores = _proveedoresRepo.ObtenerListadoProveedores().ToList();
-        viewModel.Proveedores = proveedores;
+
+        viewModel.Proveedores = _proveedoresRepo.ObtenerListadoProveedores().ToList();
         return View(viewModel);
     }
     
@@ -251,6 +230,13 @@ public class ComprasController : Controller
     {
         return PartialView("Partials/_DetalleCompraItem", new DetalleCompraVM());
     }
+
+    [HttpGet]
+    public IActionResult ObtenerVistaModificarDetalleCompra()
+    {
+        // Retorna una fila nueva (sin producto seleccionado) para agregar en Modificar
+        return PartialView("Partials/_ModificarDetalleCompraItem", new DetalleCompraVM());
+    }
     
     [HttpGet]
     public JsonResult BuscarProductosParaCompra(string term)
@@ -261,9 +247,35 @@ public class ComprasController : Controller
         {
             id = p.IdProducto,
             text = p.Producto,
-            costo = p.Costo // Devolvemos el costo para autocompletar el campo
+            costo = p.Costo
         });
 
         return Json(new { results = resultadoSelect2 });
+    }
+
+    // Endpoint para filtrar productos por proveedor (usado en Modificar)
+    [HttpGet]
+    public JsonResult BuscarProductosPorProveedor(string term, int idProveedor)
+    {
+        var todos = _productosRepo.ObtenerListadoProductos(new ProductosVM.IndexProductosVM { Busqueda = term, Inactivos = false });
+
+        IEnumerable<ProductosVM.ListarProductosVM> filtrados = todos;
+        if (idProveedor > 0)
+        {
+            // Resolver el nombre del proveedor primero para evitar llamadas dentro de LINQ
+            var nombreProveedor = _proveedoresRepo.ObtenerListadoProveedores()
+                .FirstOrDefault(pr => pr.IdProveedor == idProveedor)?.Proveedor;
+            if (!string.IsNullOrEmpty(nombreProveedor))
+                filtrados = todos.Where(p => p.Proveedor == nombreProveedor);
+        }
+
+        var resultado = filtrados.Select(p => new
+        {
+            id = p.IdProducto,
+            text = p.Producto,
+            costo = p.Costo
+        });
+
+        return Json(new { results = resultado });
     }
 }

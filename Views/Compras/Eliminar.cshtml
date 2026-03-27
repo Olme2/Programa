@@ -1,0 +1,47 @@
+@model ComprasVM.ListarComprasVM
+@{
+    ViewData["Title"] = "Eliminar Compra";
+}
+
+<h1>Confirmar Eliminación</h1>
+
+<h3 class="text-danger">¿Está seguro que desea eliminar esta compra?</h3>
+<p class="text-muted">Esta acción es <strong>permanente</strong> y no se puede deshacer. El stock de los productos involucrados será <strong>descontado</strong> automáticamente.</p>
+
+<hr />
+
+<div class="card bg-light col-md-8 shadow-sm">
+    <div class="card-body">
+        <h4 class="card-title">Compra a Eliminar:</h4>
+        <dl class="row mt-3">
+            <dt class="col-sm-3">N° de Compra</dt>
+            <dd class="col-sm-9">#@Model.IdCompra</dd>
+
+            <dt class="col-sm-3">Proveedor</dt>
+            <dd class="col-sm-9">@Model.Proveedor</dd>
+
+            <dt class="col-sm-3">Fecha</dt>
+            <dd class="col-sm-9">@Model.Fecha.ToString("dd/MM/yyyy")</dd>
+
+            <dt class="col-sm-3">Productos</dt>
+            <dd class="col-sm-9">@Model.Productos</dd>
+
+            <dt class="col-sm-3">Detalle</dt>
+            <dd class="col-sm-9">@(string.IsNullOrEmpty(Model.Detalle) ? "-" : Model.Detalle)</dd>
+
+            <dt class="col-sm-3 fs-5">Total</dt>
+            <dd class="col-sm-9 fs-5 fw-bold text-success">@Model.Total.ToString("C")</dd>
+        </dl>
+    </div>
+</div>
+
+<div class="mt-4">
+    <form asp-action="Eliminar" method="post">
+        @Html.AntiForgeryToken()
+        <input type="hidden" name="id" value="@Model.IdCompra" />
+        <button type="submit" class="btn btn-danger">
+            <i class="bi bi-trash"></i> Confirmar Eliminación
+        </button>
+        <a asp-action="Index" class="btn btn-secondary ms-2">Cancelar</a>
+    </form>
+</div>

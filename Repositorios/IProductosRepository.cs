@@ -9,4 +9,5 @@ public interface IProductosRepository
     void Eliminar(int id);
     bool PuedeSerEliminado(int id);
     IEnumerable<(string Nombre, decimal Precio)> ObtenerProductosActivosParaLista();
-}
+    EstadisticasProductoVM ObtenerEstadisticas(int idProducto, DateTime fechaInicio, DateTime fechaFin);
+}

@@ -59,7 +59,7 @@ app.MapControllerRoute(
     pattern: "{controller=Ventas}/{action=Alta}");
 try
 {
-    System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo("http://localhost:5000") { UseShellExecute = true });
+    System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo("http://localhost:5146") { UseShellExecute = true });
 }
 catch (Exception ex)
 {

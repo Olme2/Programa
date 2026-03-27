@@ -209,22 +209,14 @@ public class ProductosController : Controller
         {
             var productos = _productosRepo.ObtenerProductosActivosParaLista();
             var promociones = _promocionesRepo.ObtenerPromocionesActivasParaLista();
-
             var sb = new StringBuilder();
-
             sb.AppendLine("*PRODUCTOS*");
             foreach (var producto in productos)
-            {
                 sb.AppendLine($"{producto.Nombre} | ${producto.Precio.ToString("N2", CG.CulturaES)}");
-            }
-
-            sb.AppendLine(); // Línea en blanco para separar
+            sb.AppendLine();
             sb.AppendLine("*PROMOCIONES*");
             foreach (var promo in promociones)
-            {
                 sb.AppendLine($"{promo.Nombre} | ${promo.Precio.ToString("N2", CG.CulturaES)}");
-            }
-
             return Json(new { success = true, listaDePrecios = sb.ToString() });
         }
         catch (Exception ex)
@@ -233,4 +225,29 @@ public class ProductosController : Controller
             return Json(new { success = false, message = "Error al generar la lista." });
         }
     }
+
+    // GET: Productos/Estadisticas/5
+    [HttpGet]
+    public IActionResult Estadisticas(int id, DateTime? fechaInicio = null, DateTime? fechaFin = null)
+    {
+        try
+        {
+            var inicio = fechaInicio ?? DateTime.Today.AddMonths(-1);
+            var fin    = fechaFin    ?? DateTime.Today;
+            var vm = _productosRepo.ObtenerEstadisticas(id, inicio, fin);
+            if (vm.IdProducto == 0)
+            {
+                TempData["ErrorMessage"] = "Producto no encontrado.";
+                return RedirectToAction(nameof(Index));
+            }
+            return View(vm);
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, "Error al obtener estadísticas del producto {Id}", id);
+            TempData["ErrorMessage"] = "Error al cargar las estadísticas.";
+            return RedirectToAction(nameof(Index));
+        }
+    }
 }
+

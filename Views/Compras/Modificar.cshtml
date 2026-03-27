@@ -1,0 +1,196 @@
+@model ModificarCompraVM
+@{
+    ViewData["Title"] = "Modificar Compra";
+}
+
+<form asp-action="Modificar" asp-route-id="@Model.IdCompra" method="post" id="form-compra">
+    @Html.AntiForgeryToken()
+    <input type="hidden" asp-for="IdCompra" />
+    <h1>Modificar Compra #@Model.IdCompra</h1>
+    <hr />
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card shadow-sm mb-4">
+                <div class="card-header"><h4>Datos Generales</h4></div>
+                <div class="card-body row">
+                    <div class="col-md-6 mb-3">
+                        <label asp-for="IdProveedor" class="form-label"></label>
+                        <select asp-for="IdProveedor" class="form-select" id="IdProveedor">
+                            <option value="">Seleccione un Proveedor</option>
+                            @foreach (var p in Model.Proveedores)
+                            {
+                                <option value="@p.IdProveedor">@p.Proveedor</option>
+                            }
+                        </select>
+                        <span asp-validation-for="IdProveedor" class="text-danger"></span>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label asp-for="Fecha" class="form-label"></label>
+                        <input asp-for="Fecha" type="date" class="form-control" />
+                        <span asp-validation-for="Fecha" class="text-danger"></span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card shadow-sm mb-4">
+                <div class="card-header"><h5>Productos</h5></div>
+                <div class="card-body">
+                    <div id="detalles-productos-container">
+                        @for (var i = 0; i < Model.DetallesCompra.Count; i++)
+                        {
+                            <partial name="Partials/_ModificarDetalleCompraItem" for="DetallesCompra[i]" />
+                        }
+                    </div>
+                    <span id="advertenciaAgregarProducto" class="text-danger"></span>
+                    <button type="button" id="btn-agregar-producto" class="btn btn-outline-primary w-100 mt-2">
+                        + Añadir Producto
+                    </button>
+                    <div asp-validation-summary="ModelOnly" class="text-danger mt-2"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="summary-card" style="position: sticky; top: 20px;">
+                <h4>Resumen</h4>
+                <hr>
+                <div class="summary-item total fs-4">
+                    <span>TOTAL:</span>
+                    <span id="total-display" class="text-success">$0.00</span>
+                </div>
+                <div class="mt-2">
+                    <label asp-for="Detalle" class="form-label">Detalle (Opcional)</label>
+                    <textarea asp-for="Detalle" class="form-control" rows="2"></textarea>
+                </div>
+                <div class="mt-4">
+                    <button type="submit" class="btn btn-primary btn-lg w-100">Guardar Cambios</button>
+                    <a asp-action="Index" class="btn btn-secondary w-100 mt-2">Cancelar</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        $(document).ready(function () {
+            const productosContainer = $('#detalles-productos-container');
+            const idProveedorSelect = $('#IdProveedor');
+
+            // Asegurar reindexado antes del envío
+            $('#form-compra').on('submit', function () {
+                reindexarFilas();
+                if (productosContainer.find('.detalle-item-producto').length === 0) {
+                    alert("Debe agregar al menos un producto.");
+                    return false;
+                }
+                return true;
+            });
+
+            function getIdProveedor() {
+                return parseInt(idProveedorSelect.val()) || 0;
+            }
+
+            function inicializarSelect2Nuevo(element) {
+                element.select2({
+                    placeholder: 'Buscar producto del proveedor...',
+                    minimumInputLength: 0,
+                    ajax: {
+                        url: '@Url.Action("BuscarProductosPorProveedor", "Compras")',
+                        dataType: 'json',
+                        delay: 0,
+                        data: function (params) {
+                            return { term: params.term || '', idProveedor: getIdProveedor() };
+                        },
+                        processResults: function (data) { return { results: data.results }; }
+                    },
+                    templateResult: function (data) {
+                        if (!data.id) return data.text;
+                        return $('<span>' + data.text + ' (Costo: $' + (data.costo || 0) + ')</span>');
+                    }
+                });
+            }
+
+            function reindexarFilas() {
+                productosContainer.find('.detalle-item-producto').each(function (index) {
+                    $(this).find('input, select').each(function () {
+                        const oldName = $(this).attr('name');
+                        if (oldName) {
+                            const propertyName = oldName.replace(/^DetallesCompra\[\d+\]\./, '')
+                                                        .replace(/^\w+$/, function(m){ return m; });
+                            // Extraer solo el nombre de propiedad final
+                            const parts = oldName.split('.');
+                            const prop = parts[parts.length - 1];
+                            $(this).attr('name', `DetallesCompra[${index}].${prop}`);
+                        }
+                    });
+                });
+                recalcularTotal();
+            }
+
+            function recalcularTotal() {
+                let total = 0;
+                productosContainer.find('.detalle-item-producto').each(function () {
+                    const row = $(this);
+                    const costo = parseFloat(row.find('.costo-unitario').val()) || 0;
+                    const cantidad = parseFloat(row.find('.cantidad-producto').val()) || 0;
+                    const subtotal = costo * cantidad;
+                    row.find('.subtotal-producto-display').text(subtotal.toLocaleString('es-AR', { style: 'currency', currency: 'ARS' }));
+                    total += subtotal;
+                });
+                $('#total-display').text(total.toLocaleString('es-AR', { style: 'currency', currency: 'ARS' }));
+            }
+
+            // Cambiar proveedor limpia TODAS las filas (existentes y nuevas)
+            idProveedorSelect.on('change', function () {
+                productosContainer.empty();
+                recalcularTotal();
+                $('#advertenciaAgregarProducto').text('');
+            });
+
+            $('#btn-agregar-producto').click(function () {
+                if (getIdProveedor() === 0) {
+                    $('#advertenciaAgregarProducto').text("Primero seleccione un Proveedor.");
+                    return;
+                }
+                const ultimaFila = productosContainer.find('.detalle-item-producto').last();
+                if (ultimaFila.length > 0 && ultimaFila.find('.producto-search').length > 0 && !ultimaFila.find('.producto-search').val()) {
+                    $('#advertenciaAgregarProducto').text("Por favor seleccione un producto antes de agregar otro.");
+                    return;
+                }
+                $('#advertenciaAgregarProducto').text('');
+                $.get('@Url.Action("ObtenerVistaModificarDetalleCompra", "Compras")', function (data) {
+                    const nuevaFila = $(data);
+                    productosContainer.append(nuevaFila);
+                    inicializarSelect2Nuevo(nuevaFila.find('.producto-search'));
+                    reindexarFilas();
+                });
+            });
+
+            productosContainer.on('click', '.btn-eliminar-detalle', function () {
+                $(this).closest('.detalle-item-producto').remove();
+                reindexarFilas();
+            });
+
+            productosContainer.on('select2:select', '.producto-search', function (e) {
+                const data = e.params.data;
+                const row = $(this).closest('.detalle-item-producto');
+                if (data.costo) row.find('.costo-unitario').val(data.costo);
+                recalcularTotal();
+            });
+
+            productosContainer.on('input', '.cantidad-producto, .costo-unitario', recalcularTotal);
+
+            // Inicializar subtotales en filas existentes
+            reindexarFilas();
+        });
+
+        $(document).on('select2:open', () => {
+            setTimeout(() => {
+                const sf = document.querySelector('.select2-container--open .select2-search__field');
+                if (sf) sf.focus();
+            }, 50);
+        });
+    </script>
+}

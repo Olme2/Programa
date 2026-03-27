@@ -32,6 +32,8 @@ public class AppDbContext : DbContext
             entity.Property(e => e.Costo).HasColumnName("costo_producto").HasColumnType("numeric(7,2)").IsRequired();
             entity.Property(e => e.Precio).HasColumnName("precio_producto").HasColumnType("numeric(7,2)").IsRequired();
             entity.Property(e => e.Activo).HasColumnName("activo").HasColumnType("boolean").HasDefaultValue(true);
+            entity.Property(e => e.CostoPendiente).HasColumnName("costo_pendiente").HasColumnType("numeric(7,2)").IsRequired(false);
+            entity.Property(e => e.StockUmbral).HasColumnName("stock_umbral").HasColumnType("numeric(7,3)").IsRequired(false);
         });
         // Proveedores
         modelBuilder.Entity<Proveedores>(entity =>
@@ -60,9 +62,12 @@ public class AppDbContext : DbContext
             entity.Property(e => e.Fecha).HasColumnName("fecha").IsRequired();
             entity.Property(e => e.Detalle).HasColumnName("detalle").HasMaxLength(100);
             
+            // Configurar campo backing para que EF Core pueda poblar la colección ReadOnly
+            entity.Navigation(c => c.DetallesCompra).HasField("_detallesCompras");
+
             // Relación con Proveedor
             entity.HasOne(c => c.Proveedor)
-                  .WithMany() // Asumimos que no hay colección 'Compras' en Proveedor, o si la hay, EF la encontrará, pero esto explicita la FK
+                  .WithMany()
                   .HasForeignKey(c => c.IdProveedor)
                   .IsRequired();
         });

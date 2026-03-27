@@ -47,8 +47,8 @@ public class VentasController : Controller
                 };
                 viewModel.Turno = horaActual switch
                 {
-                    var h when h >= new TimeOnly(9, 0) && h <= new TimeOnly(14, 0) => IndexVentasVM.Turnos.Mañana,
-                    var h when h >= new TimeOnly(17, 30) && h <= new TimeOnly(21, 30) => IndexVentasVM.Turnos.Tarde,
+                    var h when h >= new TimeOnly(8, 0) && h <= new TimeOnly(14, 0) => IndexVentasVM.Turnos.Mañana,
+                    var h when h >= new TimeOnly(17, 30) && h <= new TimeOnly(22, 0) => IndexVentasVM.Turnos.Tarde,
                     _ => IndexVentasVM.Turnos.Todos
                 };
             }

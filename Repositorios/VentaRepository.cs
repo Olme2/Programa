@@ -18,12 +18,12 @@ public class VentaRepository : IVentaRepository
         switch (filtro.Turno)
         {
             case IndexVentasVM.Turnos.Mañana:
-                horaInicio = new TimeOnly(9,0);
+                horaInicio = new TimeOnly(8,0);
                 horaFin = new TimeOnly(14,0);
                 break;
             case IndexVentasVM.Turnos.Tarde:
                 horaInicio = new TimeOnly(17,30);
-                horaFin = new TimeOnly(21,30);
+                horaFin = new TimeOnly(22,0);
                 break;
             default:
                 horaInicio = new TimeOnly(0,0);
@@ -65,11 +65,14 @@ public class VentaRepository : IVentaRepository
                 Metodo = v.Metodo.Metodo,
                 ProductosYPromociones = v.VentaPromociones.Any()
                     ? string.Concat(
-                            string.Join("<br>", v.VentaPromociones.Select(vp => vp.Promocion.Promocion + " " + vp.Cantidad)),
+                            string.Join("<br>", v.VentaPromociones.Select(vp => vp.Promocion.Promocion + " x" + vp.Cantidad)),
                             "<br>",
                             string.Join("<br>", v.DetallesVenta.Select(dv => dv.Producto.Producto + " " + dv.Cantidad)))
                     : string.Join("<br>", v.DetallesVenta.Select(dv => dv.Producto.Producto + " " + dv.Cantidad)),
                 Total = v.CalcularPrecioTotal(),
+                // Costo = suma de costo_unitario de detalles + costo_promo de promociones
+                Costo = v.DetallesVenta.Sum(dv => dv.Cantidad * dv.CostoUnitario)
+                       + v.VentaPromociones.Sum(vp => vp.Cantidad * vp.CostoPromo),
                 Fecha = v.Fecha,
                 Hora = v.Hora,
                 Detalle = v.Detalle,

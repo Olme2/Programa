@@ -15,6 +15,9 @@ public class ListarVentasVM
     [DataType(DataType.Currency)]
     public decimal Total { get; set; }
 
+    [DataType(DataType.Currency)]
+    public decimal Costo { get; set; }
+
     [Display(Name = "Fecha")]
     [DisplayFormat(DataFormatString = "{0:dd/MM}")]
     public DateOnly Fecha { get; set; }

@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
-using entornoPolleria; // Asegúrate que este es el namespace de tu DbContext
+using entornoPolleria;
 using ComprasVM;
+
 public class ComprasRepository : IComprasRepository
 {
     private readonly AppDbContext _context;
@@ -8,6 +9,7 @@ public class ComprasRepository : IComprasRepository
     {
         _context = context;
     }
+
     public IEnumerable<ListarComprasVM> ObtenerListadoCompras(IndexComprasVM filtro)
     {
         var fechaInicio = DateOnly.FromDateTime(filtro.FechaInicio);
@@ -15,127 +17,107 @@ public class ComprasRepository : IComprasRepository
 
         var query = _context.Compras.AsQueryable();
 
-        query.Where(c => c.Fecha >= fechaInicio && c.Fecha <= fechaFin);
+        query = query.Where(c => c.Fecha >= fechaInicio && c.Fecha <= fechaFin);
 
         if (filtro.IdProveedor.HasValue)
-        {
             query = query.Where(c => c.IdProveedor == filtro.IdProveedor.Value);
-        }
 
-        var comprasVM = query
+        return query
             .Include(c => c.Proveedor)
             .Select(c => new ListarComprasVM()
             {
                 IdCompra = c.IdCompra,
                 Proveedor = c.Proveedor.Proveedor,
-                Productos = string.Join(",", c.DetallesCompra.Select(dc => dc.Producto.Producto)),
-                Total = c.CalcularTotal(),
+                Productos = string.Join(", ", c.DetallesCompra.Select(dc => dc.Producto.Producto)),
+                // Calcular total directamente en SQL sumando los detalles
+                Total = c.DetallesCompra.Sum(dc => dc.Cantidad * dc.CostoUnitario),
                 Fecha = c.Fecha,
                 Detalle = c.Detalle,
-            });
-        
-        return comprasVM.OrderByDescending(c => c.Fecha).ToList();
+            })
+            .OrderByDescending(c => c.IdCompra)
+            .ToList();
     }
 
     public Compras? ObtenerPorId(int id)
     {
-        try
-        {
-            return _context.Compras
-                .Include(c => c.Proveedor) // Proveedor
-                .Include(c => c.DetallesCompra)
-                    .ThenInclude(d => d.Producto) // Productos dentro de los detalles
-                .AsNoTracking()
-                .FirstOrDefault(c => c.IdCompra == id);
-        }
-        catch (Exception)
-        {
-            throw;
-        }
+        return _context.Compras
+            .Include(c => c.Proveedor)
+            .Include(c => c.DetallesCompra)
+                .ThenInclude(d => d.Producto)
+            .AsNoTracking()
+            .FirstOrDefault(c => c.IdCompra == id);
     }
 
-    public async Task Crear(Compras compra)
+    // Los triggers de Postgres (actualizar_stock_por_compra) gestionan el stock automáticamente.
+    public void Crear(Compras compra)
     {
-        using var transaction = await _context.Database.BeginTransactionAsync();
         try
         {
-            // 1. Guardar la compra base primero
-            compra.IdCompra = 0; // Force Identity Generation
+            compra.IdCompra = 0; // Forzar Identity Generation
             _context.Compras.Add(compra);
-            await _context.SaveChangesAsync();
-
-            // 2. Procesar productos de forma aislada para evitar conflictos de tracking
-            foreach (var detalle in compra.DetallesCompra)
-            {
-                // Usamos AsTracking() para asegurar que EF sepa que vamos a modificarlo
-                var producto = await _context.Productos.AsTracking()
-                                .FirstOrDefaultAsync(p => p.IdProducto == detalle.IdProducto);
-                
-                if (producto != null)
-                {
-                    // Actualizar Stock
-                    decimal stockPrevio = producto.Stock;
-                    decimal costoPrevio = producto.Costo;
-                    
-                    producto.Stock += detalle.Cantidad;
-
-                    // Actualizar Costo (Ponderado)
-                    if (stockPrevio + detalle.Cantidad > 0)
-                    {
-                        producto.Costo = ((stockPrevio * costoPrevio) + (detalle.Cantidad * detalle.CostoUnitario)) 
-                                        / (stockPrevio + detalle.Cantidad);
-                    }
-                    else
-                    {
-                        producto.Costo = detalle.CostoUnitario;
-                    }
-                    
-                    // Forzamos el estado a modificado
-                    _context.Entry(producto).State = EntityState.Modified;
-                }
-            }
-
-            await _context.SaveChangesAsync();
-            await transaction.CommitAsync();
+            _context.SaveChanges();
         }
         catch (Exception ex)
         {
-            await transaction.RollbackAsync();
-            // Log exacto para la consola (aunque _logger sería ideal, Console sirve para dotnet watch rápido)
-            Console.WriteLine($"FATAL DB ERROR: {ex.Message} Inner: {ex.InnerException?.Message}");
+            Console.WriteLine($"ERROR (Crear): {ex.Message} | Inner: {ex.InnerException?.Message}");
             throw;
         }
     }
-    
 
-    public void Actualizar(Compras compra)
+    // El trigger de Postgres gestiona el recalculo de stock al insertar/eliminar detalles.
+    public void Actualizar(int idCompra, Compras compraActualizada)
     {
         try
         {
-            _context.Compras.Update(compra);
+            var compraOriginal = _context.Compras
+                .AsTracking()
+                .FirstOrDefault(c => c.IdCompra == idCompra);
+
+            if (compraOriginal == null)
+                throw new InvalidOperationException($"No se encontró la compra con ID {idCompra}.");
+
+            // 1. Actualizar cabecera
+            compraOriginal.IdProveedor = compraActualizada.IdProveedor;
+            compraOriginal.Fecha = compraActualizada.Fecha;
+            compraOriginal.Detalle = compraActualizada.Detalle;
             _context.SaveChanges();
+
+            // 2. Eliminar todos los detalles anteriores por SQL (trigger revierta el stock)
+            _context.Database.ExecuteSqlRaw("DELETE FROM detalle_compra WHERE id_compra = {0}", idCompra);
+
+            // 3. Insertar los nuevos detalles (trigger suma el nuevo stock)
+            foreach (var d in compraActualizada.DetallesCompra)
+            {
+                _context.Database.ExecuteSqlRaw(
+                    "INSERT INTO detalle_compra (id_compra, id_producto, cantidad, costo_unitario) VALUES ({0}, {1}, {2}, {3})",
+                    idCompra, d.IdProducto, d.Cantidad, d.CostoUnitario);
+            }
         }
-        catch (Exception)
+        catch (Exception ex)
         {
+            Console.WriteLine($"ERROR (Actualizar): {ex.Message} | Inner: {ex.InnerException?.Message}");
             throw;
         }
     }
 
+    // El trigger de Postgres invierte el stock al eliminar cada detalle.
     public void Eliminar(int id)
     {
         try
         {
+            // 1. Eliminar los detalles primero con SQL directo (no hay ON DELETE CASCADE en la FK)
+            _context.Database.ExecuteSqlRaw("DELETE FROM detalle_compra WHERE id_compra = {0}", id);
+
+            // 2. Ahora eliminar la cabecera
             var compra = _context.Compras.Find(id);
-            if (compra != null)
-            {
-                _context.Compras.Remove(compra);
-                _context.SaveChanges();
-            }
+            if (compra == null) return;
+            _context.Compras.Remove(compra);
+            _context.SaveChanges();
         }
-        catch (Exception)
+        catch (Exception ex)
         {
+            Console.WriteLine($"ERROR (Eliminar): {ex.Message} | Inner: {ex.InnerException?.Message}");
             throw;
         }
     }
-
 }

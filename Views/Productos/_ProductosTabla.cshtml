@@ -29,6 +29,7 @@
             <td>@producto.PorcentajeGanancia.ToString("N2", CG.CulturaES)%</td>
             <td>@producto.VentaSemanal.ToString("N3", CG.CulturaES)</td>
             <td>
+                <a asp-action="Estadisticas" asp-route-id="@producto.IdProducto" class="btn btn-info btn-sm" title="Ver estadísticas">📊</a>
                 <a asp-action="Modificar" asp-route-id="@producto.IdProducto" class="btn btn-warning btn-sm">Modificar</a>
                 @if (producto.EsEliminable)
                 {

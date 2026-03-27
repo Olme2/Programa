@@ -1,0 +1,42 @@
+@model DetallesComprasVM.DetalleCompraVM
+@{
+    var cantidadValue = Model.Cantidad.ToString(System.Globalization.CultureInfo.InvariantCulture);
+    var costoValue = Model.CostoUnitario.ToString(System.Globalization.CultureInfo.InvariantCulture);
+    bool esExistente = Model.IdProducto > 0;
+}
+<div class="row detalle-item-producto align-items-center mb-3 p-2 border rounded @(esExistente ? "bg-light" : "")">
+    <div class="col-md-5">
+        <label class="form-label">Producto</label>
+        @if (esExistente)
+        {
+            @* Producto existente: mostrar como etiqueta fija (no se puede cambiar) *@
+            <input type="hidden" name="IdProducto" value="@Model.IdProducto" />
+            <p class="form-control-plaintext fw-bold">@Model.NombreProducto</p>
+        }
+        else
+        {
+            @* Producto nuevo: Select2 filtrable por proveedor *@
+            <select name="IdProducto" class="form-control producto-search"></select>
+        }
+    </div>
+    <div class="col-md-2">
+        <label class="form-label">Cantidad</label>
+        <input name="Cantidad" type="number" step="0.001" min="0.001" class="form-control cantidad-producto"
+               value="@(cantidadValue != "0" ? cantidadValue : "")" />
+    </div>
+    <div class="col-md-2">
+        <label class="form-label">Costo U.</label>
+        <div class="input-group">
+            <span class="input-group-text">$</span>
+            <input name="CostoUnitario" type="number" step="0.01" min="0.01" class="form-control costo-unitario"
+                   value="@(costoValue != "0" ? costoValue : "")" />
+        </div>
+    </div>
+    <div class="col-md-2">
+        <label class="form-label">Subtotal</label>
+        <p class="form-control-plaintext fw-bold subtotal-producto-display">$0.00</p>
+    </div>
+    <div class="col-md-1 text-end">
+        <button type="button" class="btn btn-danger btn-sm btn-eliminar-detalle">&times;</button>
+    </div>
+</div>

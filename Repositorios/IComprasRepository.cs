@@ -3,7 +3,7 @@ public interface IComprasRepository
 {
     IEnumerable<ListarComprasVM> ObtenerListadoCompras(IndexComprasVM filtro);
     Compras? ObtenerPorId(int id);
-    Task Crear(Compras compra);
-    void Actualizar(Compras compra);
+    void Crear(Compras compra);
+    void Actualizar(int idCompra, Compras compraActualizada);
     void Eliminar(int id);
 }

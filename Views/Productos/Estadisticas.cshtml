@@ -1,0 +1,84 @@
+@model ProductosVM.EstadisticasProductoVM
+@{
+    ViewData["Title"] = "Historial — " + Model.NombreProducto;
+}
+
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-2">
+        <div>
+            <h2 class="mb-0">📦 @Model.NombreProducto</h2>
+            <small class="text-muted">Proveedor: <strong>@Model.NombreProveedor</strong></small>
+        </div>
+        <a asp-action="Index" class="btn btn-secondary btn-sm">← Volver</a>
+    </div>
+    <hr />
+
+    <h3>Filtros de fecha</h3>
+    <form method="get" class="row g-2 align-items-end bg-light border rounded p-3 mb-3">
+        <input type="hidden" name="id" value="@Model.IdProducto" />
+        <div class="col-md-3">
+            <label class="form-label fw-bold">Fecha Inicio</label>
+            <input type="date" name="fechaInicio" class="form-control"
+                   value="@Model.FechaInicio.ToString("yyyy-MM-dd")" />
+        </div>
+        <div class="col-md-3">
+            <label class="form-label fw-bold">Fecha Fin</label>
+            <input type="date" name="fechaFin" class="form-control"
+                   value="@Model.FechaFin.ToString("yyyy-MM-dd")" />
+        </div>
+        <div class="col-md-2">
+            <button type="submit" class="btn btn-primary w-100">Filtrar</button>
+        </div>
+        <div class="col-md-4 d-flex align-items-center">
+            <div class="border rounded px-4 py-2 bg-white w-100 text-center">
+                <div class="text-muted small">Total vendido en el período</div>
+                <div class="fs-4 fw-bold">@Model.TotalCantidad.ToString("N3", CG.CulturaES)</div>
+            </div>
+        </div>
+    </form>
+
+    <h3>Tabla de ventas</h3>
+    <div class="table-responsive">
+        <table class="table table-hover table-sm">
+            <thead class="table-dark">
+                <tr>
+                    <th>Fecha</th>
+                    <th>Hora</th>
+                    <th>Cantidad</th>
+                    <th>Origen</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (Model.Filas.Any())
+                {
+                    @foreach (var fila in Model.Filas)
+                    {
+                        <tr>
+                            <td>@fila.Fecha.ToString("dd/MM/yyyy")</td>
+                            <td>@fila.Hora.ToString("HH:mm")</td>
+                            <td><strong>@fila.Cantidad.ToString("N3", CG.CulturaES)</strong></td>
+                            <td>
+                                @if (fila.Origen == "Venta directa")
+                                {
+                                    <span class="badge bg-secondary">Directa</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-info text-dark">🎁 @fila.Origen</span>
+                                }
+                            </td>
+                        </tr>
+                    }
+                }
+                else
+                {
+                    <tr>
+                        <td colspan="4" class="text-center text-muted py-3">
+                            No hay ventas de este producto en el período seleccionado.
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
