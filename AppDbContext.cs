@@ -63,6 +63,7 @@ public class AppDbContext : DbContext
             entity.Property(e => e.IdProveedor).HasColumnName("id_proveedor").IsRequired();
             entity.Property(e => e.Fecha).HasColumnName("fecha").IsRequired();
             entity.Property(e => e.Detalle).HasColumnName("detalle").HasMaxLength(100);
+            entity.Property(e => e.Pagada).HasColumnName("pagada").HasColumnType("boolean").HasDefaultValue(false).IsRequired();
             
             // Configurar campo backing para que EF Core pueda poblar la colección ReadOnly
             entity.Navigation(c => c.DetallesCompra).HasField("_detallesCompras");
@@ -199,4 +200,4 @@ public class AppDbContext : DbContext
             entity.Property(e => e.Observacion).HasColumnName("observacion").HasMaxLength(255);
         });
     }
-}
+}

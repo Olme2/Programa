@@ -1,6 +1,6 @@
 @model ProduccionVM.AltaProduccionVM
 @{
-    ViewData["Title"] = "Registrar Retiro de Producción";
+    ViewData["Title"] = "Registrar Retiro de Produccion";
 }
 
 <form asp-action="Alta" method="post" id="form-produccion">
@@ -16,44 +16,23 @@
                     </div>
                     <div class="col-md-6">
                         <label asp-for="Detalle" class="form-label">Detalle (opcional)</label>
-                        <input asp-for="Detalle" type="text" class="form-control" placeholder="Ej: milanesas para el día" />
+                        <input asp-for="Detalle" type="text" class="form-control" placeholder="Ej: milanesas para el dia" />
                     </div>
                 </div>
             </div>
 
             <div class="card">
-                <div class="card-header">Productos retirados para producción</div>
+                <div class="card-header">Productos retirados para produccion</div>
                 <div class="card-body">
                     <div id="detalles-container">
-                        <div class="fila-detalle row g-2 mb-2 align-items-end">
-                            <div class="col-md-6">
-                                <label class="form-label">Producto</label>
-                                <select name="Detalles[0].IdProducto" class="form-select select-producto">
-                                    <option value="">— Seleccionar —</option>
-                                    @foreach (var p in Model.ProductosActivos)
-                                    {
-                                        <option value="@p.IdProducto"
-                                                data-costo="@p.Costo.ToString("F2", System.Globalization.CultureInfo.InvariantCulture)"
-                                                data-stock="@p.Stock.ToString("F3", System.Globalization.CultureInfo.InvariantCulture)">
-                                            @p.Producto (stock: @p.Stock.ToString("N3", CG.CulturaES))
-                                        </option>
-                                    }
-                                </select>
-                            </div>
-                            <div class="col-md-3">
-                                <label class="form-label">Cantidad</label>
-                                <input type="number" name="Detalles[0].Cantidad" class="form-control input-cantidad" step="0.001" min="0.001" />
-                            </div>
-                            <div class="col-md-2">
-                                <label class="form-label">Costo unit.</label>
-                                <input type="number" name="Detalles[0].CostoUnitario" class="form-control input-costo" step="0.01" min="0" readonly />
-                            </div>
-                            <div class="col-md-1 d-flex align-items-end">
-                                <button type="button" class="btn btn-danger btn-sm btn-eliminar-fila" title="Eliminar">✕</button>
-                            </div>
-                        </div>
+                        @for (var i = 0; i < Model.Detalles.Count; i++)
+                        {
+                            <partial name="Partials/_DetalleProduccionItem" for="Detalles[i]" />
+                        }
                     </div>
-                    <button type="button" id="btn-agregar" class="btn btn-outline-primary btn-sm mt-1">+ Agregar producto</button>
+                    <span id="advertenciaAgregarProducto" class="text-danger"></span>
+                    <button type="button" id="btn-agregar" class="btn btn-outline-primary w-100 mt-2">+ Agregar producto</button>
+                    <div asp-validation-summary="ModelOnly" class="text-danger mt-2"></div>
                 </div>
             </div>
         </div>
@@ -67,7 +46,7 @@
                     <span id="resumen-total">$0,00</span>
                 </div>
                 <hr />
-                <button type="submit" class="btn btn-primary w-100">💾 Guardar retiro</button>
+                <button type="submit" class="btn btn-primary w-100">Guardar retiro</button>
                 <a asp-action="Index" class="btn btn-secondary w-100 mt-2">Cancelar</a>
             </div>
         </div>
@@ -75,61 +54,114 @@
 </form>
 
 @section Scripts {
-<script>
-$(document).ready(function() {
-    let idx = 1;
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        $(document).ready(function() {
+            const detallesContainer = $('#detalles-container');
 
-    function buildOptions() {
-        let opts = '<option value="">— Seleccionar —</option>';
-        @foreach (var p in Model.ProductosActivos)
-        {
-            <text>opts += '<option value="@p.IdProducto" data-costo="@p.Costo.ToString("F2", System.Globalization.CultureInfo.InvariantCulture)" data-stock="@p.Stock.ToString("F3", System.Globalization.CultureInfo.InvariantCulture)">@p.Producto (stock: @p.Stock.ToString("N3", CG.CulturaES))</option>';</text>
-        }
-        return opts;
-    }
+            $('#form-produccion').on('submit', function() {
+                reindexarFilas();
+                if (detallesContainer.find('.fila-detalle').length === 0) {
+                    alert('Debe agregar al menos un producto.');
+                    return false;
+                }
+                return true;
+            });
 
-    $(document).on('change', '.select-producto', function() {
-        const costo = $(this).find(':selected').data('costo') || 0;
-        $(this).closest('.fila-detalle').find('.input-costo').val(costo);
-        calcularResumen();
-    });
-
-    $(document).on('input', '.input-cantidad, .input-costo', calcularResumen);
-
-    $('#btn-agregar').on('click', function() {
-        const n = idx;
-        const fila = `
-        <div class="fila-detalle row g-2 mb-2 align-items-end">
-            <div class="col-md-6"><select name="Detalles[${n}].IdProducto" class="form-select select-producto">${buildOptions()}</select></div>
-            <div class="col-md-3"><input type="number" name="Detalles[${n}].Cantidad" class="form-control input-cantidad" step="0.001" min="0.001" /></div>
-            <div class="col-md-2"><input type="number" name="Detalles[${n}].CostoUnitario" class="form-control input-costo" step="0.01" min="0" readonly /></div>
-            <div class="col-md-1 d-flex align-items-end"><button type="button" class="btn btn-danger btn-sm btn-eliminar-fila">✕</button></div>
-        </div>`;
-        $('#detalles-container').append(fila);
-        idx++;
-    });
-
-    $(document).on('click', '.btn-eliminar-fila', function() {
-        if ($('.fila-detalle').length > 1) { $(this).closest('.fila-detalle').remove(); calcularResumen(); }
-    });
-
-    function calcularResumen() {
-        let total = 0, html = '';
-        $('.fila-detalle').each(function() {
-            const nombre = $(this).find('.select-producto option:selected').text().split(' (')[0].trim();
-            const cant   = parseFloat($(this).find('.input-cantidad').val()) || 0;
-            const costo  = parseFloat($(this).find('.input-costo').val()) || 0;
-            if (cant > 0 && nombre) {
-                const sub = cant * costo;
-                total += sub;
-                html += `<div class="summary-item"><span>${nombre} ×${cant}</span><span>$${sub.toFixed(2)}</span></div>`;
+            function inicializarSelect2Producto(element) {
+                element.select2({
+                    placeholder: 'Buscar producto...',
+                    minimumInputLength: 0,
+                    ajax: {
+                        url: '@Url.Action("BuscarProductosParaProduccion", "Produccion")',
+                        dataType: 'json',
+                        delay: 0,
+                        data: function(params) {
+                            let idsExcluidos = [];
+                            $('.producto-search').not(element).each(function() {
+                                if ($(this).val()) idsExcluidos.push($(this).val());
+                            });
+                            return { term: params.term || '', excluir: idsExcluidos };
+                        },
+                        processResults: function(data) { return { results: data }; }
+                    },
+                    templateResult: function(data) {
+                        if (!data.id) return data.text;
+                        if (data.disabled) return $('<div class="producto-sin-stock table-danger">' + data.text + '</div>');
+                        return data.text;
+                    }
+                });
             }
-        });
-        $('#resumen-items').html(html || '<p class="text-muted small">Sin productos aún.</p>');
-        $('#resumen-total').text('$' + total.toLocaleString('es-AR', {minimumFractionDigits:2}));
-    }
 
-    calcularResumen();
-});
-</script>
+            function reindexarFilas() {
+                detallesContainer.find('.fila-detalle').each(function(index) {
+                    $(this).find('input, select').each(function() {
+                        const oldName = $(this).attr('name');
+                        if (!oldName) return;
+                        const prop = oldName.includes('.') ? oldName.split('.').pop() : oldName;
+                        $(this).attr('name', `Detalles[${index}].${prop}`);
+                    });
+                });
+                calcularResumen();
+            }
+
+            function calcularResumen() {
+                let total = 0;
+                let html = '';
+                detallesContainer.find('.fila-detalle').each(function() {
+                    const nombre = $(this).find('.producto-search option:selected').text().split(' ($')[0].trim();
+                    const cant = parseFloat($(this).find('.input-cantidad').val()) || 0;
+                    const costo = parseFloat($(this).find('.input-costo').val()) || 0;
+                    const sub = cant * costo;
+                    $(this).find('.subtotal-producto-display').text(sub.toLocaleString('es-AR', { style: 'currency', currency: 'ARS' }));
+                    if (cant > 0 && nombre) {
+                        total += sub;
+                        html += `<div class="summary-item"><span>${nombre} x${cant}</span><span>${sub.toLocaleString('es-AR', { style: 'currency', currency: 'ARS' })}</span></div>`;
+                    }
+                });
+                $('#resumen-items').html(html || '<p class="text-muted small">Sin productos aun.</p>');
+                $('#resumen-total').text(total.toLocaleString('es-AR', { style: 'currency', currency: 'ARS' }));
+            }
+
+            $('#btn-agregar').on('click', function() {
+                const ultimaFila = detallesContainer.find('.fila-detalle').last();
+                if (ultimaFila.length > 0 && !ultimaFila.find('.producto-search').val()) {
+                    $('#advertenciaAgregarProducto').text('Por favor seleccione un producto antes de agregar otro.');
+                    return;
+                }
+
+                $.get('@Url.Action("ObtenerVistaDetalleProduccion", "Produccion")', function(data) {
+                    const nuevaFila = $(data);
+                    detallesContainer.append(nuevaFila);
+                    inicializarSelect2Producto(nuevaFila.find('.producto-search'));
+                    $('#advertenciaAgregarProducto').text('');
+                    reindexarFilas();
+                });
+            });
+
+            detallesContainer.on('click', '.btn-eliminar-fila', function() {
+                $(this).closest('.fila-detalle').remove();
+                $('#advertenciaAgregarProducto').text('');
+                reindexarFilas();
+            });
+
+            detallesContainer.on('select2:select', '.producto-search', function(e) {
+                const row = $(this).closest('.fila-detalle');
+                row.find('.input-costo').val(e.params.data.costo || 0);
+                $('#advertenciaAgregarProducto').text('');
+                calcularResumen();
+            });
+
+            detallesContainer.on('input', '.input-cantidad, .input-costo', calcularResumen);
+            detallesContainer.find('.producto-search').each(function() { inicializarSelect2Producto($(this)); });
+            reindexarFilas();
+        });
+
+        $(document).on('select2:open', () => {
+            setTimeout(() => {
+                const searchField = document.querySelector('.select2-container--open .select2-search__field');
+                if (searchField) searchField.focus();
+            }, 50);
+        });
+    </script>
 }

@@ -19,6 +19,7 @@ public class ListarComprasVM
     public DateOnly Fecha { get; set; }
 
     public string? Detalle { get; set; }
+    public bool Pagada { get; set; }
 
     public ListarComprasVM() { }
 
@@ -30,5 +31,6 @@ public class ListarComprasVM
         Total = compra.CalcularTotal();
         Fecha = compra.Fecha;
         Detalle = compra.Detalle;
+        Pagada = compra.Pagada;
     }
 }

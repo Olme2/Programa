@@ -11,6 +11,11 @@
             <td>@compra.Fecha.ToString("dd/MM")</td>
             <td class="totalCompra">$@compra.Total.ToString("N2", CG.CulturaES)</td>
             <td>
+                <span class="badge @(compra.Pagada ? "bg-success" : "bg-warning")">
+                    @(compra.Pagada ? "Pagada" : "Pendiente")
+                </span>
+            </td>
+            <td>
                 @{
                     string detalleCorto = compra.Detalle ?? "-";
                     if (detalleCorto.Length > 15)
@@ -21,8 +26,10 @@
                 <span title="@compra.Detalle">@detalleCorto</span>
             </td>
             <td>
-                <a asp-action="Modificar" asp-route-id="@compra.IdCompra" class="btn btn-warning btn-sm">Editar</a>
-                <a asp-action="Eliminar" asp-route-id="@compra.IdCompra" class="btn btn-danger btn-sm">Eliminar</a>
+                <div class="action-buttons">
+                    <a asp-action="Modificar" asp-route-id="@compra.IdCompra" class="btn btn-warning btn-sm">Editar</a>
+                    <a asp-action="Eliminar" asp-route-id="@compra.IdCompra" class="btn btn-danger btn-sm">Eliminar</a>
+                </div>
             </td>
         </tr>
     }

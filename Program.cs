@@ -3,6 +3,8 @@ using entornoPolleria;
 using System.Globalization;
 using Microsoft.AspNetCore.Localization; // 1. Asegúrate de tener esta línea
 
+using Microsoft.AspNetCore.DataProtection;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // --- PASO 1: REGISTRAR LAS REGLAS DE CULTURA ---
@@ -19,6 +21,17 @@ builder.Services.Configure<RequestLocalizationOptions>(options =>
 // --- FIN DEL PASO 1 ---
 
 // Add services to the container.
+builder.Services.AddDataProtection()
+    .SetApplicationName("PolleriaGestion");
+
+builder.Services.AddAntiforgery(options =>
+{
+    options.Cookie.Name = ".PolleriaGestion.Antiforgery";
+    options.Cookie.HttpOnly = true;
+    options.Cookie.SameSite = SameSiteMode.Strict;
+    options.Cookie.SecurePolicy = CookieSecurePolicy.None;
+});
+
 builder.Services.AddControllersWithViews();
 
 var conectionString = builder.Configuration.GetConnectionString("DefaultConnection");
@@ -73,4 +86,4 @@ catch (Exception ex)
     Console.WriteLine("No se pudo abrir el navegador automáticamente: " + ex.Message);
 }
 
-app.Run("http://localhost:5146");
+app.Run("http://localhost:5146");

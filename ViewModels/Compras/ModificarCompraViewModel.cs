@@ -19,6 +19,9 @@ public class ModificarCompraVM : IValidatableObject
     [StringLength(100, ErrorMessage = "El detalle no puede exceder los 100 caracteres.")]
     public string? Detalle { get; set; }
 
+    [Display(Name = "Ya fue pagada")]
+    public bool Pagada { get; set; }
+
     public List<DetalleCompraVM> DetallesCompra { get; set; }
 
     public List<ListarProveedoresVM> Proveedores { get; set; }
@@ -35,6 +38,7 @@ public class ModificarCompraVM : IValidatableObject
         IdProveedor = compra.IdProveedor;
         Fecha = compra.Fecha;
         Detalle = compra.Detalle;
+        Pagada = compra.Pagada;
         Proveedores = proveedores;
         DetallesCompra = compra.DetallesCompra.Select(d => new DetalleCompraVM(d)).ToList();
     }

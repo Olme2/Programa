@@ -1,6 +1,7 @@
 @model ProduccionVM.IndexProduccionVM
 @{
-    ViewData["Title"] = "Producción";
+    ViewData["Title"] = "Produccion";
+    var totalCosto = Model.Producciones.Sum(p => p.TotalCosto);
 }
 
 <div class="filter-panel">
@@ -25,6 +26,10 @@
         <div class="label">Registros</div>
         <div class="value">@Model.Producciones.Count</div>
     </div>
+    <div class="stat-chip warning">
+        <div class="label">Costo Produccion</div>
+        <div class="value">$@totalCosto.ToString("N2", CG.CulturaES)</div>
+    </div>
 </div>
 
 <div class="table-wrapper">
@@ -34,6 +39,7 @@
                 <th>Fecha</th>
                 <th>Hora</th>
                 <th>Productos retirados</th>
+                <th>Costo</th>
                 <th>Detalle</th>
                 <th>Acciones</th>
             </tr>
@@ -47,20 +53,24 @@
                         <td>@p.Fecha.ToString("dd/MM/yyyy")</td>
                         <td>@p.Hora.ToString("HH:mm")</td>
                         <td>@Html.Raw(p.Productos.Replace(", ", "<br>"))</td>
-                        <td><span title="@p.Detalle">@(p.Detalle?.Length > 20 ? p.Detalle.Substring(0, 20) + "…" : p.Detalle ?? "-")</span></td>
+                        <td class="text-warning fw-bold">$@p.TotalCosto.ToString("N2", CG.CulturaES)</td>
+                        <td><span title="@p.Detalle">@(p.Detalle?.Length > 20 ? p.Detalle.Substring(0, 20) + "..." : p.Detalle ?? "-")</span></td>
                         <td>
-                            <form asp-action="Eliminar" method="post" onsubmit="return confirm('¿Eliminar este retiro? El stock será devuelto.')">
-                                @Html.AntiForgeryToken()
-                                <input type="hidden" name="id" value="@p.IdProduccion" />
-                                <button type="submit" class="btn btn-danger btn-sm">Eliminar</button>
-                            </form>
+                            <div class="action-buttons">
+                                <a asp-action="Modificar" asp-route-id="@p.IdProduccion" class="btn btn-warning btn-sm">Modificar</a>
+                                <form asp-action="Eliminar" method="post" onsubmit="return confirm('Eliminar este retiro? El stock sera devuelto.')">
+                                    @Html.AntiForgeryToken()
+                                    <input type="hidden" name="id" value="@p.IdProduccion" />
+                                    <button type="submit" class="btn btn-danger btn-sm">Eliminar</button>
+                                </form>
+                            </div>
                         </td>
                     </tr>
                 }
             }
             else
             {
-                <tr><td colspan="5" class="text-center text-muted py-3">No hay retiros de producción en el período seleccionado.</td></tr>
+                <tr><td colspan="6" class="text-center text-muted py-3">No hay retiros de produccion en el periodo seleccionado.</td></tr>
             }
         </tbody>
     </table>

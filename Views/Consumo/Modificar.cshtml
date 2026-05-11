@@ -1,0 +1,172 @@
+@model ConsumoVM.ModificarConsumoVM
+@{
+    ViewData["Title"] = "Modificar Consumo";
+}
+
+<form asp-action="Modificar" method="post" id="form-consumo">
+    @Html.AntiForgeryToken()
+    <input type="hidden" asp-for="IdConsumo" />
+    <div class="row g-4">
+        <div class="col-lg-8">
+            <div class="card mb-3">
+                <div class="card-header">Datos generales</div>
+                <div class="card-body row g-3">
+                    <div class="col-md-4">
+                        <label asp-for="Fecha" class="form-label">Fecha</label>
+                        <input asp-for="Fecha" type="date" class="form-control" />
+                    </div>
+                    <div class="col-md-3">
+                        <label asp-for="Hora" class="form-label">Hora</label>
+                        <input asp-for="Hora" type="time" class="form-control" />
+                    </div>
+                    <div class="col-md-5">
+                        <label asp-for="Detalle" class="form-label">Detalle (opcional)</label>
+                        <input asp-for="Detalle" type="text" class="form-control" />
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">Productos consumidos</div>
+                <div class="card-body">
+                    <div id="detalles-container">
+                        @for (var i = 0; i < Model.Detalles.Count; i++)
+                        {
+                            <partial name="Partials/_DetalleConsumoItem" for="Detalles[i]" />
+                        }
+                    </div>
+                    <span id="advertenciaAgregarProducto" class="text-danger"></span>
+                    <button type="button" id="btn-agregar" class="btn btn-outline-primary w-100 mt-2">+ Agregar producto</button>
+                    <div asp-validation-summary="ModelOnly" class="text-danger mt-2"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="summary-card">
+                <h6 class="fw-bold mb-3">Resumen</h6>
+                <div id="resumen-items"></div>
+                <div class="summary-item total">
+                    <span>Costo total</span>
+                    <span id="resumen-total">$0,00</span>
+                </div>
+                <hr />
+                <button type="submit" class="btn btn-primary w-100">Guardar cambios</button>
+                <a asp-action="Index" class="btn btn-secondary w-100 mt-2">Cancelar</a>
+            </div>
+        </div>
+    </div>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        $(document).ready(function() {
+            const detallesContainer = $('#detalles-container');
+
+            $('#form-consumo').on('submit', function() {
+                reindexarFilas();
+                if (detallesContainer.find('.fila-detalle').length === 0) {
+                    alert('Debe agregar al menos un producto.');
+                    return false;
+                }
+                return true;
+            });
+
+            function inicializarSelect2Producto(element) {
+                element.select2({
+                    placeholder: 'Buscar producto...',
+                    minimumInputLength: 0,
+                    ajax: {
+                        url: '@Url.Action("BuscarProductosParaConsumo", "Consumo")',
+                        dataType: 'json',
+                        delay: 0,
+                        data: function(params) {
+                            let idsExcluidos = [];
+                            $('.producto-search').not(element).each(function() {
+                                if ($(this).val()) idsExcluidos.push($(this).val());
+                            });
+                            return { term: params.term || '', excluir: idsExcluidos };
+                        },
+                        processResults: function(data) { return { results: data }; }
+                    },
+                    templateResult: function(data) {
+                        if (!data.id) return data.text;
+                        if (data.disabled) return $('<div class="producto-sin-stock table-danger">' + data.text + '</div>');
+                        return data.text;
+                    }
+                });
+            }
+
+            function reindexarFilas() {
+                detallesContainer.find('.fila-detalle').each(function(index) {
+                    $(this).find('input, select').each(function() {
+                        const oldName = $(this).attr('name');
+                        if (!oldName) return;
+                        const prop = oldName.includes('.') ? oldName.split('.').pop() : oldName;
+                        $(this).attr('name', `Detalles[${index}].${prop}`);
+                    });
+                });
+                calcularResumen();
+            }
+
+            function calcularResumen() {
+                let total = 0;
+                let html = '';
+                detallesContainer.find('.fila-detalle').each(function() {
+                    const nombre = $(this).find('.producto-search option:selected').text().split(' ($')[0].trim();
+                    const cant = parseFloat($(this).find('.input-cantidad').val()) || 0;
+                    const costo = parseFloat($(this).find('.input-costo').val()) || 0;
+                    const sub = cant * costo;
+                    $(this).find('.subtotal-producto-display').text(sub.toLocaleString('es-AR', { style: 'currency', currency: 'ARS' }));
+                    if (cant > 0 && nombre) {
+                        total += sub;
+                        html += `<div class="summary-item"><span>${nombre} x${cant}</span><span>${sub.toLocaleString('es-AR', { style: 'currency', currency: 'ARS' })}</span></div>`;
+                    }
+                });
+                $('#resumen-items').html(html || '<p class="text-muted small">Sin productos aun.</p>');
+                $('#resumen-total').text(total.toLocaleString('es-AR', { style: 'currency', currency: 'ARS' }));
+            }
+
+            $('#btn-agregar').on('click', function() {
+                const ultimaFila = detallesContainer.find('.fila-detalle').last();
+                if (ultimaFila.length > 0 && !ultimaFila.find('.producto-search').val()) {
+                    $('#advertenciaAgregarProducto').text('Por favor seleccione un producto antes de agregar otro.');
+                    return;
+                }
+
+                $.get('@Url.Action("ObtenerVistaDetalleConsumo", "Consumo")', function(data) {
+                    const nuevaFila = $(data);
+                    detallesContainer.append(nuevaFila);
+                    inicializarSelect2Producto(nuevaFila.find('.producto-search'));
+                    $('#advertenciaAgregarProducto').text('');
+                    reindexarFilas();
+                });
+            });
+
+            detallesContainer.on('click', '.btn-eliminar-fila', function() {
+                $(this).closest('.fila-detalle').remove();
+                $('#advertenciaAgregarProducto').text('');
+                reindexarFilas();
+            });
+
+            detallesContainer.on('select2:select', '.producto-search', function(e) {
+                const row = $(this).closest('.fila-detalle');
+                row.find('.input-costo').val(e.params.data.costo || 0);
+                $('#advertenciaAgregarProducto').text('');
+                calcularResumen();
+            });
+
+            detallesContainer.on('input', '.input-cantidad, .input-costo', calcularResumen);
+            detallesContainer.find('.producto-search').each(function() { inicializarSelect2Producto($(this)); });
+            reindexarFilas();
+        });
+
+        $(document).on('select2:open', () => {
+            setTimeout(() => {
+                const searchField = document.querySelector('.select2-container--open .select2-search__field');
+                if (searchField) searchField.focus();
+            }, 50);
+        });
+    </script>
+}

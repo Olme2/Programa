@@ -14,29 +14,32 @@ public class Compras
     
     public DateOnly Fecha { get; set; }
     public string? Detalle { get; set; }
+    public bool Pagada { get; set; }
     public readonly List<DetallesCompras> _detallesCompras = new();
     public virtual IReadOnlyCollection<DetallesCompras> DetallesCompra => _detallesCompras.AsReadOnly();
     public virtual Proveedores Proveedor { get; set; } = null!;
     private Compras() { }
 
-    public Compras(int idProveedor, DateOnly fecha, string? detalle, List<DetallesCompras> detalles)
+    public Compras(int idProveedor, DateOnly fecha, string? detalle, List<DetallesCompras> detalles, bool pagada = false)
     {
         IdProveedor = idProveedor;
         Fecha = fecha;
         Detalle = detalle;
+        Pagada = pagada;
         _detallesCompras = detalles;
     }
 
     public Compras CrearDesdeViewModel(AltaCompraVM compraVM)
     {
         var detalles = compraVM.DetallesCompra.Select(DetallesCompras.CrearDesdeViewModel).ToList();
-        return new Compras(compraVM.IdProveedor, compraVM.Fecha, compraVM.Detalle, detalles);
+        return new Compras(compraVM.IdProveedor, compraVM.Fecha, compraVM.Detalle, detalles, compraVM.Pagada);
     }
     public void ActualizarDesdeViewModel(ModificarCompraVM compraVM)
     {
         IdProveedor = compraVM.IdProveedor;
         Fecha = compraVM.Fecha;
         Detalle = compraVM.Detalle;
+        Pagada = compraVM.Pagada;
         var detallesActualizados = compraVM.DetallesCompra.Select(DetallesCompras.CrearDesdeViewModel).ToList();
         LimpiarDetalles();
         foreach (var detalle in detallesActualizados)

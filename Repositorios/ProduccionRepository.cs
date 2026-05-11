@@ -33,6 +33,39 @@ public class ProduccionRepository : IProduccionRepository
         _context.SaveChanges();
     }
 
+    public void Actualizar(ModificarProduccionVM vm)
+    {
+        var egreso = _context.Ventas
+            .Include(v => v.DetallesVenta)
+            .FirstOrDefault(v => v.IdVenta == vm.IdProduccion && v.Tipo == "produccion");
+
+        if (egreso == null)
+            throw new InvalidOperationException("No se encontro el retiro de produccion.");
+
+        using var transaction = _context.Database.BeginTransaction();
+
+        egreso.Fecha = DateOnly.FromDateTime(vm.Fecha);
+        egreso.Hora = vm.Hora;
+        egreso.Detalle = vm.Detalle;
+
+        _context.DetallesVentas.RemoveRange(egreso.DetallesVenta);
+        _context.SaveChanges();
+
+        var detalles = vm.Detalles
+            .Where(d => d.IdProducto > 0 && d.Cantidad > 0)
+            .Select(d => DetallesVentas.CrearParaEgreso(d.IdProducto, d.Cantidad, d.CostoUnitario))
+            .ToList();
+
+        foreach (var detalle in detalles)
+        {
+            detalle.IdVenta = egreso.IdVenta;
+            _context.DetallesVentas.Add(detalle);
+        }
+
+        _context.SaveChanges();
+        transaction.Commit();
+    }
+
     public IEnumerable<ListarProduccionVM> ObtenerListado(DateTime fechaInicio, DateTime fechaFin)
     {
         var inicio = DateOnly.FromDateTime(fechaInicio);
@@ -50,6 +83,7 @@ public class ProduccionRepository : IProduccionRepository
                 Hora         = v.Hora,
                 Detalle      = v.Detalle,
                 Productos    = string.Join(", ", v.DetallesVenta.Select(d => d.Producto.Producto + " ×" + d.Cantidad.ToString("N3"))),
+                TotalCosto   = v.CalcularCostoTotal(),
             })
             .ToList();
     }

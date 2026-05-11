@@ -41,7 +41,7 @@ public class DashboardVM
     public int CantidadProducciones { get; set; }
 
     // Calculados
-    public decimal CostoTotal => TotalCostoVentas + TotalCostoConsumo + TotalCostoProduccion + TotalGastos;
+    public decimal CostoTotal => TotalCostoVentas + TotalCostoConsumo + TotalGastos;
     public decimal Ganancia => TotalVenta - CostoTotal;
     public decimal MargenPct => TotalVenta > 0 ? Math.Round(Ganancia / TotalVenta * 100, 1) : 0;
     public decimal CostoPct => TotalVenta > 0 ? Math.Round(CostoTotal / TotalVenta * 100, 1) : 0;

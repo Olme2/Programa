@@ -17,6 +17,9 @@ public class AltaCompraVM : IValidatableObject
     [StringLength(100, ErrorMessage = "El detalle no puede exceder los 100 caracteres.")]
     public string? Detalle { get; set; }
 
+    [Display(Name = "Ya fue pagada")]
+    public bool Pagada { get; set; }
+
     public List<DetalleCompraVM> DetallesCompra { get; set; }
     public List<ListarProductosVM> Productos { get; set; }
     public List<ListarProveedoresVM> Proveedores { get; set; }

@@ -94,7 +94,8 @@ public class ComprasController : Controller
             try
             {
                 var nuevaCompra = new Compras(viewModel.IdProveedor, viewModel.Fecha, viewModel.Detalle,
-                    viewModel.DetallesCompra.Select(d => new DetallesCompras(d.IdProducto, d.Cantidad, d.CostoUnitario)).ToList());
+                    viewModel.DetallesCompra.Select(d => new DetallesCompras(d.IdProducto, d.Cantidad, d.CostoUnitario)).ToList(),
+                    viewModel.Pagada);
 
                 _comprasRepo.Crear(nuevaCompra);
                 TempData["SuccessMessage"] = "Compra registrada con éxito.";
@@ -146,7 +147,8 @@ public class ComprasController : Controller
                     viewModel.IdProveedor,
                     viewModel.Fecha,
                     viewModel.Detalle,
-                    viewModel.DetallesCompra.Select(d => new DetallesCompras(d.IdProducto, d.Cantidad, d.CostoUnitario)).ToList());
+                    viewModel.DetallesCompra.Select(d => new DetallesCompras(d.IdProducto, d.Cantidad, d.CostoUnitario)).ToList(),
+                    viewModel.Pagada);
 
                 _comprasRepo.Actualizar(id, compraActualizada);
                 TempData["SuccessMessage"] = "Compra modificada con éxito.";
@@ -205,7 +207,7 @@ public class ComprasController : Controller
     private Compras MapearAltaViewModelAEntidad(AltaCompraVM viewModel)
     {
         var detalles = viewModel.DetallesCompra.Select(dc => DetallesCompras.CrearDesdeViewModel(dc)).ToList();
-        return new Compras(viewModel.IdProveedor, viewModel.Fecha, viewModel.Detalle, detalles);
+        return new Compras(viewModel.IdProveedor, viewModel.Fecha, viewModel.Detalle, detalles, viewModel.Pagada);
     }
     
     private Compras MapearModificarViewModelAEntidad(ModificarCompraVM viewModel)
@@ -218,7 +220,7 @@ public class ComprasController : Controller
             return detalle;
         }).ToList();
 
-        var compra = new Compras(viewModel.IdProveedor, viewModel.Fecha, viewModel.Detalle, detallesActualizados);
+        var compra = new Compras(viewModel.IdProveedor, viewModel.Fecha, viewModel.Detalle, detallesActualizados, viewModel.Pagada);
         return compra;
     }
 

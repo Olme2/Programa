@@ -56,20 +56,23 @@
                         <td>@c.Hora.ToString("HH:mm")</td>
                         <td>@Html.Raw(c.Productos.Replace(", ", "<br>"))</td>
                         <td class="text-danger fw-bold">$@c.TotalCosto.ToString("N2", CG.CulturaES)</td>
-                        <td><span title="@c.Detalle">@(c.Detalle?.Length > 20 ? c.Detalle.Substring(0, 20) + "…" : c.Detalle ?? "-")</span></td>
+                        <td><span title="@c.Detalle">@(c.Detalle?.Length > 20 ? c.Detalle.Substring(0, 20) + "..." : c.Detalle ?? "-")</span></td>
                         <td>
-                            <form asp-action="Eliminar" method="post" onsubmit="return confirm('¿Eliminar este consumo? El stock será devuelto.')">
-                                @Html.AntiForgeryToken()
-                                <input type="hidden" name="id" value="@c.IdConsumo" />
-                                <button type="submit" class="btn btn-danger btn-sm">Eliminar</button>
-                            </form>
+                            <div class="action-buttons">
+                                <a asp-action="Modificar" asp-route-id="@c.IdConsumo" class="btn btn-warning btn-sm">Modificar</a>
+                                <form asp-action="Eliminar" method="post" onsubmit="return confirm('Eliminar este consumo? El stock sera devuelto.')">
+                                    @Html.AntiForgeryToken()
+                                    <input type="hidden" name="id" value="@c.IdConsumo" />
+                                    <button type="submit" class="btn btn-danger btn-sm">Eliminar</button>
+                                </form>
+                            </div>
                         </td>
                     </tr>
                 }
             }
             else
             {
-                <tr><td colspan="6" class="text-center text-muted py-3">No hay consumos en el período seleccionado.</td></tr>
+                <tr><td colspan="6" class="text-center text-muted py-3">No hay consumos en el periodo seleccionado.</td></tr>
             }
         </tbody>
     </table>

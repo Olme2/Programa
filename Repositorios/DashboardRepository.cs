@@ -20,8 +20,11 @@ public class DashboardRepository : IDashboardRepository
 
         // ── 1. Ventas reales ─────────────────────────────────────────────
         var ventas = _context.Ventas
-            .Include(v => v.DetallesVenta)
+            .Include(v => v.DetallesVenta).ThenInclude(d => d.Producto)
             .Include(v => v.VentaPromociones)
+                .ThenInclude(vp => vp.Promocion)
+                    .ThenInclude(p => p.DetallesPromocion)
+                        .ThenInclude(dp => dp.Producto)
             .Where(v => v.Tipo == "venta" && v.Fecha >= inicio && v.Fecha <= fin)
             .AsEnumerable()
             .ToList();
@@ -69,10 +72,9 @@ public class DashboardRepository : IDashboardRepository
                     var diaOnly = DateOnly.FromDateTime(dia);
                     var vDia = ventas.Where(v => v.Fecha == diaOnly);
                     var cDia = consumos.Where(v => v.Fecha == diaOnly).Sum(v => v.CalcularCostoTotal());
-                    var pDia = producciones.Where(v => v.Fecha == diaOnly).Sum(v => v.CalcularCostoTotal());
                     var gDia = gastosList.Where(g => g.Fecha == diaOnly).Sum(g => g.Monto);
                     var venta = vDia.Sum(v => v.CalcularPrecioTotal());
-                    var costo = vDia.Sum(v => v.CalcularCostoTotal()) + cDia + pDia + gDia;
+                    var costo = vDia.Sum(v => v.CalcularCostoTotal()) + cDia + gDia;
                     return new VM.PuntoTemporalVM { Label = dia.ToString("dd/MM"), Venta = venta, Costo = costo };
                 })
                 .ToList();
@@ -89,10 +91,9 @@ public class DashboardRepository : IDashboardRepository
                 var semF = DateOnly.FromDateTime(cur.AddDays(6));
                 var vSem = ventas.Where(v => v.Fecha >= semI && v.Fecha <= semF);
                 var cSem = consumos.Where(v => v.Fecha >= semI && v.Fecha <= semF).Sum(v => v.CalcularCostoTotal());
-                var pSem = producciones.Where(v => v.Fecha >= semI && v.Fecha <= semF).Sum(v => v.CalcularCostoTotal());
                 var gSem = gastosList.Where(g => g.Fecha >= semI && g.Fecha <= semF).Sum(g => g.Monto);
                 var venta = vSem.Sum(v => v.CalcularPrecioTotal());
-                var costo = vSem.Sum(v => v.CalcularCostoTotal()) + cSem + pSem + gSem;
+                var costo = vSem.Sum(v => v.CalcularCostoTotal()) + cSem + gSem;
                 semanas.Add(new VM.PuntoTemporalVM { Label = cur.ToString("dd/MM"), Venta = venta, Costo = costo });
                 cur = cur.AddDays(7);
             }
@@ -109,10 +110,9 @@ public class DashboardRepository : IDashboardRepository
                 var mesF = DateOnly.FromDateTime(cur.AddMonths(1).AddDays(-1));
                 var vMes = ventas.Where(v => v.Fecha >= mesI && v.Fecha <= mesF);
                 var cMes = consumos.Where(v => v.Fecha >= mesI && v.Fecha <= mesF).Sum(v => v.CalcularCostoTotal());
-                var pMes = producciones.Where(v => v.Fecha >= mesI && v.Fecha <= mesF).Sum(v => v.CalcularCostoTotal());
                 var gMes = gastosList.Where(g => g.Fecha >= mesI && g.Fecha <= mesF).Sum(g => g.Monto);
                 var venta = vMes.Sum(v => v.CalcularPrecioTotal());
-                var costo = vMes.Sum(v => v.CalcularCostoTotal()) + cMes + pMes + gMes;
+                var costo = vMes.Sum(v => v.CalcularCostoTotal()) + cMes + gMes;
                 meses.Add(new VM.PuntoTemporalVM { Label = cur.ToString("MMM yy"), Venta = venta, Costo = costo });
                 cur = cur.AddMonths(1);
             }
@@ -120,17 +120,49 @@ public class DashboardRepository : IDashboardRepository
         }
 
         // ── 6. Top 5 productos por ingresos ─────────────────────────────
-        var topProductos = _context.Ventas
-            .Include(v => v.DetallesVenta).ThenInclude(d => d.Producto)
-            .Where(v => v.Tipo == "venta" && v.Fecha >= inicio && v.Fecha <= fin)
-            .AsEnumerable()
+        var movimientosProductos = new List<VM.TopProductoVM>();
+
+        movimientosProductos.AddRange(ventas
             .SelectMany(v => v.DetallesVenta)
-            .GroupBy(d => d.Producto.Producto)
+            .Select(d => new VM.TopProductoVM
+            {
+                Producto = d.Producto.Producto,
+                Cantidad = d.Cantidad,
+                TotalVenta = d.PrecioUnitario * d.Cantidad,
+            }));
+
+        foreach (var ventaPromo in ventas.SelectMany(v => v.VentaPromociones))
+        {
+            var detallesPromo = ventaPromo.Promocion.DetallesPromocion
+                .Where(d => d.Cantidad > 0)
+                .ToList();
+
+            if (!detallesPromo.Any())
+                continue;
+
+            var precioListaPromo = detallesPromo.Sum(d => d.Producto.Precio * d.Cantidad);
+            foreach (var detallePromo in detallesPromo)
+            {
+                var proporcion = precioListaPromo > 0
+                    ? (detallePromo.Producto.Precio * detallePromo.Cantidad) / precioListaPromo
+                    : 1m / detallesPromo.Count;
+
+                movimientosProductos.Add(new VM.TopProductoVM
+                {
+                    Producto = detallePromo.Producto.Producto,
+                    Cantidad = ventaPromo.Cantidad * detallePromo.Cantidad,
+                    TotalVenta = ventaPromo.PrecioPromo * ventaPromo.Cantidad * proporcion,
+                });
+            }
+        }
+
+        var topProductos = movimientosProductos
+            .GroupBy(d => d.Producto)
             .Select(g => new VM.TopProductoVM
             {
                 Producto   = g.Key,
                 Cantidad   = g.Sum(d => d.Cantidad),
-                TotalVenta = g.Sum(d => d.PrecioUnitario * d.Cantidad),
+                TotalVenta = g.Sum(d => d.TotalVenta),
             })
             .OrderByDescending(x => x.TotalVenta)
             .Take(5)
@@ -141,7 +173,6 @@ public class DashboardRepository : IDashboardRepository
         {
             new() { Etiqueta = "Costo de Ventas",     Monto = totalCostoVentas },
             new() { Etiqueta = "Consumo Interno",      Monto = totalCostoConsumo },
-            new() { Etiqueta = "Producción",           Monto = totalCostoProduccion },
             new() { Etiqueta = "Gastos Extras",        Monto = totalGastos },
         }.Where(d => d.Monto > 0).ToList();
 

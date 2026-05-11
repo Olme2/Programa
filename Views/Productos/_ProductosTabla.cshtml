@@ -3,8 +3,7 @@
 @{
     var busqueda = ViewData["BusquedaActual"] as string;
 
-    // Función para resaltar las coincidencias de la búsqueda.
-    Func<string, HtmlString> ResaltarCoincidencia = (texto) => 
+    Func<string, HtmlString> ResaltarCoincidencia = (texto) =>
     {
         if (string.IsNullOrEmpty(busqueda) || string.IsNullOrEmpty(texto) || !texto.Contains(busqueda, StringComparison.CurrentCultureIgnoreCase))
         {
@@ -29,16 +28,18 @@
             <td>@producto.PorcentajeGanancia.ToString("N2", CG.CulturaES)%</td>
             <td>@producto.VentaSemanal.ToString("N3", CG.CulturaES)</td>
             <td>
-                <a asp-action="Estadisticas" asp-route-id="@producto.IdProducto" class="btn btn-info btn-sm" title="Ver estadísticas">📊</a>
-                <a asp-action="Modificar" asp-route-id="@producto.IdProducto" class="btn btn-warning btn-sm">Modificar</a>
-                @if (producto.EsEliminable)
-                {
-                    <a asp-action="Eliminar" asp-route-id="@producto.IdProducto" class="btn btn-danger btn-sm">Eliminar</a>
-                }
-                else
-                {
-                    <a class="btn btn-secondary btn-sm disabled" title="No se puede eliminar, está en uso">Eliminar</a>
-                }
+                <div class="action-buttons">
+                    <a asp-action="Estadisticas" asp-route-id="@producto.IdProducto" class="btn btn-info btn-sm" title="Ver estadisticas">Info</a>
+                    <a asp-action="Modificar" asp-route-id="@producto.IdProducto" class="btn btn-warning btn-sm">Modificar</a>
+                    @if (producto.EsEliminable)
+                    {
+                        <a asp-action="Eliminar" asp-route-id="@producto.IdProducto" class="btn btn-danger btn-sm">Eliminar</a>
+                    }
+                    else
+                    {
+                        <a class="btn btn-secondary btn-sm disabled" title="No se puede eliminar, esta en uso">Eliminar</a>
+                    }
+                </div>
             </td>
         </tr>
     }

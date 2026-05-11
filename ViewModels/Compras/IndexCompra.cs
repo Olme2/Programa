@@ -9,7 +9,7 @@ public class IndexComprasVM
     public int? IdProveedor { get; set; }
 
     [DataType(DataType.Date)]
-    public DateTime FechaInicio { get; set; } = DateTime.Now.AddMonths(-1);
+    public DateTime FechaInicio { get; set; } = DateTime.Today;
 
     [DataType(DataType.Date)]
     public DateTime FechaFin { get; set; } = DateTime.Today;
@@ -26,7 +26,7 @@ public class IndexComprasVM
     }
     public IndexComprasVM(IndexComprasVM filtro)
     {
-        FechaInicio = filtro.FechaInicio == default ? DateTime.Now.AddMonths(-1) : filtro.FechaInicio;
+        FechaInicio = filtro.FechaInicio == default ? DateTime.Today : filtro.FechaInicio;
         FechaFin = filtro.FechaFin == default ? DateTime.Today : filtro.FechaFin;
         IdProveedor = filtro.IdProveedor;
     }

@@ -1,0 +1,39 @@
+@model ConsumoVM.DetalleConsumoVM
+@{
+    var cantidadValue = Model.Cantidad.ToString(System.Globalization.CultureInfo.InvariantCulture);
+    var costoValue = Model.CostoUnitario.ToString(System.Globalization.CultureInfo.InvariantCulture);
+}
+
+<div class="row detalle-item-producto fila-detalle align-items-end mb-3 p-2 border rounded">
+    <div class="col-lg-6 col-md-12">
+        <label class="form-label">Producto</label>
+        <select asp-for="IdProducto" class="form-control producto-search">
+            @if (Model.IdProducto > 0)
+            {
+                <option value="@Model.IdProducto" selected>@Model.NombreProducto</option>
+            }
+        </select>
+        <span asp-validation-for="IdProducto" class="text-danger"></span>
+    </div>
+
+    <div class="col-lg-2 col-md-4">
+        <label asp-for="Cantidad" class="form-label">Cantidad</label>
+        <input asp-for="Cantidad" type="number" step="0.001" min="0.001" class="form-control input-cantidad" value="@(cantidadValue != "0" ? cantidadValue : "")" />
+        <span asp-validation-for="Cantidad" class="text-danger"></span>
+    </div>
+
+    <div class="col-lg-2 col-md-4">
+        <label asp-for="CostoUnitario" class="form-label">Costo U.</label>
+        <input asp-for="CostoUnitario" type="number" step="0.01" min="0" class="form-control input-costo" value="@(costoValue != "0" ? costoValue : "")" readonly />
+        <span asp-validation-for="CostoUnitario" class="text-danger"></span>
+    </div>
+
+    <div class="col-lg-1 col-md-3">
+        <label class="form-label">Subtotal</label>
+        <p class="form-control-plaintext fw-bold subtotal-producto-display">$0,00</p>
+    </div>
+
+    <div class="col-lg-1 col-md-1 text-end">
+        <button type="button" class="btn btn-danger btn-sm btn-eliminar-fila" title="Eliminar">&times;</button>
+    </div>
+</div>

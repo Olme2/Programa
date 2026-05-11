@@ -33,6 +33,39 @@ public class ConsumoRepository : IConsumoRepository
         _context.SaveChanges();
     }
 
+    public void Actualizar(ModificarConsumoVM vm)
+    {
+        var egreso = _context.Ventas
+            .Include(v => v.DetallesVenta)
+            .FirstOrDefault(v => v.IdVenta == vm.IdConsumo && v.Tipo == "consumo");
+
+        if (egreso == null)
+            throw new InvalidOperationException("No se encontro el consumo.");
+
+        using var transaction = _context.Database.BeginTransaction();
+
+        egreso.Fecha = DateOnly.FromDateTime(vm.Fecha);
+        egreso.Hora = vm.Hora;
+        egreso.Detalle = vm.Detalle;
+
+        _context.DetallesVentas.RemoveRange(egreso.DetallesVenta);
+        _context.SaveChanges();
+
+        var detalles = vm.Detalles
+            .Where(d => d.IdProducto > 0 && d.Cantidad > 0)
+            .Select(d => DetallesVentas.CrearParaEgreso(d.IdProducto, d.Cantidad, d.CostoUnitario))
+            .ToList();
+
+        foreach (var detalle in detalles)
+        {
+            detalle.IdVenta = egreso.IdVenta;
+            _context.DetallesVentas.Add(detalle);
+        }
+
+        _context.SaveChanges();
+        transaction.Commit();
+    }
+
     public IEnumerable<ListarConsumoVM> ObtenerListado(DateTime fechaInicio, DateTime fechaFin)
     {
         var inicio = DateOnly.FromDateTime(fechaInicio);

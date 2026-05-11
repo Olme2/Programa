@@ -14,7 +14,7 @@
                 </div>
 
                 <div class="card-body row">
-                    <div class="col-md-6 mb-3">
+                    <div class="col-md-4 mb-3">
                         <label asp-for="IdProveedor" class="form-label"></label>
                         <select asp-for="IdProveedor" class="form-select" id="IdProveedor">
                             <option value="">Seleccione un Proveedor</option>
@@ -26,10 +26,18 @@
                         <span asp-validation-for="IdProveedor" class="text-danger"></span>
                     </div>
 
-                    <div class="col-md-6 mb-3">
+                    <div class="col-md-4 mb-3">
                         <label asp-for="Fecha" class="form-label"></label>
                         <input asp-for="Fecha" type="date" class="form-control" />
                         <span asp-validation-for="Fecha" class="text-danger"></span>
+                    </div>
+
+                    <div class="col-md-4 mb-3">
+                        <label asp-for="Pagada" class="form-label"></label>
+                        <div class="form-check form-switch pt-2">
+                            <input asp-for="Pagada" class="form-check-input" type="checkbox" />
+                            <label asp-for="Pagada" class="form-check-label">No sumar deuda al proveedor</label>
+                        </div>
                     </div>
                 </div>
             </div>
